@@ -21,7 +21,7 @@
             <span class="material-symbols-outlined" style="font-size:15px">download</span>
             PDF 저장
         </button>
-        <button class="btn-pdf-close" @click="window.close()">
+        <button class="btn-pdf-close" @click="closePdf">
             <span class="material-symbols-outlined" style="font-size:15px">close</span>
             닫기
         </button>
@@ -306,7 +306,9 @@
                }
            });
 
-           return { store, codeStore, downloadPdf, leaveTypeName };
+           const closePdf = () => { window.close(); };
+
+           return { store, codeStore, downloadPdf, leaveTypeName, closePdf };
        }
    });
 
