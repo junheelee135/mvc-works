@@ -1,0 +1,218 @@
+@charset "UTF-8";
+
+/* Vue 마운트 전 깜박임 방지 */
+[v-cloak] { display: none; }
+
+/* ── 문서유형 관리 전용 스타일 ── */
+.doctype-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+.doctype-header h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #3a3f51;
+    margin: 0;
+}
+.doctype-header h4 .material-symbols-outlined {
+    font-size: 22px;
+    color: #4e73df;
+}
+.doctype-header p {
+    font-size: 12px;
+    color: #9aa0b4;
+    margin: 4px 0 0 30px;
+}
+
+.btn-add-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1bbfb0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s;
+}
+.btn-add-type:hover { background: #17ada0; }
+.btn-add-type .material-symbols-outlined { font-size: 18px; }
+
+/* 통계 카드 */
+.stat-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-item {
+    background: #fff;
+    border: 1px solid #e6eaf4;
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: center;
+    flex: 1;
+}
+.stat-item .stat-num {
+    font-size: 26px;
+    font-weight: 700;
+}
+.stat-item .stat-num.total { color: #4e73df; }
+.stat-item .stat-num.active { color: #1a9660; }
+.stat-item .stat-num.inactive { color: #9aa0b4; }
+.stat-item .stat-label {
+    font-size: 12px;
+    color: #9aa0b4;
+    margin-top: 4px;
+}
+
+/* 테이블 헤더 */
+.doctype-table-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #e6eaf4;
+    font-size: 14px;
+    font-weight: 600;
+    color: #3a3f51;
+}
+
+/* 테이블 */
+.doctype-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.doctype-table thead tr {
+    background: #f8f9fd;
+    border-bottom: 2px solid #e6eaf4;
+}
+.doctype-table thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7b82a0;
+    white-space: nowrap;
+}
+.doctype-table tbody tr {
+    border-bottom: 1px solid #f0f2f9;
+    transition: background .12s;
+}
+.doctype-table tbody tr:hover { background: #f6f8ff; }
+.doctype-table tbody tr:last-child { border-bottom: none; }
+.doctype-table tbody td {
+    padding: 13px 14px;
+    color: #3a3f51;
+    vertical-align: middle;
+}
+.row-disabled { opacity: 0.5; }
+
+.type-code-badge {
+    background: #eef1fd;
+    color: #4e73df;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+}
+.use-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.use-badge.on { background: #e0f5ef; color: #1a9660; }
+.use-badge.off { background: #f0f2f5; color: #9aa0b4; }
+
+.btn-edit, .btn-del {
+    background: none;
+    border: 1px solid #e6eaf4;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-edit { color: #4e73df; }
+.btn-edit:hover { background: #f0f3ff; border-color: #4e73df; }
+.btn-del { color: #d93025; margin-left: 4px; }
+.btn-del:hover { background: #fff0f0; border-color: #d93025; }
+
+.table-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #f0f2f9;
+    font-size: 12px;
+    color: #9aa0b4;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.table-footer .material-symbols-outlined { font-size: 14px; }
+
+/* ── 모달 오버라이드 ── */
+.modal-content {
+    border-radius: 10px;
+    border: 1px solid #e6eaf4;
+}
+.modal-header { border-bottom: 1px solid #e6eaf4; padding: 16px 20px; }
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #3a3f51;
+}
+.modal-title .material-symbols-outlined { font-size: 20px; color: #4e73df; }
+.modal-body label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3a3f51;
+    margin-bottom: 6px;
+}
+.modal-body input[type="text"],
+.modal-body input[type="number"] {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #3a3f51;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color .15s;
+}
+.modal-body input[type="text"]:focus,
+.modal-body input[type="number"]:focus { border-color: #4e73df; }
+.modal-footer { border-top: 1px solid #e6eaf4; padding: 12px 20px; }
+
+.btn-modal-cancel {
+    background: #fff;
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #7b82a0;
+    cursor: pointer;
+}
+.btn-modal-cancel:hover { background: #f8f9fc; }
+.btn-modal-save {
+    background: #4e73df;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+.btn-modal-save:hover { background: #3a5abf; }

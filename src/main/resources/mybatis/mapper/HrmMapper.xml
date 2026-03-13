@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mvc.app.mapper.HrmMapper">
+
+    <!-- ════════════════════════════════════════
+         ResultMap — employee1 + employee2 JOIN
+    ════════════════════════════════════════ -->
+    <resultMap id="employeeResultMap" type="com.mvc.app.domain.dto.HrmDto">
+        <!-- employee1 -->
+        <id     property="empId"              column="empId"/>
+        <result property="password"           column="password"/>
+        <result property="levelCode"          column="levelCode"/>
+        <result property="enabled"            column="enabled"/>
+        <result property="empStatusCode"      column="empStatusCode"/>
+        <result property="lastLoginDate"      column="lastLoginDate"/>
+        <result property="loginFailureCount"  column="loginFailureCount"/>
+        <result property="e1RegDate"          column="e1RegDate"/>
+        <result property="updateDate"         column="updateDate"/>
+        <!-- employee2 -->
+        <result property="name"               column="name"/>
+        <result property="birth"              column="birth"/>
+        <result property="profilePhoto"       column="profilePhoto"/>
+        <result property="tel"                column="tel"/>
+        <result property="zip"                column="zip"/>
+        <result property="addr1"              column="addr1"/>
+        <result property="addr2"              column="addr2"/>
+        <result property="email"              column="email"/>
+        <result property="ipAddr"             column="ipAddr"/>
+        <result property="hireDate"           column="hireDate"/>
+        <result property="deptCode"           column="deptCode"/>
+        <result property="gradeCode"          column="gradeCode"/>
+        <!-- 화면 표시용 -->
+        <result property="deptName"           column="deptName"/>
+        <result property="gradeName"          column="gradeName"/>
+        <result property="regEmpId"           column="regEmpId"/>
+        <result property="e2RegDate"          column="e2RegDate"/>
+        <!-- 권한, 프로젝트 참여명 -->
+        <result property="projectNames"       column="projectNames"/>
+        <result property="authorityCode" column="authorityCode"/>
+    	<result property="authorityName" column="authorityName"/>
+    </resultMap>
+
+    <!--
+         공통 검색 조건
+         searchParams key:
+           name, empNo, project,
+           empStatusCode, levelCode,
+           pmoY(isPmo='Y'), pmoN(isPmo='N') 
+    -->
+    <sql id="searchWhere">
+        <where>
+            <if test="name != null and name != ''">
+                AND e2.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="empNo != null and empNo != ''">
+                AND e1.empId LIKE '%' || #{empNo} || '%'
+            </if>
+            <if test="empStatusCode != null and empStatusCode != ''">
+                AND e1.empStatusCode = #{empStatusCode}
+            </if>
+            <if test="levelCode != null">
+                AND e1.levelCode = #{levelCode}
+            </if>
+            <!-- 권한코드 검색 : employeeAuthority -->
+            <if test="authorityCode != null and authorityCode != ''">
+                AND EXISTS (
+                    SELECT 1 FROM employeeAuthority ea
+                    WHERE  ea.empId    = e1.empId
+                    AND    ea.authority = #{authorityCode}
+                )
+            </if>
+            <!-- 부서코드 검색 -->
+            <if test="deptCode != null and deptCode != ''">
+                AND e2.deptCode = #{deptCode}
+            </if>
+            <!-- 직급코드 검색 -->
+            <if test="gradeCode != null and gradeCode != ''">
+                AND e2.gradeCode = #{gradeCode}
+            </if>
+            <!-- 프로젝트명 검색 -->
+            <if test="project != null and project != ''">
+                AND EXISTS (
+                    SELECT 1
+                    FROM   empProject ep
+                    JOIN   project    pj ON ep.projectId = pj.projectId
+                    WHERE  ep.empId   = e1.empId
+                    AND    pj.title  LIKE '%' || #{project} || '%'
+                )
+            </if>
+            <!-- PMO Y 검색 -->
+            <if test="pmoY == true">
+                AND EXISTS (
+                    SELECT 1
+                    FROM   empProject ep
+                    WHERE  ep.empId = e1.empId
+                    AND    ep.isPmo = 'Y'
+                )
+            </if>
+            <!-- PMO N 검색 -->
+            <if test="pmoN == true">
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM   empProject ep
+                    WHERE  ep.empId = e1.empId
+                    AND    ep.isPmo = 'Y'
+                )
+            </if>
+            	AND e1.drawCode is null
+        </where>
+    </sql>
+
+    <!-- 공통 SELECT 컬럼 목록 -->
+    <sql id="selectColumns">
+        e1.empId,
+        e1.password,
+        e1.levelCode,
+        e1.enabled,
+        e1.empStatusCode,
+        TO_CHAR(e1.lastLoginDate, 'YYYY-MM-DD HH24:MI') AS lastLoginDate,
+        e1.loginFailureCount,
+        TO_CHAR(e1.regDate,    'YYYY-MM-DD') AS e1RegDate,
+        TO_CHAR(e1.updateDate, 'YYYY-MM-DD') AS updateDate,
+        e2.name,
+        TO_CHAR(e2.birth,    'YYYY-MM-DD') AS birth,
+        e2.profilePhoto,
+        e2.tel,
+        e2.zip,
+        e2.addr1,
+        e2.addr2,
+        e2.email,
+        e2.ipAddr,
+        ea.authority AS authorityCode,
+        TO_CHAR(e2.hireDate, 'YYYY-MM-DD') AS hireDate,
+        e2.deptCode,
+        e2.gradeCode,
+        (SELECT cc.codeName FROM COMMONCODE cc
+         WHERE cc.codeGroup = 'DEPT' AND cc.code = e2.deptCode) AS deptName,
+        (SELECT cc.codeName FROM COMMONCODE cc
+         WHERE cc.codeGroup = 'RANK' AND cc.code = e2.gradeCode) AS gradeName,
+        (SELECT cc.codeName FROM COMMONCODE cc
+         WHERE cc.codeGroup = 'AUTHORITY' AND cc.code = ea.authority) AS authorityName,
+        (SELECT cc.codeName FROM COMMONCODE cc
+         WHERE cc.codeGroup = 'EMPSTATUS' AND cc.code = e1.empstatuscode) AS empStatusName,
+        e2.regEmpId,
+        TO_CHAR(e2.regDate,  'YYYY-MM-DD') AS e2RegDate,
+        (
+            SELECT LISTAGG(pj.title, ', ')
+                   WITHIN GROUP (ORDER BY pj.title)
+            FROM   empProject ep
+            JOIN   project    pj ON ep.projectId = pj.projectId
+            WHERE  ep.empId = e1.empId
+        ) AS projectNames
+    </sql>
+
+    <!-- 전체 건수 -->
+    <select id="dataCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   employee1 e1
+        JOIN   employee2 e2 ON e1.empId = e2.empId
+        <include refid="searchWhere"/>
+    </select>
+
+    <!-- 목록 조회 -->
+    <select id="listEmployee" parameterType="map" resultMap="employeeResultMap">
+        SELECT
+            <include refid="selectColumns"/>
+        FROM   employee1 e1
+        JOIN   employee2 e2 ON e1.empId = e2.empId
+        JOIN   employeeAuthority ea ON e1.empid = ea.empid
+        <include refid="searchWhere"/>
+        <choose>
+            <when test="sortCol != null and sortCol != ''">
+                <choose>
+                    <when test="sortCol == 'name'">    ORDER BY e2.name       </when>
+                    <when test="sortCol == 'empNo'">   ORDER BY e1.empId      </when>
+                    <when test="sortCol == 'dept'">    ORDER BY e2.deptCode   </when>
+                    <when test="sortCol == 'rank'">    ORDER BY e2.gradeCode  </when>
+                    <when test="sortCol == 'status'">  ORDER BY e1.empStatusCode </when>
+                    <otherwise>                        ORDER BY e1.empId      </otherwise>
+                </choose>
+                <choose>
+                    <when test="sortDir == 'DESC'"> DESC </when>
+                    <otherwise>                     ASC  </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                ORDER BY e1.empId DESC
+            </otherwise>
+        </choose>
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="findById" parameterType="string" resultMap="employeeResultMap">
+        SELECT
+            <include refid="selectColumns"/>
+        FROM   employee1 e1
+        JOIN   employee2 e2 ON e1.empId = e2.empId
+        WHERE  e1.empId = #{empId}
+    </select>
+
+    <!-- 사원번호 중복 체크 -->
+    <select id="findByEmpId)" parameterType="string" resultMap="employeeResultMap">
+        SELECT empId
+        FROM   employee1
+        WHERE  empId = #{empId}
+    </select>
+
+    <!-- 
+    가장 큰 사원번호 조회 (사원 번호 자동채번용)
+               empId 는 VARCHAR2(11)
+               MAX(TO_NUMBER(empId)) 로 최댓값을 구한 뒤 +1 반환
+    -->
+    <select id="findMaxEmpId" resultType="string">
+        SELECT NVL(MAX(TO_NUMBER(empId DEFAULT 0 ON CONVERSION ERROR)), 0)
+		FROM   employee1
+    </select>
+
+    <!--
+    직원 등록 — employee1 먼저 INSERT 참조제약
+    -->
+    <insert id="insertEmployee1" parameterType="com.mvc.app.domain.dto.HrmDto">
+        INSERT INTO employee1
+            (empId, password, levelCode, enabled, empStatusCode, regDate, updateDate)
+        VALUES
+            (#{empId}, #{password},
+             #{levelCode,   jdbcType=NUMERIC},
+             #{enabled,     jdbcType=NUMERIC},
+             #{empStatusCode, jdbcType=CHAR},
+             SYSDATE, SYSDATE)
+    </insert>
+
+    <!--
+    직원 등록 — employee2 INSERT
+    -->
+    <insert id="insertEmployee2" parameterType="com.mvc.app.domain.dto.HrmDto">
+        INSERT INTO employee2
+            (empId, name, birth, profilePhoto, tel,
+             zip, addr1, addr2, email,
+             hireDate, deptCode, gradeCode, regEmpId, regDate)
+        VALUES
+            (#{empId}, #{name},
+             #{birth,        jdbcType=DATE},
+             #{profilePhoto, jdbcType=VARCHAR},
+             #{tel,          jdbcType=VARCHAR},
+             #{zip,          jdbcType=VARCHAR},
+             #{addr1,        jdbcType=VARCHAR},
+             #{addr2,        jdbcType=VARCHAR},
+             #{email,        jdbcType=VARCHAR},
+             SYSDATE,
+             #{deptCode,     jdbcType=VARCHAR},
+             #{gradeCode,    jdbcType=VARCHAR},
+             #{regEmpId,     jdbcType=VARCHAR},
+             SYSDATE)
+    </insert>
+    
+    <!-- 직원 권한 등록 -->
+    <insert id="insertAuthority" parameterType="com.mvc.app.domain.dto.HrmDto">
+        INSERT INTO employeeAuthority
+            (empId, authority)
+        VALUES
+            (
+            #{empId},
+            #{authorityCode}
+             )
+    </insert>
+
+    <!-- employee1 수정 -->
+    <update id="updateEmployee1" parameterType="com.mvc.app.domain.dto.HrmDto">
+        UPDATE employee1
+        SET
+            updateDate = SYSDATE
+            <if test="password      != null and password      != ''">, password      = #{password}      </if>
+            <if test="levelCode     != null">                         , levelCode     = #{levelCode}     </if>
+            <if test="enabled       != null">                         , enabled       = #{enabled}       </if>
+            <if test="empStatusCode != null and empStatusCode != ''">, empStatusCode = #{empStatusCode} </if>
+        WHERE empId = #{empId}
+    </update>
+
+    <!-- employee2 수정 -->
+    <update id="updateEmployee2" parameterType="com.mvc.app.domain.dto.HrmDto">
+        UPDATE employee2
+        SET
+            name        = #{name}
+            <if test="birth       != null and birth       != ''">, birth       = #{birth}       </if>
+            <if test="profilePhoto!= null">                       , profilePhoto= #{profilePhoto}</if>
+            <if test="tel         != null">                       , tel         = #{tel}         </if>
+            <if test="zip         != null">                       , zip         = #{zip}         </if>
+            <if test="addr1       != null">                       , addr1       = #{addr1}       </if>
+            <if test="addr2       != null">                       , addr2       = #{addr2}       </if>
+            <if test="email       != null">                       , email       = #{email}       </if>
+            <if test="hireDate    != null and hireDate    != ''">, hireDate    = #{hireDate}    </if>
+            <if test="deptCode    != null">                       , deptCode    = #{deptCode}    </if>
+            <if test="gradeCode   != null">                       , gradeCode   = #{gradeCode}   </if>
+        WHERE empId = #{empId}
+    </update>
+    
+    <update id="updateAuthority" parameterType="com.mvc.app.domain.dto.HrmDto">
+        UPDATE employeeAuthority
+        SET authority = #{authorityCode}
+        WHERE empId = #{empId}
+    </update>
+
+    <!-- 단건 탈퇴 — employee1 drawCode 탈퇴여부 'y' 처리 -->
+    <update id="deleteEmployee1" parameterType="string">
+        UPDATE employee1 SET drawCode = 'y' WHERE empId = #{empId}
+    </update>
+
+    <!-- 벌크 삭제 — employee1 drawCode 탈퇴여부 'y' 처리-->
+    <update id="deleteEmployees1" parameterType="list">
+        UPDATE employee1 SET drawCode = 'y'
+        WHERE empId IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 공통코드 조회 — codeGroup 별 code/codeName 목록
+         반환 Map key : code, codeName 
+    -->
+    <select id="listCommonCode" parameterType="string" resultType="map">
+        SELECT code, codename AS codeName
+        FROM   commoncode
+        WHERE  codegroup = #{codeGroup}
+        ORDER BY code
+    </select>
+
+</mapper>

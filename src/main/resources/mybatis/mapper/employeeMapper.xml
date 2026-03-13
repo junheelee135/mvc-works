@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mvc.app.mapper.EmployeeMapper">
+	<!-- employee1 + employee2 동시 입력 -->
+	<insert id="insertEmployee12"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		INSERT ALL
+		INTO employee1(empId, password, levelCode,
+		enabled, regDate, updateDate, loginFailureCount)
+		VALUES (#{empId},
+		#{password, jdbcType=VARCHAR}, #{levelCode}, 1, SYSDATE, SYSDATE, 0)
+		INTO employee2(empId, name, birth, email, tel,
+		profilePhoto, zip,
+		addr1, addr2, ipAddr)
+		VALUES (#{empId}, #{name},
+		TO_DATE(#{birth},
+		'YYYY-MM-DD'),
+		#{email, jdbcType=VARCHAR}, #{tel, jdbcType=VARCHAR},
+		#{profilePhoto, jdbcType=VARCHAR}, #{zip, jdbcType=VARCHAR},
+		#{addr1,
+		jdbcType=VARCHAR}, #{addr2, jdbcType=VARCHAR},
+		#{ipAddr,
+		jdbcType=VARCHAR})
+		SELECT * FROM dual
+	</insert>
+
+	<!-- 재직상태 추가 -->
+	<insert id="insertEmployeeStatus"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		INSERT INTO employeeStatus(num, empId, empStatusCode,
+		memo, regDate, regEmpId)
+		VALUES (employeeStatus_seq.NEXTVAL, #{empId},
+		#{empStatusCode}, #{memo}, SYSDATE, #{regEmpId})
+	</insert>
+
+	<!-- 계정 활성/비활성 변경 -->
+	<update id="updateEmployeeEnabled" parameterType="map">
+		UPDATE
+		employee1 SET enabled = #{enabled}
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- 패스워드 변경 -->
+	<update id="updateEmployeePassword"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		UPDATE employee1 SET password = #{password}, updateDate
+		= SYSDATE
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- employee2 정보 수정 -->
+	<update id="updateEmployee2"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		UPDATE employee2 SET
+		email = #{email, jdbcType=VARCHAR},
+		<if test="birth != null and birth != ''">
+			birth = TO_DATE(#{birth, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		</if>
+		<if test="tel != null">
+			tel = #{tel, jdbcType=VARCHAR},
+		</if>
+		profilePhoto = #{profilePhoto, jdbcType=VARCHAR},
+		zip = #{zip,
+		jdbcType=VARCHAR},
+		addr1 = #{addr1, jdbcType=VARCHAR},
+		addr2 = #{addr2,
+		jdbcType=VARCHAR}
+
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- 프로필 사진 삭제 -->
+	<update id="deleteProfilePhoto" parameterType="map">
+		UPDATE employee2
+		SET profilePhoto = NULL
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- 마지막 로그인 시간, 실패횟수 초기화 -->
+	<update id="updateLastLogin" parameterType="String">
+		UPDATE employee1 SET
+		lastLoginDate = SYSDATE, loginFailureCount = 0
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- 사원 정보 조회 (by empId) -->
+	<select id="findByEmpId" parameterType="String"
+		resultType="com.mvc.app.domain.dto.EmployeeDto">
+		SELECT e1.empId, password, levelCode, e1.enabled,
+		TO_CHAR(e1.regDate, 'YYYY-MM-DD') regDate,
+		TO_CHAR(e1.updateDate,
+		'YYYY-MM-DD HH24:MI:SS') updateDate,
+		TO_CHAR(lastLoginDate,
+		'YYYY-MM-DD') lastLoginDate,
+		loginFailureCount, empStatusCode,
+		name,
+		TO_CHAR(birth, 'YYYY-MM-DD') birth, tel,
+		profilePhoto, zip, addr1,
+		addr2, email, ipAddr,
+		authority,
+		e2.deptCode,
+		e2.gradeCode,
+		cd.codeName AS
+		deptName,
+		cg.codeName AS gradeName
+		FROM employee1 e1
+		LEFT OUTER JOIN
+		employee2 e2 ON e1.empId = e2.empId
+		LEFT OUTER JOIN employeeAuthority
+		ea ON e1.empId = ea.empId
+		LEFT OUTER JOIN commonCode cd ON cd.codeGroup
+		= 'DEPT' AND cd.code =
+		e2.deptCode
+		LEFT OUTER JOIN commonCode cg ON
+		cg.codeGroup = 'RANK' AND cg.code =
+		e2.gradeCode
+		WHERE e1.empId =
+		#{empId}
+	</select>
+
+	<!-- 패스워드 실패 횟수 -->
+	<select id="checkFailureCount" parameterType="String"
+		resultType="Integer">
+		SELECT NVL(loginFailureCount, 0) loginFailureCount
+		FROM
+		employee1
+		WHERE empId = #{empId}
+	</select>
+
+	<!-- 패스워드 실패 횟수 초기화 -->
+	<update id="updateFailureCountReset" parameterType="String">
+		UPDATE
+		employee1 SET loginFailureCount = 0
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- 패스워드 실패 횟수 증가 -->
+	<update id="updateFailureCount" parameterType="String">
+		UPDATE employee1
+		SET loginFailureCount = loginFailureCount + 1
+		WHERE empId = #{empId}
+	</update>
+
+	<!-- employee2 삭제 -->
+	<delete id="deleteEmployee2" parameterType="map">
+		DELETE FROM employee2
+		WHERE empId = #{empId}
+	</delete>
+
+	<!-- 사원 검색 -->
+	<select id="listFindMember" parameterType="map"
+		resultType="com.mvc.app.domain.dto.EmployeeDto">
+		SELECT e1.empId, name
+		FROM employee1 e1
+		JOIN employee2 e2 ON e1.empId =
+		e2.empId
+		<where>
+			e1.empId != #{empId}
+			<if test="kwd != null and kwd != ''">
+				AND
+				<choose>
+					<when test="schType == 'empId'">
+						INSTR(e1.empId, #{kwd}) &gt;= 1
+					</when>
+					<otherwise>
+						INSTR(${schType}, #{kwd}) &gt;= 1
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+	<!-- 권한(authority) 테이블 -->
+	<insert id="insertAuthority"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		INSERT INTO employeeAuthority(empId, authority)
+		VALUES
+		(#{empId}, #{authority})
+	</insert>
+
+	<delete id="deleteAuthority" parameterType="map">
+		DELETE FROM
+		employeeAuthority
+		WHERE empId = #{empId}
+	</delete>
+
+	<select id="findByAuthority" parameterType="String"
+		resultType="String">
+		SELECT authority
+		FROM employeeAuthority
+		WHERE empId =
+		#{empId}
+	</select>
+
+	<!-- refreshToken -->
+	<insert id="insertRefreshToken"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		INSERT INTO refreshToken(empId, refreshTokenValue)
+		VALUES (#{empId}, #{refreshTokenValue})
+	</insert>
+
+	<update id="updateRefreshToken"
+		parameterType="com.mvc.app.domain.dto.EmployeeDto">
+		UPDATE refreshToken SET refreshTokenValue =
+		#{refreshTokenValue}
+		WHERE empId = #{empId}
+	</update>
+
+	<delete id="deleteRefreshToken" parameterType="String">
+		DELETE FROM
+		refreshToken
+		WHERE empId = #{empId}
+	</delete>
+
+	<select id="findByToken" parameterType="String"
+		resultType="com.mvc.app.domain.dto.EmployeeDto">
+		SELECT empId, refreshTokenValue
+		FROM refreshToken
+		WHERE empId
+		= #{empId}
+	</select>
+
+</mapper>

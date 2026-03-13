@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.ApprovalNoticeMapper">
+
+    <select id="listNotice" parameterType="map"
+            resultType="com.mvc.app.domain.dto.ApprovalNoticeDto">
+        SELECT noticeId, title, writerEmpId, writerName,
+               hitCount, regDate, updateDate
+        FROM approvalNotice
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (UPPER(title) LIKE '%' || UPPER(#{keyword}) || '%'
+                 OR UPPER(writerName) LIKE '%' || UPPER(#{keyword}) || '%')
+            </if>
+        </where>
+        ORDER BY noticeId DESC
+        OFFSET #{offset} ROWS FETCH FIRST #{pageSize} ROWS ONLY
+    </select>
+
+    <select id="countNotice" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM approvalNotice
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (UPPER(title) LIKE '%' || UPPER(#{keyword}) || '%'
+                 OR UPPER(writerName) LIKE '%' || UPPER(#{keyword}) || '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="long"
+            resultType="com.mvc.app.domain.dto.ApprovalNoticeDto">
+        SELECT noticeId, title, content, writerEmpId, writerName,
+               hitCount, regDate, updateDate
+        FROM approvalNotice
+        WHERE noticeId = #{noticeId}
+    </select>
+
+    <update id="updateHitCount" parameterType="long">
+        UPDATE approvalNotice
+        SET hitCount = hitCount + 1
+        WHERE noticeId = #{noticeId}
+    </update>
+
+    <insert id="insertNotice"
+            parameterType="com.mvc.app.domain.dto.ApprovalNoticeDto">
+        <selectKey keyProperty="noticeId" resultType="long" order="BEFORE">
+            SELECT approvalNotice_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO approvalNotice
+            (noticeId, title, content, writerEmpId, writerName)
+        VALUES
+            (#{noticeId}, #{title}, #{content}, #{writerEmpId}, #{writerName})
+    </insert>
+
+    <update id="updateNotice"
+            parameterType="com.mvc.app.domain.dto.ApprovalNoticeDto">
+        UPDATE approvalNotice
+        SET title = #{title},
+            content = #{content},
+            updateDate = SYSDATE
+        WHERE noticeId = #{noticeId}
+    </update>
+
+    <delete id="deleteNotice" parameterType="long">
+        DELETE FROM approvalNotice
+        WHERE noticeId = #{noticeId}
+    </delete>
+
+    <insert id="insertFile" parameterType="com.mvc.app.domain.dto.ApprovalNoticeFileDto">
+        INSERT INTO approvalNoticeFile (fileId, noticeId, oriFilename, saveFilename, fileSize, regDate)
+        VALUES (approvalNoticeFile_seq.NEXTVAL, #{noticeId}, #{oriFilename}, #{saveFilename}, #{fileSize}, SYSDATE)
+    </insert>
+
+  
+    <select id="listFilesByNoticeId" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalNoticeFileDto">
+        SELECT fileId, noticeId, oriFilename, saveFilename, fileSize,
+               TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
+        FROM approvalNoticeFile
+        WHERE noticeId = #{noticeId}
+      ORDER BY fileId
+    </select>
+
+    <delete id="deleteFile" parameterType="long">
+        DELETE FROM approvalNoticeFile WHERE fileId = #{fileId}
+    </delete>
+
+  
+    <delete id="deleteFilesByNoticeId" parameterType="long">
+        DELETE FROM approvalNoticeFile WHERE noticeId = #{noticeId}
+    </delete>
+    
+    <select id="findFileById" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalNoticeFileDto">
+        SELECT fileId, noticeId, oriFilename, saveFilename, fileSize,
+               TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
+        FROM approvalNoticeFile
+        WHERE fileId = #{fileId}
+    </select>    
+</mapper>

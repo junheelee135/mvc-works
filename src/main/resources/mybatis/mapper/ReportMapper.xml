@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.group.mapper.ReportMapper">
+
+    <!-- ============================================================
+         ResultMap
+    ============================================================ -->
+    <resultMap id="reportResultMap" type="com.mvc.app.group.dto.ReportDto">
+        <id     property="filenum"       column="filenum"/>
+        <result property="subject"       column="subject"/>
+        <result property="content"       column="content"/>
+        <result property="groupnum"      column="groupnum"/>
+        <result property="depth"         column="depth"/>
+        <result property="orderno"       column="orderno"/>
+        <result property="parent"        column="parent"/>
+        <result property="hitcount"      column="hitcount"/>
+        <result property="regdate"       column="regdate"/>
+        <result property="updatedate"    column="updatedate"/>
+        <result property="periodStart"   column="period_start"/>
+        <result property="periodEnd"     column="period_end"/>
+        <result property="empId"         column="empId"/>
+        <result property="evaluation"    column="evaluation"/>
+        <result property="writerName"    column="writer_name"/>
+        <result property="deptName"      column="dept_name"/>
+        <result property="gradeName"     column="grade_name"/>
+        <result property="feedbackCount" column="feedback_count"/>
+        <!-- 원본 보고서 참조 (피드백 상세용) -->
+        <result property="refSubject"      column="ref_subject"/>
+        <result property="refWriterName"   column="ref_writer_name"/>
+        <result property="refDeptName"     column="ref_dept_name"/>
+        <result property="refPeriodStart"  column="ref_period_start"/>
+        <result property="refPeriodEnd"    column="ref_period_end"/>
+    </resultMap>
+
+    <resultMap id="reportFileResultMap" type="com.mvc.app.group.dto.ReportFileDto">
+        <id     property="filenum"           column="filenum"/>
+        <result property="savefilename"      column="savefilename"/>
+        <result property="originalfilename"  column="originalfilename"/>
+        <result property="filesize"          column="filesize"/>
+        <result property="filenum2"          column="filenum2"/>
+    </resultMap>
+
+    <!-- ============================================================
+         공통 SELECT 컬럼 fragment
+    ============================================================ -->
+    <sql id="reportColumns">
+        r.filenum,
+        r.subject,
+        r.groupnum,
+        r.depth,
+        r.orderno,
+        r.parent,
+        r.hitcount,
+        TO_CHAR(r.regdate,    'YYYY.MM.DD') AS regdate,
+        TO_CHAR(r.updatedate, 'YYYY.MM.DD') AS updatedate,
+        TO_CHAR(r.period_start, 'YYYY-MM-DD') AS period_start,
+        TO_CHAR(r.period_end,   'YYYY-MM-DD') AS period_end,
+        r.empId,
+        r.evaluation,
+        e2.name  AS writer_name,
+        cc_dept.codeName  AS dept_name,
+        cc_grade.codeName AS grade_name
+    </sql>
+
+    <!-- ============================================================
+         보고서 카운트
+    ============================================================ -->
+    <select id="reportCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM report r
+        LEFT JOIN employee2 e2    ON r.empId = e2.empId
+        LEFT JOIN commoncode cc_dept  ON e2.deptCode  = cc_dept.code
+        LEFT JOIN commoncode cc_grade ON e2.gradeCode = cc_grade.code
+        WHERE r.depth = 0
+        <include refid="reportSearchWhere"/>
+        <include refid="reportAccessWhere"/>
+    </select>
+
+    <!-- ============================================================
+         보고서 목록
+    ============================================================ -->
+    <select id="listReport" parameterType="map" resultMap="reportResultMap">
+        SELECT rn.*, feedback_count
+        FROM (
+            SELECT ROWNUM AS rn_num, sub.*
+            FROM (
+                SELECT
+                    <include refid="reportColumns"/>,
+                    (
+                        SELECT COUNT(*)
+                        FROM report fb
+                        WHERE fb.parent = r.filenum
+                          AND fb.depth  = 1
+                    ) AS feedback_count
+                FROM report r
+                LEFT JOIN employee2 e2       ON r.empId      = e2.empId
+                LEFT JOIN commoncode cc_dept  ON e2.deptCode  = cc_dept.code  AND cc_dept.codeGroup  = 'DEPT'
+                LEFT JOIN commoncode cc_grade ON e2.gradeCode = cc_grade.code AND cc_grade.codeGroup = 'RANK'
+                WHERE r.depth = 0
+                <include refid="reportSearchWhere"/>
+                <include refid="reportAccessWhere"/>
+                ORDER BY r.filenum DESC
+            ) sub
+            WHERE ROWNUM &lt;= #{endRow}
+        ) rn
+        WHERE rn.rn_num &gt;= #{startRow}
+    </select>
+
+    <!-- 보고서 검색 조건 -->
+    <sql id="reportSearchWhere">
+        <if test="writerName != null and writerName != ''">
+            AND e2.name LIKE '%' || #{writerName} || '%'
+        </if>
+        <if test="subject != null and subject != ''">
+            AND r.subject LIKE '%' || #{subject} || '%'
+        </if>
+        <if test="periodStart != null and periodStart != ''">
+            AND r.period_start &gt;= TO_DATE(#{periodStart}, 'YYYY-MM-DD')
+        </if>
+        <if test="periodEnd != null and periodEnd != ''">
+            AND r.period_end &lt;= TO_DATE(#{periodEnd}, 'YYYY-MM-DD')
+        </if>
+        <if test="feedbackYn != null and feedbackYn == 'Y'">
+            AND EXISTS (
+                SELECT 1 FROM report fb WHERE fb.parent = r.filenum AND fb.depth = 1
+            )
+        </if>
+        <if test="feedbackYn != null and feedbackYn == 'N'">
+            AND NOT EXISTS (
+                SELECT 1 FROM report fb WHERE fb.parent = r.filenum AND fb.depth = 1
+            )
+        </if>
+    </sql>
+
+    <!-- 보고서 접근 제어 조건
+         userLevel 51 미만  → 자기 자신 보고서만
+         userLevel 51~98   → 같은 프로젝트 사원 보고서만 (empIdList 파라미터 필요)
+         userLevel 99      → 전체 (조건 없음)
+    -->
+    <sql id="reportAccessWhere">
+        <choose>
+            <when test="userLevel != null and userLevel &gt;= 99">
+                <!-- 관리자: 전체 조회 -->
+            </when>
+            <when test="userLevel != null and userLevel &gt;= 51">
+                <!-- 피드백 작성자: 같은 프로젝트 사원 + 자기 자신 -->
+                <if test="empIdList != null and empIdList.size() > 0">
+                    AND r.empId IN
+                    <foreach collection="empIdList" item="id" open="(" separator="," close=")">
+                        #{id}
+                    </foreach>
+                </if>
+            </when>
+            <otherwise>
+                <!-- 일반 사원: 자기 자신만 -->
+                AND r.empId = #{sessionEmpId}
+            </otherwise>
+        </choose>
+    </sql>
+
+    <!-- ============================================================
+         피드백 카운트
+    ============================================================ -->
+    <select id="feedbackCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM report r
+        LEFT JOIN employee2 e2     ON r.empId = e2.empId
+        LEFT JOIN commoncode cc_dept  ON e2.deptCode  = cc_dept.code  AND cc_dept.codeGroup  = 'DEPT'
+        LEFT JOIN commoncode cc_grade ON e2.gradeCode = cc_grade.code AND cc_grade.codeGroup = 'RANK'
+        LEFT JOIN report ref ON r.parent = ref.filenum
+        LEFT JOIN employee2 ref_e2 ON ref.empId = ref_e2.empId
+        WHERE r.depth = 1
+        <include refid="feedbackSearchWhere"/>
+        <include refid="feedbackAccessWhere"/>
+    </select>
+
+    <!-- ============================================================
+         피드백 목록
+    ============================================================ -->
+    <select id="listFeedback" parameterType="map" resultMap="reportResultMap">
+        SELECT rn.*
+        FROM (
+            SELECT ROWNUM AS rn_num, sub.*
+            FROM (
+                SELECT
+                    <include refid="reportColumns"/>,
+                    ref.subject        AS ref_subject,
+                    ref_e2.name        AS ref_writer_name,
+                    TO_CHAR(ref.period_start, 'YYYY-MM-DD') AS ref_period_start,
+                    TO_CHAR(ref.period_end,   'YYYY-MM-DD') AS ref_period_end,
+                    0 AS feedback_count
+                FROM report r
+                LEFT JOIN employee2 e2       ON r.empId      = e2.empId
+                LEFT JOIN commoncode cc_dept  ON e2.deptCode  = cc_dept.code  AND cc_dept.codeGroup  = 'DEPT'
+                LEFT JOIN commoncode cc_grade ON e2.gradeCode = cc_grade.code AND cc_grade.codeGroup = 'RANK'
+                LEFT JOIN report ref          ON r.parent     = ref.filenum
+                LEFT JOIN employee2 ref_e2    ON ref.empId    = ref_e2.empId
+                WHERE r.depth = 1
+                <include refid="feedbackSearchWhere"/>
+                <include refid="feedbackAccessWhere"/>
+                ORDER BY r.filenum DESC
+            ) sub
+            WHERE ROWNUM &lt;= #{endRow}
+        ) rn
+        WHERE rn.rn_num &gt;= #{startRow}
+    </select>
+
+    <!-- 피드백 검색 조건 -->
+    <sql id="feedbackSearchWhere">
+        <if test="targetName != null and targetName != ''">
+            AND ref_e2.name LIKE '%' || #{targetName} || '%'
+        </if>
+        <if test="subject != null and subject != ''">
+            AND r.subject LIKE '%' || #{subject} || '%'
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND TRUNC(r.regdate) &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND TRUNC(r.regdate) &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        </if>
+    </sql>
+
+    <!-- 피드백 접근 제어
+         userLevel 51 미만  → 자기 보고서에 달린 피드백만 (ref.empId = sessionEmpId)
+         userLevel 51~98   → 같은 프로젝트 사원의 보고서 피드백 (empIdList)
+         userLevel 99      → 전체
+    -->
+    <sql id="feedbackAccessWhere">
+        <choose>
+            <when test="userLevel != null and userLevel &gt;= 99">
+                <!-- 최고 관리자: 전체 -->
+            </when>
+            <when test="userLevel != null and userLevel &gt;= 51">
+                <!-- 피드백 작성자: 같은 프로젝트 사원 보고서의 피드백만 -->
+                <if test="empIdList != null and empIdList.size() > 0">
+                    AND ref.empId IN
+                    <foreach collection="empIdList" item="id" open="(" separator="," close=")">
+                        #{id}
+                    </foreach>
+                </if>
+            </when>
+            <otherwise>
+                <!-- 일반 사원: 자기 보고서에 달린 피드백만 -->
+                AND ref.empId = #{sessionEmpId}
+            </otherwise>
+        </choose>
+    </sql>
+
+    <!-- ============================================================
+         보고서 단건 조회
+    ============================================================ -->
+    <select id="findReportById" parameterType="long" resultMap="reportResultMap">
+        SELECT
+            <include refid="reportColumns"/>,
+            r.content,
+            (
+                SELECT COUNT(*)
+                FROM report fb
+                WHERE fb.parent = r.filenum AND fb.depth = 1
+            ) AS feedback_count
+        FROM report r
+        LEFT JOIN employee2 e2       ON r.empId      = e2.empId
+        LEFT JOIN commoncode cc_dept  ON e2.deptCode  = cc_dept.code  AND cc_dept.codeGroup  = 'DEPT'
+        LEFT JOIN commoncode cc_grade ON e2.gradeCode = cc_grade.code AND cc_grade.codeGroup = 'RANK'
+        WHERE r.filenum = #{filenum}
+          AND r.depth   = 0
+    </select>
+
+    <!-- ============================================================
+         피드백 단건 조회 (상세 페이지용 - 원본 보고서 정보 포함)
+    ============================================================ -->
+    <select id="findFeedbackById" parameterType="long" resultMap="reportResultMap">
+        SELECT
+            r.filenum,
+            r.subject,
+            r.content,
+            r.groupnum,
+            r.depth,
+            r.orderno,
+            r.parent,
+            r.hitcount,
+            TO_CHAR(r.regdate,    'YYYY.MM.DD') AS regdate,
+            TO_CHAR(r.updatedate, 'YYYY.MM.DD') AS updatedate,
+            r.empId,
+            r.evaluation,
+            e2.name  AS writer_name,
+            cc_dept.codeName  AS dept_name,
+            cc_grade.codeName AS grade_name,
+            /* 원본 보고서 정보 */
+            ref.subject                               AS ref_subject,
+            ref_e2.name                               AS ref_writer_name,
+            ref_cc_dept.codeName                      AS ref_dept_name,
+            TO_CHAR(ref.period_start, 'YYYY-MM-DD')   AS ref_period_start,
+            TO_CHAR(ref.period_end,   'YYYY-MM-DD')   AS ref_period_end,
+            0 AS feedback_count
+        FROM report r
+        LEFT JOIN employee2 e2         ON r.empId   = e2.empId
+        LEFT JOIN commoncode cc_dept   ON e2.deptCode  = cc_dept.code  AND cc_dept.codeGroup  = 'DEPT'
+        LEFT JOIN commoncode cc_grade  ON e2.gradeCode = cc_grade.code AND cc_grade.codeGroup = 'RANK'
+        LEFT JOIN report ref           ON r.parent  = ref.filenum
+        LEFT JOIN employee2 ref_e2     ON ref.empId = ref_e2.empId
+        LEFT JOIN commoncode ref_cc_dept ON ref_e2.deptCode = ref_cc_dept.code AND ref_cc_dept.codeGroup = 'DEPT'
+        WHERE r.filenum = #{filenum}
+          AND r.depth   = 1
+    </select>
+
+    <!-- ============================================================
+         보고서에 달린 피드백 단건 (reportDetail 인라인용)
+    ============================================================ -->
+    <select id="findFeedbackByParent" parameterType="long" resultMap="reportResultMap">
+        SELECT
+            r.filenum,
+            r.subject,
+            r.content,
+            r.parent,
+            r.evaluation,
+            TO_CHAR(r.regdate, 'YYYY.MM.DD') AS regdate,
+            e2.name AS writer_name,
+            0 AS feedback_count
+        FROM report r
+        LEFT JOIN employee2 e2 ON r.empId = e2.empId
+        WHERE r.parent = #{parent}
+          AND r.depth  = 1
+        ORDER BY r.filenum DESC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <!-- ============================================================
+         시퀀스 채번
+    ============================================================ -->
+    <select id="nextReportSeq"     resultType="long">SELECT report_seq.NEXTVAL FROM DUAL</select>
+    <select id="nextReportFileSeq" resultType="long">SELECT reportfile_seq.NEXTVAL FROM DUAL</select>
+
+    <!-- ============================================================
+         보고서 INSERT
+    ============================================================ -->
+    <insert id="insertReport" parameterType="com.mvc.app.group.dto.ReportDto">
+        INSERT INTO report (
+            filenum, subject, content, groupnum, depth, orderno, parent,
+            hitcount, regdate, period_start, period_end, empId
+        ) VALUES (
+            #{filenum},
+            #{subject},
+            #{content},
+            #{filenum},
+            0,
+            0,
+            0,
+            0,
+            SYSDATE,
+            TO_DATE(#{periodStart}, 'YYYY-MM-DD'),
+            TO_DATE(#{periodEnd},   'YYYY-MM-DD'),
+            #{empId}
+        )
+    </insert>
+
+    <!-- ============================================================
+         보고서 UPDATE
+    ============================================================ -->
+    <update id="updateReport" parameterType="com.mvc.app.group.dto.ReportDto">
+        UPDATE report SET
+            subject      = #{subject},
+            content      = #{content},
+            period_start = TO_DATE(#{periodStart}, 'YYYY-MM-DD'),
+            period_end   = TO_DATE(#{periodEnd},   'YYYY-MM-DD'),
+            updatedate   = SYSDATE
+        WHERE filenum = #{filenum}
+          AND depth   = 0
+    </update>
+
+    <!-- ============================================================
+         보고서 DELETE
+    ============================================================ -->
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM report WHERE filenum = #{filenum} AND depth = 0
+    </delete>
+
+    <!-- ============================================================
+         피드백 INSERT
+    ============================================================ -->
+    <insert id="insertFeedback" parameterType="com.mvc.app.group.dto.ReportDto">
+        INSERT INTO report (
+            filenum, subject, content, groupnum, depth, orderno, parent,
+            hitcount, regdate, empId, evaluation
+        ) VALUES (
+            #{filenum},
+            #{subject},
+            #{content},
+            #{parent},
+            1,
+            0,
+            #{parent},
+            0,
+            SYSDATE,
+            #{empId},
+            #{evaluation}
+        )
+    </insert>
+
+    <!-- ============================================================
+         피드백 UPDATE
+    ============================================================ -->
+    <update id="updateFeedback" parameterType="com.mvc.app.group.dto.ReportDto">
+        UPDATE report SET
+            subject    = #{subject},
+            content    = #{content},
+            evaluation = #{evaluation},
+            updatedate = SYSDATE
+        WHERE filenum = #{filenum}
+          AND depth   = 1
+    </update>
+
+    <!-- ============================================================
+         피드백 DELETE
+    ============================================================ -->
+    <delete id="deleteFeedback" parameterType="long">
+        DELETE FROM report WHERE filenum = #{filenum} AND depth = 1
+    </delete>
+
+    <!-- ============================================================
+         조회수 증가
+    ============================================================ -->
+    <update id="incrementHitcount" parameterType="long">
+        UPDATE report SET hitcount = hitcount + 1 WHERE filenum = #{filenum}
+    </update>
+
+    <!-- ============================================================
+         첨부파일 INSERT
+    ============================================================ -->
+    <insert id="insertReportFile" parameterType="com.mvc.app.group.dto.ReportFileDto">
+        INSERT INTO reportfile (filenum, savefilename, originalfilename, filesize, filenum2)
+        VALUES (#{filenum}, #{savefilename}, #{originalfilename}, #{filesize}, #{filenum2})
+    </insert>
+
+    <!-- ============================================================
+         첨부파일 단건 조회
+    ============================================================ -->
+    <select id="findFileById" parameterType="long" resultMap="reportFileResultMap">
+        SELECT filenum, savefilename, originalfilename, filesize, filenum2
+        FROM reportfile
+        WHERE filenum = #{filenum}
+    </select>
+
+    <!-- ============================================================
+         첨부파일 목록 (보고서 기준)
+    ============================================================ -->
+    <select id="listFilesByReport" parameterType="long" resultMap="reportFileResultMap">
+        SELECT filenum, savefilename, originalfilename, filesize, filenum2
+        FROM reportfile
+        WHERE filenum2 = #{filenum2}
+        ORDER BY filenum ASC
+    </select>
+
+    <!-- ============================================================
+         첨부파일 단건 삭제
+    ============================================================ -->
+    <delete id="deleteReportFile" parameterType="long">
+        DELETE FROM reportfile WHERE filenum = #{filenum}
+    </delete>
+
+    <!-- ============================================================
+         첨부파일 전체 삭제 (보고서 삭제 시)
+    ============================================================ -->
+    <delete id="deleteFilesByReport" parameterType="long">
+        DELETE FROM reportfile WHERE filenum2 = #{filenum2}
+    </delete>
+
+    <!-- ============================================================
+         같은 프로젝트 사원 empId 목록 조회
+         (피드백 작성자와 empProject.projectId가 겹치는 사원)
+    ============================================================ -->
+    <select id="findEmpIdsBySharedProject" parameterType="string" resultType="string">
+        SELECT DISTINCT ep2.empId
+        FROM empProject ep1
+        JOIN empProject ep2 ON ep1.projectId = ep2.projectId
+        WHERE ep1.empId = #{empId}
+          AND ep2.empId != #{empId}
+        UNION
+        SELECT #{empId} FROM DUAL
+    </select>
+
+</mapper>

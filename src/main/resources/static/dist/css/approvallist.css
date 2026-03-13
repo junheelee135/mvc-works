@@ -1,0 +1,339 @@
+@charset "UTF-8";
+
+/* ───────────────────────────────
+   레이아웃 - 사이드바 오른쪽 영역
+─────────────────────────────── */
+#main-content {
+    margin-left: 240px !important;
+    padding: 24px 32px !important;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background: #f8f9fc;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ───────────────────────────────
+   상단 액션 바
+─────────────────────────────── */
+.approval-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-new-approval {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1bbfb0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .18s;
+}
+.btn-new-approval:hover { background: #17ada0; }
+.btn-new-approval .material-symbols-outlined { font-size: 18px; }
+
+.topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.topbar-controls select,
+.topbar-controls input[type="date"],
+.topbar-controls input[type="text"] {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #3a3f51;
+    background: #fff;
+    height: 38px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color .15s;
+}
+.topbar-controls select:focus,
+.topbar-controls input:focus {
+    border-color: #4e73df;
+}
+.topbar-controls input[type="text"] { width: 200px; }
+
+.btn-refresh {
+    background: #fff;
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .15s;
+}
+.btn-refresh:hover { background: #f0f3ff; }
+.btn-refresh .material-symbols-outlined { font-size: 18px; color: #666; }
+
+.btn-search {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    height: 38px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s;
+}
+.btn-search:hover { background: #3a5abf; }
+.btn-search .material-symbols-outlined { font-size: 16px; }
+
+.btn-options {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    height: 38px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background .18s;
+}
+.btn-options:hover { background: #3a5abf; }
+
+/* ───────────────────────────────
+   본문 영역 (필터 + 테이블)
+─────────────────────────────── */
+.approval-body {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex: 1;
+}
+
+/* ───────────────────────────────
+   왼쪽 필터 패널
+─────────────────────────────── */
+.filter-panel {
+    width: 180px;
+    min-width: 160px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e6eaf4;
+    padding: 20px 16px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.filter-section { margin-bottom: 24px; }
+.filter-section:last-child { margin-bottom: 0; }
+
+.filter-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9aa0b4;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.filter-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #3a3f51;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+}
+.filter-link:hover { background: #f0f3ff; color: #4e73df; }
+.filter-link.active { background: #eef1fd; color: #4e73df; font-weight: 600; }
+.filter-link .material-symbols-outlined { font-size: 16px; color: inherit; }
+
+.filter-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 4px;
+    font-size: 13px;
+    color: #3a3f51;
+    cursor: pointer;
+}
+.filter-checkbox-item input[type="checkbox"] {
+    accent-color: #4e73df;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ───────────────────────────────
+   오른쪽 테이블 영역
+─────────────────────────────── */
+.table-panel {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e6eaf4;
+    overflow: hidden;
+}
+
+.approval-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.approval-table thead tr {
+    background: #f8f9fd;
+    border-bottom: 2px solid #e6eaf4;
+}
+
+.approval-table thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7b82a0;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.approval-table thead th .th-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+}
+.approval-table thead th .th-inner .material-symbols-outlined {
+    font-size: 14px;
+    color: #b0b7cc;
+}
+.approval-table thead th.cb-col { width: 40px; text-align: center; }
+
+.approval-table tbody tr {
+    border-bottom: 1px solid #f0f2f9;
+    transition: background .12s;
+    cursor: pointer;
+}
+.approval-table tbody tr:hover { background: #f6f8ff; }
+.approval-table tbody tr:last-child { border-bottom: none; }
+
+.approval-table tbody td {
+    padding: 13px 14px;
+    color: #3a3f51;
+    vertical-align: middle;
+}
+.approval-table tbody td.cb-col { text-align: center; }
+.approval-table tbody td input[type="checkbox"] {
+    accent-color: #4e73df;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.td-title { font-weight: 500; }
+.td-title small {
+    display: block;
+    font-size: 11px;
+    color: #9aa0b4;
+    margin-top: 2px;
+    font-weight: 400;
+}
+
+/* 결재 상태 뱃지 */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.status-DRAFT    { background: #f0f3ff; color: #4e73df; }
+.status-PENDING  { background: #fff4e0; color: #d97706; }
+.status-APPROVED { background: #e0f5ef; color: #1a9660; }
+.status-REJECTED { background: #ffe0e0; color: #d93025; }
+.status-CANCELED { background: #f0f0f0; color: #6b7280; }
+.status-ON_HOLD  { background: #fff3cd; color: #856404; }
+.status-MYAPPROVED { background: #e0f5ef; color: #1a9660; }
+.status-INPROGRESS { background: #e0ecff; color: #2563eb; }
+
+/* ───────────────────────────────
+   페이지네이션
+─────────────────────────────── */
+.table-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 16px;
+    border-top: 1px solid #f0f2f9;
+}
+
+.page-btn {
+    background: none;
+    border: 1px solid #e6eaf4;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #7b82a0;
+    cursor: pointer;
+    transition: all .15s;
+}
+.page-btn:hover { background: #f0f3ff; border-color: #4e73df; color: #4e73df; }
+.page-btn.active { background: #4e73df; border-color: #4e73df; color: #fff; font-weight: 700; }
+.page-btn:disabled { opacity: .4; cursor: default; }
+
+/* ───────────────────────────────
+   뱃지 카운트
+─────────────────────────────── */
+.badge-count {
+    background: #e74c3c;
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+/* 참조 결재함 읽음/안읽음 표시 */
+.row-unread { background: #f0f6ff; }
+.row-unread td { font-weight: 600; }
+.row-unread .td-title { font-weight: 700; }
+
+.read-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+.read-badge.unread { background: #e0ecff; color: #2563eb; }
+.read-badge.read   { background: #f0f0f0; color: #9aa0b4; }

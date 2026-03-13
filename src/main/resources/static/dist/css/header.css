@@ -1,0 +1,68 @@
+/* ================================================
+   header.css - Duralux ERP
+   상단 Navbar 전용 스타일
+   ================================================ */
+
+/* --- Navbar --- */
+.navbar-custom {
+    background: #fff;
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-icon-btn {
+    color: var(--text-gray);
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-icon-btn:hover {
+    color: var(--primary-blue);
+}
+
+.navbar-mega-menu {
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* 알림 배지 */
+.navbar-badge {
+    font-size: 0.5rem;
+}
+
+/* 프로필 아바타 */
+.navbar-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    margin-left: 4px;
+    cursor: pointer;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+    transition: border-color 0.2s;
+}
+
+.navbar-avatar:hover {
+    border-color: var(--primary-blue);
+}

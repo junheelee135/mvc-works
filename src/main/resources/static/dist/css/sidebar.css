@@ -1,0 +1,98 @@
+/* ================================================
+   sidebar.css - Duralux ERP
+   사이드바 전용 스타일
+   ================================================ */
+
+:root {
+    --sidebar-width: 260px;
+    --primary-blue: #0061ff;
+    --bg-light: #f4f7fe;
+    --border-color: #eaecf0;
+    --text-gray: #64748b;
+}
+
+/* --- Sidebar --- */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #fff;
+    border-right: 1px solid var(--border-color);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    padding: 24px;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 1px;
+}
+
+.nav-section {
+    padding: 12px 24px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    padding: 10px 24px;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.nav-link i {
+    margin-right: 12px;
+    width: 18px;
+    text-align: center;
+}
+
+.nav-link:hover {
+    color: var(--primary-blue);
+    background: #f0f6ff;
+}
+
+.nav-link.active {
+    color: var(--primary-blue);
+    background: #f0f6ff;
+    border-right: 3px solid var(--primary-blue);
+}
+
+.sub-menu {
+    padding-left: 54px;
+    list-style: none;
+    margin-bottom: 8px;
+    padding-right: 0;
+}
+
+.sub-menu a {
+    display: block;
+    padding: 6px 0;
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+.sub-menu a:hover {
+    color: var(--primary-blue);
+}
+
+.sub-menu a.active {
+    color: var(--primary-blue);
+    font-weight: 600;
+}

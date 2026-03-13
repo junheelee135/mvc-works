@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mvc.app.mapper.OrgMapper">
+
+	<!-- 전체 부서 목록 (트리 구성은 서비스에서 처리) -->
+	<select id="listDepartment" resultType="com.mvc.app.domain.dto.DepartmentDto">
+		SELECT deptCode, deptName, extNo, superDeptCode, useYn,
+			TO_CHAR(regDate, 'YYYY-MM-DD') regDate
+		FROM department
+		WHERE useYn = 'Y'
+		ORDER BY deptCode
+	</select>
+
+	<!-- 부서별 사원 목록 (해당 부서만, 하위 부서 포함은 서비스에서 처리) -->
+	<select id="listEmpByDept" parameterType="String" resultType="map">
+		SELECT e2.empId, e2.name, e2.deptCode,
+			d.deptName AS dept,
+			e2.gradeCode,
+			cc.codeName AS grade
+		FROM employee2 e2
+		JOIN employee1 e1 ON e2.empId = e1.empId
+		JOIN department d ON e2.deptCode = d.deptCode
+		LEFT JOIN commonCode cc ON e2.gradeCode = cc.code AND cc.codeGroup = 'RANK'
+		WHERE e2.deptCode = #{deptCode}
+			AND e1.enabled = 1
+		ORDER BY cc.sortOrder DESC, e2.name
+	</select>
+
+	<!-- 사원 검색 (이름, 부서명, 직급명) -->
+	<select id="searchEmp" parameterType="String" resultType="map">
+		SELECT e2.empId, e2.name, e2.deptCode,
+			d.deptName AS dept,
+			e2.gradeCode,
+			cc.codeName AS grade
+		FROM employee2 e2
+		JOIN employee1 e1 ON e2.empId = e1.empId
+		JOIN department d ON e2.deptCode = d.deptCode
+		LEFT JOIN commonCode cc ON e2.gradeCode = cc.code AND cc.codeGroup = 'RANK'
+		WHERE e1.enabled = 1
+			AND (
+				INSTR(e2.name, #{keyword}) >= 1
+				OR INSTR(d.deptName, #{keyword}) >= 1
+				OR INSTR(cc.codeName, #{keyword}) >= 1
+			)
+		ORDER BY cc.sortOrder DESC, e2.name
+	</select>
+
+</mapper>

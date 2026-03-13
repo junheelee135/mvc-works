@@ -1,0 +1,117 @@
+body {
+	background: #f6f8fb;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 카드 */
+.profile-card {
+	background: #ffffff;
+	border-radius: 18px;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+	padding: 50px;
+	width: 100%;
+	max-width: 920px;
+	transition: all 0.25s ease;
+}
+
+/* 섹션 제목 */
+.section-title {
+	font-weight: 600;
+	font-size: 18px;
+	margin-bottom: 18px;
+	color: #111827;
+}
+
+/* 구분선 */
+.divider {
+	margin: 35px 0;
+	border-top: 1px solid #f1f3f5;
+}
+
+/* 프로필 이미지 */
+.large-avatar {
+	width: 110px;
+	height: 110px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 5px solid #f1f5f9;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* input */
+.form-control {
+	border-radius: 12px;
+	height: 46px;
+	border: 1px solid #e5e7eb;
+	padding-left: 14px;
+	font-size: 14px;
+	transition: all 0.2s ease;
+}
+
+.form-control:focus {
+	border-color: #2563eb;
+	box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* 파일 업로드 */
+input[type="file"] {
+	border-radius: 10px;
+	font-size: 14px;
+}
+
+/* 버튼 공통 */
+button {
+	transition: all 0.2s ease;
+}
+
+/* 삭제 버튼 */
+.btn-outline-danger {
+	border-radius: 10px;
+	font-size: 13px;
+	padding: 6px 14px;
+}
+
+/* 저장 버튼 */
+.btn-save {
+	background: linear-gradient(135deg,#3b82f6,#2563eb);
+	color: white;
+	padding: 11px 26px;
+	border-radius: 12px;
+	border: none;
+	font-weight: 500;
+	font-size: 15px;
+	box-shadow: 0 4px 10px rgba(37,99,235,0.25);
+}
+
+.btn-save:hover {
+	background: linear-gradient(135deg,#2563eb,#1d4ed8);
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(37,99,235,0.35);
+}
+
+/* 하단 버튼 영역 */
+.action-footer {
+	text-align: right;
+	margin-top: 35px;
+}
+
+/* 취소 버튼 */
+.btn-cancel {
+	background: #f3f4f6;
+	color: #374151;
+	padding: 10px 22px;
+	border-radius: 12px;
+	border: none;
+	font-weight: 500;
+	margin-right: 10px;
+}
+
+.btn-cancel:hover {
+	background: #e5e7eb;
+}
+
+.form-label{
+	font-weight:500;
+	color:#374151;
+	margin-bottom:6px;
+}

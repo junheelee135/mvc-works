@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.EmpPerformanceMapper">
+
+    <!-- ════════════════════════════════════════════════════════
+         ResultMap — 직원 목록용
+    ════════════════════════════════════════════════════════ -->
+    <resultMap id="empPerformanceResultMap" type="com.mvc.app.domain.dto.EmpPerformanceDto">
+        <id     property="empId"          column="empId"/>
+        <result property="empName"        column="empName"/>
+        <result property="deptCode"       column="deptCode"/>
+        <result property="deptName"       column="deptName"/>
+        <result property="gradeCode"      column="gradeCode"/>
+        <result property="gradeName"      column="gradeName"/>
+        <result property="empStatusCode"  column="empStatusCode"/>
+        <result property="empStatusName"  column="empStatusName"/>
+        <result property="projectNames"   column="projectNames"/>
+    </resultMap>
+
+    <!-- ════════════════════════════════════════════════════════
+         ResultMap — 평가 그리드용
+    ════════════════════════════════════════════════════════ -->
+    <resultMap id="evalGridResultMap" type="com.mvc.app.domain.dto.EmpPerformanceDto">
+        <result property="reportMonth"  column="reportMonth"/>
+        <result property="reportWeek"   column="reportWeek"/>
+        <result property="evaluation"   column="evaluation"/>
+    </resultMap>
+
+    <!-- ════════════════════════════════════════════════════════
+         공통 검색 조건
+    ════════════════════════════════════════════════════════ -->
+    <sql id="searchWhere">
+        <where>
+            <!-- 탈퇴 직원 제외 -->
+            AND e1.drawCode IS NULL
+
+            <!--
+                [기본 필터] 세션 로그인 직원과 같은 프로젝트에 속한 직원만 조회
+                → 항상 적용되는 조건 (sessionEmpId는 Controller에서 항상 주입)
+                → 로그인 직원 본인도 포함 (UNION)
+            -->
+            AND e1.empId IN (
+                SELECT DISTINCT ep2.empId
+                FROM   empProject ep1
+                JOIN   empProject ep2 ON ep1.projectId = ep2.projectId
+                WHERE  ep1.empId = #{sessionEmpId}
+                UNION
+                SELECT #{sessionEmpId} FROM DUAL
+            )
+
+            <!-- 사원번호 검색 -->
+            <if test="empId != null and empId != ''">
+                AND e1.empId LIKE '%' || #{empId} || '%'
+            </if>
+
+            <!-- 이름 검색 -->
+            <if test="empName != null and empName != ''">
+                AND e2.name LIKE '%' || #{empName} || '%'
+            </if>
+
+            <!-- 부서명 검색 -->
+            <if test="deptName != null and deptName != ''">
+                AND EXISTS (
+                    SELECT 1 FROM commoncode cc
+                    WHERE cc.codeGroup = 'DEPT'
+                      AND cc.code      = e2.deptCode
+                      AND cc.codeName  LIKE '%' || #{deptName} || '%'
+                )
+            </if>
+
+            <!-- 직급명 검색 -->
+            <if test="gradeName != null and gradeName != ''">
+                AND EXISTS (
+                    SELECT 1 FROM commoncode cc
+                    WHERE cc.codeGroup = 'RANK'
+                      AND cc.code      = e2.gradeCode
+                      AND cc.codeName  LIKE '%' || #{gradeName} || '%'
+                )
+            </if>
+
+            <!-- 재직상태 코드 검색 -->
+            <if test="empStatus != null and empStatus != ''">
+                AND e1.empStatusCode = #{empStatus}
+            </if>
+
+            <!--
+                [선택 필터] 특정 프로젝트 1개로 좁혀서 검색
+                → 기본 필터(소속 프로젝트 전체) 위에 추가로 적용
+                → select에서 특정 프로젝트 선택 시 해당 프로젝트 직원만 조회
+            -->
+            <if test="projectId != null and projectId != ''">
+                AND EXISTS (
+                    SELECT 1 FROM empProject ep
+                    WHERE ep.empId     = e1.empId
+                      AND ep.projectId = #{projectId}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <!-- ════════════════════════════════════════════════════════
+         전체 건수
+    ════════════════════════════════════════════════════════ -->
+    <select id="dataCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   employee1 e1
+        JOIN   employee2 e2 ON e1.empId = e2.empId
+        <include refid="searchWhere"/>
+    </select>
+
+    <!-- ════════════════════════════════════════════════════════
+         직원 목록 (페이징)
+         Oracle 12c+ OFFSET/FETCH 방식 (HrmMapper 패턴 참고)
+    ════════════════════════════════════════════════════════ -->
+    <select id="listEmpPerformance" parameterType="map" resultMap="empPerformanceResultMap">
+        SELECT
+            e1.empId,
+            e2.name         AS empName,
+            e2.deptCode,
+            e2.gradeCode,
+            e1.empStatusCode,
+            (
+                SELECT cc.codeName FROM commoncode cc
+                WHERE cc.codeGroup = 'DEPT' AND cc.code = e2.deptCode
+            ) AS deptName,
+            (
+                SELECT cc.codeName FROM commoncode cc
+                WHERE cc.codeGroup = 'RANK' AND cc.code = e2.gradeCode
+            ) AS gradeName,
+            (
+                SELECT cc.codeName FROM commoncode cc
+                WHERE cc.codeGroup = 'EMPSTATUS' AND cc.code = e1.empStatusCode
+            ) AS empStatusName,
+            (
+                SELECT LISTAGG(pj.title, ', ') WITHIN GROUP (ORDER BY pj.title)
+                FROM   empProject ep
+                JOIN   project    pj ON ep.projectId = pj.projectId
+                WHERE  ep.empId = e1.empId
+            ) AS projectNames
+        FROM   employee1 e1
+        JOIN   employee2 e2 ON e1.empId = e2.empId
+        <include refid="searchWhere"/>
+        ORDER BY e1.empId ASC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <!-- ════════════════════════════════════════════════════════
+         재직상태 공통코드 목록 (codeGroup = 'EMPSTATUS')
+         → 재직상태 select 옵션 렌더링에 사용
+         code     → value (ES01, ES02 …)
+         codeName → label (재직, 휴직 …)
+         resultType="map" + 쌍따옴표 alias → JS에서 item.code / item.codeName 접근 가능
+    ════════════════════════════════════════════════════════ -->
+    <select id="listEmpStatusCodes" resultType="map">
+        SELECT
+            cc.code     AS "code",
+            cc.codeName AS "codeName"
+        FROM   commoncode cc
+        WHERE  cc.codeGroup = 'EMPSTATUS'
+        ORDER BY cc.code ASC
+    </select>
+
+    <!-- ════════════════════════════════════════════════════════
+         세션 empId 기준 소속 프로젝트 목록
+         → 참여 프로젝트 select 옵션 렌더링에 사용
+    ════════════════════════════════════════════════════════ -->
+    <!-- resultType="map" 시 Oracle은 컬럼명을 대문자로 반환하므로
+         쌍따옴표 alias로 카멜케이스를 명시해야 JS에서 project.projectId / project.projectName 접근 가능
+         empProject.projectId = VARCHAR2(11), project.projectId = NUMBER → TO_CHAR로 타입 통일 -->
+    <select id="listMyProjects" parameterType="string" resultType="map">
+        SELECT DISTINCT
+            TO_CHAR(pj.projectId)  AS "projectId",
+            pj.title               AS "projectName"
+        FROM   empProject ep
+        JOIN   project    pj ON TO_CHAR(ep.projectId) = TO_CHAR(pj.projectId)
+        WHERE  ep.empId = #{empId}
+        ORDER BY pj.title
+    </select>
+
+    <!-- ════════════════════════════════════════════════════════
+         해당 직원의 보고서가 존재하는 연도 목록
+         → 평가 모달의 연도 select 옵션에 사용
+         depth=0 (보고서) 기준, period_start 연도 추출
+    ════════════════════════════════════════════════════════ -->
+    <select id="listEvalYears" parameterType="string" resultType="int">
+        SELECT DISTINCT EXTRACT(YEAR FROM period_start) AS evalYear
+        FROM   report
+        WHERE  empId = #{empId}
+          AND  depth = 0
+          AND  period_start IS NOT NULL
+        ORDER BY evalYear DESC
+    </select>
+
+    <!-- ════════════════════════════════════════════════════════
+         연도별 월×주차 평가 그리드 데이터
+         
+         주차 계산 로직:
+           period_start 기준으로 해당 월의 몇 번째 주인지 계산
+           → Oracle: CEIL(( TO_NUMBER(TO_CHAR(period_start,'DD'))
+                          + TO_NUMBER(TO_CHAR(TRUNC(period_start,'MM'),'D')) - 1 ) / 7)
+              단, 이는 일 기준이며 실제로는 period_start의 일(day)만으로
+              간단하게 주차를 산정:
+              1~7일  → 1주, 8~14일 → 2주, 15~21일 → 3주, 22일~ → 4주
+         
+         평가값(evaluation):
+           피드백(depth=1)의 evaluation 컬럼에 저장됨
+           → 보고서(depth=0)와 JOIN하여 가져옴
+           → 피드백이 없으면 'NONE'(미제출)
+         
+         params: empId, year
+    ════════════════════════════════════════════════════════ -->
+    <select id="listEvalGrid" parameterType="map" resultMap="evalGridResultMap">
+        SELECT
+            EXTRACT(MONTH FROM r.period_start) AS reportMonth,
+            CASE
+                WHEN TO_NUMBER(TO_CHAR(r.period_start, 'DD')) &lt;= 7  THEN 1
+                WHEN TO_NUMBER(TO_CHAR(r.period_start, 'DD')) &lt;= 14 THEN 2
+                WHEN TO_NUMBER(TO_CHAR(r.period_start, 'DD')) &lt;= 21 THEN 3
+                ELSE 4
+            END AS reportWeek,
+            NVL(
+                (
+                    SELECT MAX(fb.evaluation)
+                    FROM   report fb
+                    WHERE  fb.parent = r.filenum
+                      AND  fb.depth  = 1
+                      AND  fb.evaluation IS NOT NULL
+                ),
+                'NONE'
+            ) AS evaluation
+        FROM   report r
+        WHERE  r.empId       = #{empId}
+          AND  r.depth       = 0
+          AND  r.period_start IS NOT NULL
+          AND  EXTRACT(YEAR FROM r.period_start) = #{year}
+        ORDER BY reportMonth, reportWeek
+    </select>
+
+</mapper>

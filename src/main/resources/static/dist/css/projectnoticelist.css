@@ -1,0 +1,152 @@
+@charset "UTF-8";
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━
+   레이아웃 및 초기화
+━━━━━━━━━━━━━━━━━━━━━━━━ */
+.main-content {
+    margin-left: 240px !important;
+    padding: 24px 32px !important;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background: #f8f9fc;
+    display: flex;
+    flex-direction: column;
+}
+
+/* [중요] Vue 렌더링 전 중괄호 노출 방지 */
+[v-cloak] { display: none !important; }
+
+/* ── 상단 액션 바 ── */
+.notice-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+.notice-topbar-left  { display: flex; align-items: center; gap: 10px; }
+.notice-topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.page-title { font-size: 20px; font-weight: 700; color: #1d2939; margin: 0; }
+
+/* ── 프로젝트 셀렉트 ── */
+.project-select {
+    width: 300px;
+    padding: 8px 12px;
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+    transition: border-color .15s;
+}
+.project-select:focus { border-color: #4e73df; }
+
+/* ── 검색 바 ── */
+.notice-search-bar { display: flex; gap: 6px; }
+.notice-search-bar input {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    width: 220px;
+    outline: none;
+}
+.btn-search {
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* ── 공통 패널 ── */
+.notice-panel {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e6eaf4;
+    overflow: hidden;
+    flex: 1;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   목록 뷰 (Table)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.notice-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.notice-table thead tr { background: #f8f9fd; border-bottom: 2px solid #e6eaf4; }
+.notice-table thead th { padding: 12px 16px; text-align: left; color: #7b82a0; font-weight: 700; }
+.notice-table tbody tr { border-bottom: 1px solid #f0f2f9; cursor: pointer; transition: background .12s; }
+.notice-table tbody tr:hover { background: #f6f8ff; }
+.notice-table td { padding: 14px 16px; color: #3a3f51; }
+
+.badge-notice {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #fff4e0;
+    color: #d97706;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   상세 뷰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.detail-header { padding: 24px 28px 16px; border-bottom: 1px solid #f0f2f9; }
+.detail-title { font-size: 20px; font-weight: 700; color: #1d2939; margin-bottom: 12px; }
+.detail-meta { display: flex; gap: 16px; font-size: 12px; color: #9aa0b4; }
+.detail-body { padding: 24px 28px; min-height: 200px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+
+.file-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0f3ff;
+    border: 1px solid #c7d2f8;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #4e73df;
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: 8px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   등록/수정 폼 뷰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.form-panel-header { padding: 16px 24px; border-bottom: 1px solid #f0f2f9; background: #f8f9fd; font-weight: 700; }
+.form-panel-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.form-field { display: flex; flex-direction: column; gap: 7px; }
+.form-label { font-size: 11px; font-weight: 700; color: #667085; text-transform: uppercase; }
+.form-input, .form-textarea {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ── 버튼 공통 ── */
+.btn-new-notice, .btn-submit {
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.table-pagination { display: flex; justify-content: center; padding: 16px; gap: 5px; border-top: 1px solid #f0f2f9; }
+.page-btn { border: 1px solid #e6eaf4; background: #fff; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.page-btn.active { background: #4e73df; color: #fff; border-color: #4e73df; }
+
+.empty-msg { text-align: center; padding: 60px; color: #9aa0b4; }

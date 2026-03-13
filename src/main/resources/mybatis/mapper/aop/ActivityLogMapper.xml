@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.aop.mapper.ActivityLogMapper">
+
+    <!-- ════════════════════════════════════════
+         활동 로그 INSERT
+         PK(log_id) : seq_activity_log.NEXTVAL (DDL DEFAULT 처리)
+    ════════════════════════════════════════ -->
+    <insert id="insertActivityLog" parameterType="com.mvc.app.aop.dto.ActivityLogDto">
+        INSERT INTO activity_log (
+            actor_emp_id,
+            actor_name,
+            action_type,
+            target_menu,
+            target_emp_ids,
+            before_data,
+            after_data,
+            result,
+            error_msg,
+            ip_addr,
+            log_date
+        ) VALUES (
+            #{actorEmpId},
+            #{actorName,     jdbcType=VARCHAR},
+            #{actionType},
+            #{targetMenu,    jdbcType=VARCHAR},
+            #{targetEmpIds,  jdbcType=VARCHAR},
+            #{beforeData,    jdbcType=CLOB},
+            #{afterData,     jdbcType=CLOB},
+            #{result},
+            #{errorMsg,      jdbcType=VARCHAR},
+            #{ipAddr,        jdbcType=VARCHAR},
+            SYSDATE
+        )
+    </insert>
+
+</mapper>

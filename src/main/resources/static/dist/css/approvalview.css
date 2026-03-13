@@ -1,0 +1,296 @@
+@charset "UTF-8";
+
+/* ── 레이아웃 ── */
+#main-content {
+    margin-left: 240px !important;
+    padding: 14px 32px !important;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background: #f8f9fc;
+}
+
+/* ── 페이지 헤더 ── */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.page-header .material-symbols-outlined { font-size: 15px; color: #4e73df; }
+.page-header-label { font-size: 13px; font-weight: 700; color: #1d2939; }
+.page-header-divider { font-size: 13px; color: #b0b7cc; }
+.page-header-doc { font-size: 13px; font-weight: 600; color: #4e73df; }
+
+/* ── 섹션 공통 ── */
+.view-section {
+    background: #fff;
+    border: 1px solid #e6eaf4;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+.view-section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f0f2f9;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1d2939;
+}
+.view-section-header .material-symbols-outlined { font-size: 15px; color: #4e73df; }
+.view-section-body { padding: 14px 16px; }
+
+/* ── 기본정보 그리드 ── */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+}
+.view-field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #667085;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 4px;
+}
+.view-field .view-value {
+    font-size: 13px;
+    color: #1d2939;
+    padding: 7px 10px;
+    background: #f8f9fc;
+    border: 1px solid #e6eaf4;
+    border-radius: 5px;
+}
+
+/* ── 상태 뱃지 ── */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.status-DRAFT    { background: #f1f3f9; color: #667085; }
+.status-PENDING  { background: #fff4e0; color: #d97706; }
+.status-APPROVED { background: #e0f5ef; color: #1a9660; }
+.status-REJECTED { background: #fde8e8; color: #e53e3e; }
+.status-CANCELED    { background: #f0f0f0; color: #6b7280; }
+.status-ON_HOLD     { background: #fff3cd; color: #856404; }
+.status-MYAPPROVED  { background: #e0f5ef; color: #1a9660; }
+.status-INPROGRESS  { background: #e0ecff; color: #2563eb; }
+
+/* ── 결재선 ── */
+.line-grid {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.line-card {
+    flex: 1;
+    min-width: 140px;
+    border: 1px solid #e6eaf4;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+}
+.line-card-header {
+    background: #f8f9fc;
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #667085;
+    border-bottom: 1px solid #e6eaf4;
+}
+.line-card-body { padding: 10px; }
+.line-card-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1d2939;
+    margin-bottom: 4px;
+}
+.line-card-dept {
+    font-size: 11px;
+    color: #667085;
+    margin-bottom: 8px;
+}
+
+/* ── 결재선 상태별 색상 ── */
+.line-WAIT     { border-color: #e6eaf4; }
+.line-WAIT .line-card-header     { background: #f8f9fc; color: #667085; }
+.line-APPROVED { border-color: #b6e5d8; }
+.line-APPROVED .line-card-header { background: #e0f5ef; color: #1a9660; }
+.line-REJECTED { border-color: #f5c6c6; }
+.line-REJECTED .line-card-header { background: #fde8e8; color: #e53e3e; }
+.line-HOLD     { border-color: #fde0a5; }
+.line-HOLD .line-card-header     { background: #fff4e0; color: #d97706; }
+
+/* ── 참조자 읽음/안읽음 ── */
+.ref-READ      { border-color: #a3c4f3; }
+.ref-READ .line-card-header      { background: #e0ecff; color: #2563eb; }
+.ref-UNREAD    { border-color: #e6eaf4; }
+.ref-UNREAD .line-card-header    { background: #f8f9fc; color: #667085; }
+.status-READ   { background: #e0ecff; color: #2563eb; }
+.status-UNREAD { background: #f1f3f9; color: #667085; }
+
+/* ── 세부정보 그리드 ── */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+.detail-content {
+    font-size: 13px;
+    color: #1d2939;
+    padding: 10px;
+    background: #f8f9fc;
+    border: 1px solid #e6eaf4;
+    border-radius: 5px;
+    min-height: 80px;
+    white-space: pre-wrap;
+}
+
+/* ── 첨부파일 ── */
+.file-list { display: flex; flex-direction: column; gap: 6px; }
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f9fc;
+    border: 1px solid #e6eaf4;
+    border-radius: 6px;
+    font-size: 12px;
+}
+.file-item .material-symbols-outlined { font-size: 16px; color: #4e73df; }
+.file-item-name { flex: 1; color: #1d2939; }
+.file-item-size { color: #9aa0b4; font-size: 11px; }
+.file-item-btn {
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+}
+.file-item-btn:hover { background: #3a5abf; }
+.no-file { font-size: 12px; color: #9aa0b4; padding: 10px 0; }
+
+/* ── 하단 버튼 ── */
+.view-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 0 4px;
+}
+.btn-back {
+    background: #f1f3f9;
+    color: #3a3f51;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+}
+.btn-back:hover { background: #e2e6f0; }
+.btn-approve {
+    background: #12b76a;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+}
+.btn-approve:hover { background: #0e9a5a; }
+.btn-reject {
+    background: #e53e3e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+}
+.btn-reject:hover { background: #c53030; }
+.btn-hold {
+    background: #f79009;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+}
+.btn-hold:hover { background: #dc6803; }
+.btn-resubmit {
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+}
+.btn-resubmit:hover { background: #3a5abf; }
+
+/* ── 대결 뱃지 ── */
+.deputy-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #e0ecff;
+    color: #2563eb;
+}
+.deputy-badge.deputy-scheduled {
+    background: #fff4e0;
+    color: #d97706;
+}
+
+/* ── 대결 안내 문구 ── */
+.deputy-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #e0ecff;
+    color: #2563eb;
+}

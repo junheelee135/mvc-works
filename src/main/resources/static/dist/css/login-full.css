@@ -1,0 +1,262 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@400;600;700&display=swap");
+
+:root {
+    --blue:       #2b87d0;
+    --blue-dark:  #1a6ab8;
+    --blue-deep:  #0f509a;
+    --blue-light: #daeef9;
+    --blue-mid:   #b8dcf4;
+    --blue-dim:   rgba(27,106,184,.1);
+    --border:     rgba(27,106,184,.28);
+    --text-main:  #07182e;
+    --text-muted: #4a86b0;
+    --text-sub:   #85b8d8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/*----------------------------------
+# Full Screen
+----------------------------------*/
+.full-main {
+    font-family: 'Quicksand', sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/*----------------------------------
+# 배경 블롭 (비활성)
+----------------------------------*/
+.full-main-bg,
+.full-main-bg .large-circle-1,
+.full-main-bg .small-circle-1,
+.full-main-bg .large-circle-2,
+.full-main-bg .small-circle-2 { display: none; }
+
+/*----------------------------------
+# 카드 컨테이너
+----------------------------------*/
+.full-main .card-container {
+    position: relative;
+    z-index: 1;
+    padding: 0;
+}
+
+/*----------------------------------
+# 카드
+----------------------------------*/
+.full-main .card-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 420px;
+    max-width: 95vw;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow:
+        0 0 0 6px var(--blue-dim),
+        0 24px 64px rgba(27,106,184,.18),
+        0 4px 20px rgba(0,0,0,.08);
+    overflow: hidden;
+    animation: card-in .7s cubic-bezier(.16,1,.3,1) both;
+    padding: 0 !important;
+}
+
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(24px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 상단 단색 바 */
+.full-main .card-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--blue);
+    z-index: 1;
+}
+
+.full-main .card-inner {
+    padding: 40px 40px 36px;
+}
+
+/*----------------------------------
+# 카드 헤더 (브랜드)
+----------------------------------*/
+.full-main .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.full-main .card-header .brand-info { flex: 1; }
+
+.full-main .card-header .brand-name {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    display: block;
+}
+
+.full-main .card-header .brand-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: .3px;
+}
+
+/*----------------------------------
+# 폼 헤더
+----------------------------------*/
+.full-main .login-form-header {
+    margin-bottom: 28px;
+    padding: 0;
+}
+
+.full-main .login-form-header h3 {
+    color: var(--text-main);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    margin-bottom: 4px;
+    text-align: left;
+}
+
+.full-main .login-form-header .form-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/*----------------------------------
+# 입력 필드
+----------------------------------*/
+.full-main .field-group { margin-bottom: 16px; }
+
+.full-main .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: .3px;
+    margin-bottom: 7px;
+}
+
+.full-main .form-control {
+    width: 100%;
+    background: var(--blue-light);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+.full-main .form-control::placeholder { color: var(--text-sub); }
+
+.full-main .form-control:focus {
+    border-color: var(--blue);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(78,168,232,.1);
+}
+
+/*----------------------------------
+# 체크박스
+----------------------------------*/
+.full-main .form-check-input {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    background: var(--blue-light);
+    cursor: pointer;
+    accent-color: var(--blue);
+}
+
+.full-main .form-check-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+/*----------------------------------
+# 버튼
+----------------------------------*/
+.full-main .btn-accent {
+    width: 100%;
+    background: var(--blue-dark);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    padding: 14px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .3s, transform .2s;
+}
+
+.full-main .btn-accent:hover {
+    box-shadow: 0 8px 24px rgba(27,106,184,.35);
+    transform: translateY(-1px);
+}
+
+/*----------------------------------
+# 하단 링크
+----------------------------------*/
+.full-main .border-link-right {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color .2s;
+}
+.full-main .border-link-right:hover { color: var(--blue); }
+
+.full-main .text-danger { font-size: 12px; }
+
+/*----------------------------------
+# 카드 하단 정보
+----------------------------------*/
+.full-main .card-footer-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--blue-mid);
+}
+.full-main .card-footer-info span {
+    font-size: 11px;
+    color: var(--text-sub);
+}
+.full-main .card-footer-info .ver {
+    font-size: 11px;
+    color: var(--blue);
+    font-weight: 700;
+}
+
+/*----------------------------------
+# 반응형
+----------------------------------*/
+@media (max-width: 480px) {
+    .full-main .card-inner { padding: 32px 24px; }
+}

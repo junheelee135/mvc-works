@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.DocTypeMapper">
+
+    <!-- 등록 (typeCode, sortOrder 자동생성) -->
+    <insert id="insertDocType" parameterType="com.mvc.app.domain.dto.DocTypeDto">
+        INSERT INTO approvalDocType (docTypeId, typeName, typeCode, description, sortOrder, useYn, regEmpId, regDate)
+        VALUES (
+            approvalDocType_seq.NEXTVAL,
+            #{typeName},
+            'DOC-' || LPAD(TO_CHAR(approvalDocType_seq.CURRVAL), 3, '0'),
+            #{description},
+            (SELECT NVL(MAX(sortOrder), 0) + 1 FROM approvalDocType),
+            #{useYn},
+            #{regEmpId},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 전체 목록 -->
+    <select id="listDocType" resultType="com.mvc.app.domain.dto.DocTypeDto">
+        SELECT docTypeId, typeName, typeCode, description, sortOrder, useYn, regEmpId,
+               TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate,
+               formCode, notice
+        FROM approvalDocType
+        ORDER BY sortOrder, docTypeId
+    </select>
+
+    <!-- 1건 조회 -->
+    <select id="findById" parameterType="Long" resultType="com.mvc.app.domain.dto.DocTypeDto">
+        SELECT docTypeId, typeName, typeCode, description, sortOrder, useYn, regEmpId,
+               TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate,
+               formCode, notice
+        FROM approvalDocType
+        WHERE docTypeId = #{docTypeId}
+    </select>
+
+    <!-- 수정 (typeCode는 변경 불가) -->
+    <update id="updateDocType" parameterType="com.mvc.app.domain.dto.DocTypeDto">
+        UPDATE approvalDocType
+        SET typeName = #{typeName},
+            description = #{description},
+            useYn = #{useYn},
+            sortOrder = #{sortOrder},
+            formCode = #{formCode},
+            notice = #{notice}
+        WHERE docTypeId = #{docTypeId}
+    </update>
+
+    <!-- 삭제 -->
+    <delete id="deleteDocType" parameterType="Long">
+        DELETE FROM approvalDocType
+        WHERE docTypeId = #{docTypeId}
+    </delete>
+
+</mapper>

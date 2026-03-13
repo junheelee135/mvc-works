@@ -1,0 +1,22 @@
+※ 깃 .gitignore 해야 할것
+   - 개인 정보가 있는 api 서비스 키를 가지고 있는 파일
+      카카오, 공공 API, 결제 API 키등
+   - application.yml
+   - 메일 보내기 파일
+   - 기타 중요 정보
+   - 작성 예
+# -------------------------------------
+# 빌드 디렉토리 무시
+/build/
+**/WEB-INF/views/api/**
+
+footer.jsp
+application.yml
+KakaoAuthService.java
+MailSender.java
+# -------------------------------------
+
+
+  - 카카오 지도 등은 
+     /WEB-INF/views/api/map.jsp 처럼 jsp 파일을 만들어 <script> 태그를 만들고
+     지도를 표시할 jsp 에서 include 해서 사용

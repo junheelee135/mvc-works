@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mvc.app.mapper.ProjectsMapper">
+
+	<!-- 프로젝트 생성 -->
+	<insert id="insertProject"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		<selectKey keyProperty="projectId" resultType="long"
+			order="BEFORE">
+			SELECT PROJECTS_SEQ .NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO project (projectId, projectType, pmoType, title,
+		description, startDate, endDate, createdDate, status, progress)
+		VALUES(#{projectId}, #{projectType}, #{pmoType}, #{title},
+		#{description}, #{startDate}, #{endDate}, SYSDATE,
+		CASE
+		WHEN #{endDate}
+		&lt; TRUNC(SYSDATE) THEN 4
+		WHEN #{startDate} &lt;= TRUNC(SYSDATE) AND
+		#{endDate} &gt;= TRUNC(SYSDATE)
+		THEN 2
+		ELSE 1
+		END, 0)
+	</insert>
+
+	<!-- 프로젝트 구성원 조성 및 역할 부여 -->
+	<insert id="insertProjectMembers" parameterType="map">
+		INSERT INTO EMPPROJECT (empprojId, empId, projectId, role)
+		SELECT 'EP'
+		|| LPAD(EMPPROJECT_SEQ.NEXTVAL, 9, '0'), A.* FROM (
+		<foreach collection="members" item="member"
+			separator="UNION ALL">
+			SELECT
+			#{member.empId}, #{projectId}, NVL(#{member.role},
+			'P')
+			FROM DUAL
+		</foreach>
+		) A
+	</insert>
+
+	<!-- 프로젝트 단계 설정 -->
+	<insert id="insertProjectStep" parameterType="map">
+		INSERT INTO STAGE (stageId, projectId, stgTitle, sequence, stgStatus,
+		stgProgress, stgCreatedDate)
+		SELECT 'STG' || LPAD(STAGE_SEQ.NEXTVAL, 8,
+		'0'), B.projectId, B.stgTitle,
+		B.sequence, '1', 0, SYSDATE FROM (
+		<foreach collection="stages" item="stage"
+			separator="UNION ALL">
+			SELECT
+			#{projectId} as projectId,
+			#{stage.stgTitle} as
+			stgTitle,
+			#{stage.sequence} as sequence
+			FROM DUAL
+		</foreach>
+		) B
+	</insert>
+
+	<sql id="where-project">
+		<choose>
+			<when test="schType == 'title'">
+				INSTR(p.TITLE, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'manager'">
+				INSTR(e.NAME, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'startDate'">
+				(INSTR(TO_CHAR(p.STARTDATE, 'YYYY/MM/DD'), #{kwd})
+				&gt; 0
+				OR INSTR(TO_CHAR(p.STARTDATE, 'YYYY-MM-DD'), #{kwd}) &gt; 0
+				OR
+				INSTR(TO_CHAR(p.STARTDATE, 'YYYYMMDD'), #{kwd}) &gt; 0)
+			</when>
+			<when test="schType == 'endDate'">
+				(INSTR(TO_CHAR(p.ENDDATE, 'YYYY/MM/DD'), #{kwd}) &gt;
+				0
+				OR INSTR(TO_CHAR(p.ENDDATE, 'YYYY-MM-DD'), #{kwd}) &gt; 0
+				OR
+				INSTR(TO_CHAR(p.ENDDATE, 'YYYYMMDD'), #{kwd}) &gt; 0)
+			</when>
+			<otherwise>
+				INSTR(${schType}, #{kwd}) &gt; 0
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="findStageByProjectId" parameterType="long"
+		resultType="map">
+		SELECT
+		stageId AS stageId,
+		sequence AS sequence
+		FROM STAGE
+		WHERE projectId = #{projectId}
+		ORDER BY sequence
+	</select>
+
+<insert id="insertTasks">
+INSERT INTO TASK (
+    TASKID,
+    STAGEID,
+    TASKTITLE,
+    TASKDESCRIPTION,
+    TASKCREATOR,
+    TASKSTATUS,
+    TASKCREATEDDATE
+)
+SELECT
+    'TSK' || LPAD(TASK_SEQ.NEXTVAL, 8, '0'),
+    #{stageId},
+    jt.taskTitle,
+    '',
+    #{creator},
+    '1',
+    SYSDATE
+FROM JSON_TABLE(
+    #{tasks,jdbcType=VARCHAR},
+    '$[*]'
+    COLUMNS (
+        taskTitle VARCHAR2(200) PATH '$.taskTitle'
+    )
+) jt
+</insert>
+	
+	<!-- 프로젝트 리스트 -->
+	<select id="projectslist" parameterType="map"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+		p.PROJECTID,
+		p.TITLE,
+		p.PROJECTTYPE,
+		CASE
+		WHEN COUNT(e.NAME) > 1
+		THEN MIN(e.NAME) || ' 외 ' || (COUNT(e.NAME) - 1) || '명'
+		ELSE
+		MIN(e.NAME)
+		END AS managerName,
+		TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS
+		startDate,
+		TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
+		TRUNC(p.ENDDATE
+		- p.STARTDATE) AS totalDays,
+		CASE
+		WHEN p.STARTDATE &gt; TRUNC(SYSDATE)
+		THEN '시작 전'
+		WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '0'
+		ELSE
+		TO_CHAR(GREATEST(TRUNC(p.ENDDATE - SYSDATE), 0)) || ' / ' ||
+		TO_CHAR(TRUNC(p.ENDDATE - p.STARTDATE))
+		END AS remainDays,
+		p.PROGRESS,
+		CASE
+		WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '4'
+		WHEN p.STARTDATE &lt;=
+		TRUNC(SYSDATE) AND p.ENDDATE &gt;= TRUNC(SYSDATE)
+		THEN '2'
+		ELSE p.STATUS
+		END AS status
+		FROM PROJECT p
+		JOIN EMPPROJECT ep ON p.PROJECTID =
+		ep.PROJECTID
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE ep.ROLE = 'M'
+		<if test="kwd != null and kwd != ''">
+			AND
+			<include refid="where-project" />
+		</if>
+		GROUP BY
+		p.PROJECTID,
+		p.TITLE,
+		p.PROJECTTYPE,
+		p.STARTDATE,
+		p.ENDDATE,
+		p.PROGRESS,
+		p.STATUS
+		ORDER BY p.PROJECTID DESC
+		OFFSET #{offset} ROWS
+		FETCH FIRST #{size} ROWS ONLY
+	</select>
+
+
+	<select id="dataCount" parameterType="map" resultType="Integer">
+		SELECT NVL(COUNT(*), 0)
+		FROM PROJECT p
+		JOIN EMPPROJECT ep ON p.PROJECTID
+		= ep.PROJECTID
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE ep.ROLE =
+		'M'
+		<if test="kwd != null and kwd != ''">
+			AND
+			<include refid="where-project" />
+		</if>
+	</select>
+
+	<!-- 프로젝트 단건 조회 -->
+	<select id="projectarticle" parameterType="long"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+		p.PROJECTID, p.TITLE, p.PROJECTTYPE, p.PMOTYPE,
+		p.DESCRIPTION,
+		TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
+		TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
+		TRUNC(p.ENDDATE -
+		p.STARTDATE) AS totalDays,
+		CASE
+		WHEN p.STARTDATE &gt; TRUNC(SYSDATE)
+		THEN '시작 전'
+		WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '0'
+		ELSE
+		TO_CHAR(GREATEST(TRUNC(p.ENDDATE - SYSDATE), 0)) || ' / ' ||
+		TO_CHAR(TRUNC(p.ENDDATE - p.STARTDATE))
+		END AS remainDays,
+		p.PROGRESS,
+		p.STATUS,
+		LISTAGG(e.NAME, ', ') WITHIN GROUP (ORDER BY e.NAME) AS
+		managerName
+		FROM PROJECT p
+		JOIN EMPPROJECT ep ON p.PROJECTID =
+		ep.PROJECTID
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE p.PROJECTID =
+		#{projectId}
+		AND ep.ROLE = 'M'
+		GROUP BY
+		p.PROJECTID, p.TITLE,
+		p.PROJECTTYPE, p.PMOTYPE,
+		p.DESCRIPTION,
+		p.STARTDATE, p.ENDDATE,
+		p.PROGRESS, p.STATUS
+	</select>
+
+	<!-- 프로젝트 구성원 조회 -->
+	<select id="projectMembers" parameterType="long" resultType="map">
+		SELECT
+		ep.EMPID,
+		e.NAME,
+		ep.ROLE
+		FROM EMPPROJECT ep
+		JOIN
+		EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE ep.PROJECTID = #{projectId}
+	</select>
+
+	<select id="findById" parameterType="long"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+		p.PROJECTID,
+		p.TITLE,
+		p.DESCRIPTION,
+		TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
+		TO_CHAR(p.ENDDATE,
+		'YYYY/MM/DD') AS endDate,
+		p.PROGRESS,
+		LISTAGG(e.NAME, ', ') WITHIN GROUP
+		(ORDER BY e.NAME) AS managerName
+		FROM PROJECT p
+		JOIN EMPPROJECT ep ON
+		p.PROJECTID = ep.PROJECTID
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE
+		p.PROJECTID = #{projectId}
+		AND ep.ROLE = 'M'
+		GROUP BY
+		p.PROJECTID,
+		p.TITLE,
+		p.DESCRIPTION,
+		p.STARTDATE,
+		p.ENDDATE,
+		p.PROGRESS
+	</select>
+
+	<select id="findProjectsByEmpId" parameterType="string"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+
+		SELECT p.*
+		FROM PROJECT p
+		JOIN EMPPROJECT ep
+		ON p.projectId =
+		ep.projectId
+		WHERE ep.empId = #{empId}
+	</select>
+</mapper>

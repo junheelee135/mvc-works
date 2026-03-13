@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.ProjectNoticeMapper">
+
+    <!-- ── 등록 ── -->
+    <insert id="insertNotice" parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        <selectKey keyProperty="noticenum" resultType="long" order="BEFORE">
+            SELECT PROJECTNOTICE_SEQ.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO projectnotice (
+            noticenum, projectid, subject, content,
+            hitcount, regdate, isnotice, state, authorempid
+        ) VALUES (
+            #{noticenum},
+            #{projectid,   jdbcType=NUMERIC},
+            #{subject,     jdbcType=VARCHAR},
+            #{content,     jdbcType=VARCHAR},
+            0, SYSDATE,
+            #{isnotice},
+            1,
+            #{authorempid, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- ── 수정 ── -->
+    <update id="updateNotice" parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        UPDATE projectnotice
+        SET subject    = #{subject,  jdbcType=VARCHAR},
+            content    = #{content,  jdbcType=VARCHAR},
+            isnotice   = #{isnotice},
+            updatedate = SYSDATE
+        WHERE noticenum = #{noticenum}
+    </update>
+
+    <!-- ── 삭제 (소프트) ── -->
+    <update id="deleteNotice" parameterType="long">
+        UPDATE projectnotice SET state = 0 WHERE noticenum = #{noticenum}
+    </update>
+
+    <!-- ── 조회수 증가 ── -->
+    <update id="increaseHit" parameterType="long">
+        UPDATE projectnotice SET hitcount = hitcount + 1 WHERE noticenum = #{noticenum}
+    </update>
+
+    <!-- ── 목록 ── -->
+    <select id="listNotice" parameterType="map" resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        SELECT n.noticenum,
+               n.projectid,
+               n.subject,
+               n.hitcount,
+               n.isnotice,
+               n.state,
+               TO_CHAR(n.regdate,    'YYYY-MM-DD') AS regdate,
+               TO_CHAR(n.updatedate, 'YYYY-MM-DD') AS updatedate,
+               n.authorempid,
+               e.name AS authorName
+        FROM projectnotice n
+        LEFT JOIN employee2 e ON n.authorempid = e.empId
+        WHERE n.state = 1
+          AND n.projectid = #{projectid}
+        <if test="keyword != null and keyword != ''">
+            AND (n.subject LIKE '%' || #{keyword} || '%'
+              OR n.content LIKE '%' || #{keyword} || '%')
+        </if>
+        ORDER BY n.isnotice DESC, n.noticenum DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <!-- ── 건수 ── -->
+    <select id="countNotice" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM projectnotice
+        WHERE state = 1
+          AND projectid = #{projectid}
+        <if test="keyword != null and keyword != ''">
+            AND (subject LIKE '%' || #{keyword} || '%'
+              OR content LIKE '%' || #{keyword} || '%')
+        </if>
+    </select>
+
+    <!-- ── 단건 ── -->
+    <select id="getNotice" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        SELECT n.noticenum,
+               n.projectid,
+               n.subject,
+               n.content,
+               n.hitcount,
+               n.isnotice,
+               n.state,
+               TO_CHAR(n.regdate,    'YYYY-MM-DD') AS regdate,
+               TO_CHAR(n.updatedate, 'YYYY-MM-DD') AS updatedate,
+               n.authorempid,
+               e.name AS authorName,
+               p.title AS projectName
+        FROM projectnotice n
+        LEFT JOIN employee2 e ON n.authorempid = e.empId
+        LEFT JOIN project   p ON n.projectid   = p.projectid
+        WHERE n.noticenum = #{noticenum}
+    </select>
+
+    <!-- ── 내 프로젝트 목록 (셀렉트박스용) ── -->
+    <select id="getMyProjects" parameterType="string" resultType="map">
+        SELECT ep.projectid,
+               p.title AS projectname,
+               ep.role
+        FROM empproject ep
+        JOIN project p ON ep.projectid = p.projectid
+        WHERE ep.empid = #{empId}
+        ORDER BY p.projectname
+    </select>
+
+    <!-- ── 첨부파일 등록 ── -->
+    <insert id="insertFile" parameterType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
+        <selectKey keyProperty="filenum" resultType="long" order="BEFORE">
+            SELECT PROJECTNOTICEFILE_SEQ.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO projectnoticefile (
+            filenum, savefilename, originalfilename, filesize, noticenum
+        ) VALUES (
+            #{filenum},
+            #{savefilename},
+            #{originalfilename, jdbcType=VARCHAR},
+            #{filesize},
+            #{noticenum}
+        )
+    </insert>
+
+    <!-- ── 첨부파일 삭제 ── -->
+    <delete id="deleteFile" parameterType="long">
+        DELETE FROM projectnoticefile WHERE filenum = #{filenum}
+    </delete>
+
+    <!-- ── 첨부파일 목록 ── -->
+    <select id="getFiles" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
+        SELECT filenum, savefilename, originalfilename, filesize, noticenum
+        FROM projectnoticefile
+        WHERE noticenum = #{noticenum}
+        ORDER BY filenum ASC
+    </select>
+
+    <!-- ── 첨부파일 단건 ── -->
+    <select id="getFile" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
+        SELECT filenum, savefilename, originalfilename, filesize, noticenum
+        FROM projectnoticefile
+        WHERE filenum = #{filenum}
+    </select>
+
+</mapper>

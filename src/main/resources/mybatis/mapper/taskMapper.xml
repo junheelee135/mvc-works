@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mvc.app.mapper.TaskMapper">
+	<!-- task 생성 -->
+	<!-- <insert id="insertProjectTask"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		INSERT INTO TASK (
+		TASKID,
+		STAGEID,
+		TASKTITLE,
+		TASKDESCRIPTION,
+		TASKSTARTDATE,
+		TASKENDDATE,
+		TASKSTATUS,
+		TASKCREATEDDATE,
+		TASKCREATOR
+		)
+		VALUES (
+		'TSK' || TASK_SEQ.NEXTVAL,
+		#{stageId, jdbcType=VARCHAR},
+		#{taskTitle},
+		#{taskDescription, jdbcType=VARCHAR},
+		#TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		#TO_DATE(#{taskEndDate}, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		CASE
+		 	WHEN TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt; TRUNC(SYSDATE) THEN 4
+            WHEN TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;= TRUNC(SYSDATE)
+            AND TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &gt;= TRUNC(SYSDATE) THEN 2
+            ELSE 1
+		END,
+		SYSDATE,
+		#{taskCreator, jdbcType=VARCHAR}
+		)
+	</insert>-->
+	
+	<insert id="insertEmpTask" parameterType="com.mvc.app.domain.dto.ProjectsDto">
+	    INSERT INTO EMPTASK (
+	        EMPTASKID,
+	        EMPID,
+	        TASKID,
+	        EMTASKSTARTDATE,
+	        EMPTASKENDDATE,
+	        EMPTASKSTATUS
+	    ) VALUES (
+	        'ET' || LPAD(EMPTASK_SEQ.NEXTVAL, 9, '0'),
+	        #{empId, jdbcType=VARCHAR},
+	        #{taskId},
+	        TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+	        TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+	        '1'
+	    )
+	</insert>
+	
+
+	<!-- 수정 task 제목, 설명, 시작일, 종료일 한정 -->
+	<!--  <update id="updateProjectTask" parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		UPDATE TASK 
+	</update> -->
+	
+
+	<!-- 계획 취소 / 삭제 불가로 -->
+	<sql id="where-task">
+		<choose>
+			<when test="schType == 'stgTitle'">
+				INSTR(s.STGTITLE, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'taskTitle'">
+				INSTR(t.TASKTITLE, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'taskStartDate'">
+				(INSTR(TO_CHAR(t.TASKSTARTDATE, 'YYYY/MM/DD'),
+				#{kwd}) &gt; 0
+				OR INSTR(TO_CHAR(t.TASKSTARTDATE, 'YYYY-MM-DD'),
+				#{kwd}) &gt; 0)
+			</when>
+			<when test="schType == 'taskEndDate'">
+				(INSTR(TO_CHAR(t.TASKENDDATE, 'YYYY/MM/DD'), #{kwd})
+				&gt; 0
+				OR INSTR(TO_CHAR(t.TASKENDDATE, 'YYYY-MM-DD'), #{kwd}) &gt; 0)
+			</when>
+			<when test="schType == 'taskCreater'">
+				INSTR(${schType}, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'member'">
+				INSTR(${schType}, #{kwd}) &gt; 0
+			</when>
+		</choose>
+	</sql>
+
+	<select id="findByEmpId" resultType="map">
+		SELECT
+		p.TITLE AS projectName,
+		t.TASKTITLE AS title,
+		TO_CHAR(e.EMPTASKSTARTDATE,'YYYY-MM-DD') AS deadline
+		FROM EMPTASK e
+		JOIN TASK t ON e.TASKID = t.TASKID
+		JOIN STAGE s ON t.STAGEID = s.STAGEID
+		JOIN PROJECT p ON s.PROJECTID = p.PROJECTID
+		WHERE e.EMPID = #{empId}
+		AND e.EMPTASKSTATUS = '1'
+		ORDER BY e.EMPTASKSTARTDATE DESC
+	</select>
+
+	<!-- task 리스트 -->
+	<select id="tasklist" parameterType="map"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+		t.taskId,
+		t.stageId,
+		s.projectId,
+		t.taskTitle,
+		t.taskDescription,
+		TO_CHAR(t.taskStartDate, 'YYYY-MM-DD'),
+		TO_CHAR(t.taskEndDate,
+		'YYYY-MM-DD'),
+		t.taskStatus,
+		t.taskcreator,
+		TO_CHAR(t.taskCreatedDate,
+		'YYYY-MM-DD'),
+		s.stgTitle,
+		s.sequence,
+		e1.NAME AS taskCreaterName,
+		e2.NAME AS name
+		FROM TASK t
+		LEFT JOIN STAGE s ON t.stageId = s.stageId
+		LEFT JOIN EMPLOYEE2 e1 ON t.taskcreator = e1.empId
+		LEFT JOIN EMPTASK ep
+		ON t.taskId = ep.taskId
+		LEFT JOIN EMPLOYEE2 e2 ON ep.empId = e2.empId
+		WHERE s.PROJECTID = #{projectId}
+		<if test="kwd != null and kwd != ''">
+			AND
+			<include refid="where-task" />
+		</if>
+		ORDER BY s.sequence ASC, t.taskStartDate ASC
+	</select>
+
+
+	<select id="findStagesByProjectId" parameterType="long"
+	    resultType="com.mvc.app.domain.dto.ProjectsDto">
+	    SELECT stageId, stgTitle, sequence
+	    FROM STAGE
+	    WHERE projectId = #{projectId}
+	    ORDER BY sequence
+	</select>
+
+</mapper>

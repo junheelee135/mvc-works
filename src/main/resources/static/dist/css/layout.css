@@ -1,0 +1,129 @@
+/* =============================================================
+   layout.css
+   공통 레이아웃 - sidebar, topbar, wrapper 전역 스타일
+   ============================================================= */
+
+/* ── Base ── */
+* { box-sizing: border-box; }
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #f4f7fe;
+    overflow-x: hidden;
+    margin: 0;
+}
+
+/* ── Wrapper ── */
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.main-content {
+    padding: 0 2rem 2rem 2rem;
+    flex: 1;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #fff;
+    border-right: 1px solid #e3e6f0;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-brand {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+}
+.sidebar-brand:hover { text-decoration: none !important; }
+.grid-icon {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+    width: 18px;
+    flex-shrink: 0;
+}
+.grid-dot {
+    width: 7px;
+    height: 7px;
+    background: #5d78ff;
+    border-radius: 2px;
+}
+.sidebar .nav-item .nav-link {
+    color: #a3a6b7;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+.sidebar .nav-item .nav-link i {
+    width: 25px;
+    font-size: 1.1rem;
+    margin-right: 10px;
+}
+.sidebar .nav-item.active .nav-link {
+    color: #5d78ff;
+    background: #f0f3ff;
+    border-radius: 0 50px 50px 0;
+    margin-right: 15px;
+}
+.sidebar .nav-item .nav-link:hover { color: #5d78ff; }
+.sidebar-nav-section { flex: 1; }
+.upgrade-card {
+    background: #f8f9fc;
+    border-radius: 20px;
+    margin: 2rem 1.2rem;
+    padding: 1.5rem;
+}
+
+/* ── Topbar ── */
+.topbar {
+    background: transparent;
+    padding: 1.5rem 2rem;
+}
+.search-group {
+    background: #fff;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+.search-group .input-group-prepend {
+    padding: 0.5rem 0 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+}
+.search-group input {
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+}
+.search-group input:focus {
+    box-shadow: none;
+    background: transparent;
+}
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.badge-counter {
+    position: absolute;
+    transform: scale(0.7);
+    top: 5px;
+    right: 2px;
+}
+.topbar-divider {
+    border-right: 1px solid #e3e6f0;
+    height: 2rem;
+}

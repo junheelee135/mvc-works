@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.NoticeMapper">
+
+    <!-- ── 공지사항 등록 ── -->
+    <insert id="insertNotice" parameterType="com.mvc.app.domain.dto.NoticeDto">
+        <selectKey keyProperty="noticenum" resultType="long" order="BEFORE">
+            SELECT NOTICE_SEQ.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO notice (
+            noticenum, subject, content,
+            hitcount, regdate, isnotice, state, authorEmpId
+        ) VALUES (
+            #{noticenum},
+            #{subject,    jdbcType=VARCHAR},
+            #{content,    jdbcType=VARCHAR},
+            0,
+            SYSDATE,
+            #{isnotice},
+            1,
+            #{authorEmpId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- ── 공지사항 수정 ── -->
+    <update id="updateNotice" parameterType="com.mvc.app.domain.dto.NoticeDto">
+        UPDATE notice
+        SET subject   = #{subject,   jdbcType=VARCHAR},
+            content   = #{content,   jdbcType=VARCHAR},
+            isnotice  = #{isnotice},
+            updatedate  = SYSDATE
+        WHERE noticenum = #{noticenum}
+    </update>
+
+    <!-- ── 공지사항 삭제 (소프트 삭제: state = 0) ── -->
+    <update id="deleteNotice" parameterType="long">
+        UPDATE notice
+        SET state = 0
+        WHERE noticenum = #{noticenum}
+    </update>
+
+    <!-- ── 조회수 증가 ── -->
+    <update id="increaseHit" parameterType="long">
+        UPDATE notice
+        SET hitcount = hitcount + 1
+        WHERE noticenum = #{noticenum}
+    </update>
+
+    <!-- ── 공지사항 목록 ── -->
+    <select id="listNotice" parameterType="map" resultType="com.mvc.app.domain.dto.NoticeDto">
+        SELECT n.noticenum,
+               n.subject,
+               n.hitcount,
+               n.isnotice,
+               n.state,
+               TO_CHAR(n.regdate,   'YYYY-MM-DD') AS regdate,
+               TO_CHAR(n.updatedate, 'YYYY-MM-DD') AS updateDate,
+               n.authorEmpId,
+               e2.name AS authorName
+        FROM notice n
+        LEFT JOIN employee2 e2 ON n.authorEmpId = e2.empId
+        WHERE n.state = 1
+        <if test="keyword != null and keyword != ''">
+            AND (n.subject LIKE '%' || #{keyword} || '%'
+              OR n.content LIKE '%' || #{keyword} || '%')
+        </if>
+        ORDER BY n.isnotice DESC, n.noticenum DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <!-- ── 공지사항 건수 ── -->
+    <select id="countNotice" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM notice
+        WHERE state = 1
+        <if test="keyword != null and keyword != ''">
+            AND (subject LIKE '%' || #{keyword} || '%'
+              OR content LIKE '%' || #{keyword} || '%')
+        </if>
+    </select>
+
+    <!-- ── 공지사항 단건 조회 ── -->
+    <select id="getNotice" parameterType="long" resultType="com.mvc.app.domain.dto.NoticeDto">
+        SELECT n.noticenum,
+               n.subject,
+               n.content,
+               n.hitcount,
+               n.isnotice,
+               n.state,
+               TO_CHAR(n.regdate,   'YYYY-MM-DD') AS regdate,
+               TO_CHAR(n.updatedate, 'YYYY-MM-DD') AS updateDate,
+               n.authorEmpId,
+               e2.name AS authorName
+        FROM notice n
+        LEFT JOIN employee2 e2 ON n.authorEmpId = e2.empId
+        WHERE n.noticenum = #{noticenum}
+    </select>
+
+    <!-- ── 첨부파일 등록 ── -->
+    <insert id="insertFile" parameterType="com.mvc.app.domain.dto.NoticeFileDto">
+        <selectKey keyProperty="filenum" resultType="long" order="BEFORE">
+            SELECT NOTICE_FILE_SEQ.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO noticefile (
+            filenum, savefilename, originalfilename, filesize, noticenum
+        ) VALUES (
+            #{filenum},
+            #{savefilename},
+            #{originalfilename, jdbcType=VARCHAR},
+            #{filesize},
+            #{noticenum}
+        )
+    </insert>
+
+    <!-- ── 첨부파일 삭제 ── -->
+    <delete id="deleteFile" parameterType="long">
+        DELETE FROM noticefile WHERE filenum = #{filenum}
+    </delete>
+
+    <!-- ── 첨부파일 목록 (공지 번호로) ── -->
+    <select id="getFiles" parameterType="long" resultType="com.mvc.app.domain.dto.NoticeFileDto">
+        SELECT filenum, savefilename, originalfilename, filesize, noticenum
+        FROM noticefile
+        WHERE noticenum = #{noticenum}
+        ORDER BY filenum ASC
+    </select>
+
+    <!-- ── 첨부파일 단건 ── -->
+    <select id="getFile" parameterType="long" resultType="com.mvc.app.domain.dto.NoticeFileDto">
+        SELECT filenum, savefilename, originalfilename, filesize, noticenum
+        FROM noticefile
+        WHERE filenum = #{filenum}
+    </select>
+
+</mapper>

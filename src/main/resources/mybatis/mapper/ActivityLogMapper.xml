@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.ActivityLogQueryMapper">
+    <resultMap id="activityLogMap" type="com.mvc.app.domain.dto.ActivityLogDto">
+        <id     property="logId"        column="LOG_ID"/>
+        <result property="actorEmpId"   column="ACTOR_EMP_ID"/>
+        <result property="actorName"    column="ACTOR_NAME"/>
+        <result property="actionType"   column="ACTION_TYPE"/>
+        <result property="targetMenu"   column="TARGET_MENU"/>
+        <result property="targetEmpIds" column="TARGET_EMP_IDS"/>
+        <result property="beforeData"   column="BEFORE_DATA"/>
+        <result property="afterData"    column="AFTER_DATA"/>
+        <result property="result"       column="RESULT"/>
+        <result property="errorMsg"     column="ERROR_MSG"/>
+        <result property="ipAddr"       column="IP_ADDR"/>
+        <result property="logDate"      column="LOG_DATE"/>
+    </resultMap>
+    
+    <sql id="searchWhere">
+        <where>
+            <if test="actorEmpId != null and actorEmpId != ''">
+                AND ACTOR_EMP_ID LIKE '%' || #{actorEmpId} || '%'
+            </if>
+            <if test="actorName != null and actorName != ''">
+                AND ACTOR_NAME LIKE '%' || #{actorName} || '%'
+            </if>
+            <if test="targetMenu != null and targetMenu != ''">
+                AND TARGET_MENU LIKE '%' || #{targetMenu} || '%'
+            </if>
+            <if test="result != null and result != ''">
+                AND RESULT = #{result}
+            </if>
+            <if test="actionType != null and actionType != ''">
+                AND ACTION_TYPE = #{actionType}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND TRUNC(LOG_DATE) >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND TRUNC(LOG_DATE) &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+        </where>
+    </sql>
+    
+    <select id="dataCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   ACTIVITY_LOG
+        <include refid="searchWhere"/>
+    </select>
+    
+    <select id="listActivityLog" parameterType="map" resultMap="activityLogMap">
+        SELECT *
+        FROM (
+            SELECT A.*,
+                   ROWNUM AS RN
+            FROM (
+                SELECT
+                    LOG_ID,
+                    ACTOR_EMP_ID,
+                    ACTOR_NAME,
+                    ACTION_TYPE,
+                    TARGET_MENU,
+                    TARGET_EMP_IDS,
+                    BEFORE_DATA,
+                    AFTER_DATA,
+                    RESULT,
+                    ERROR_MSG,
+                    IP_ADDR,
+                    TO_CHAR(LOG_DATE, 'YYYY-MM-DD HH24:MI:SS') AS LOG_DATE
+                FROM ACTIVITY_LOG
+                <include refid="searchWhere"/>
+                ORDER BY
+                <choose>
+                    <when test="sortCol == 'logId'"      >LOG_ID</when>
+                    <when test="sortCol == 'actorEmpId'" >ACTOR_EMP_ID</when>
+                    <when test="sortCol == 'actorName'"  >ACTOR_NAME</when>
+                    <when test="sortCol == 'actionType'" >ACTION_TYPE</when>
+                    <when test="sortCol == 'targetMenu'" >TARGET_MENU</when>
+                    <when test="sortCol == 'result'"     >RESULT</when>
+                    <otherwise>LOG_DATE</otherwise>
+                </choose>
+                ${sortDir}
+            ) A
+            WHERE ROWNUM &lt;= #{offset} + #{size}
+        )
+        WHERE RN > #{offset}
+    </select>
+    
+    <select id="findById" parameterType="long" resultMap="activityLogMap">
+        SELECT
+            LOG_ID,
+            ACTOR_EMP_ID,
+            ACTOR_NAME,
+            ACTION_TYPE,
+            TARGET_MENU,
+            TARGET_EMP_IDS,
+            BEFORE_DATA,
+            AFTER_DATA,
+            RESULT,
+            ERROR_MSG,
+            IP_ADDR,
+            TO_CHAR(LOG_DATE, 'YYYY-MM-DD HH24:MI:SS') AS LOG_DATE
+        FROM ACTIVITY_LOG
+        WHERE LOG_ID = #{logId}
+    </select>
+</mapper>
