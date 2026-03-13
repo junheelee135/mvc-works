@@ -159,6 +159,22 @@ export const useHrmStore = defineStore('hrm', {
                         alert('비밀번호는 필수입니다.');
                         return;
                     }
+					if (!emp.authorityCode) {
+						alert('권한은 필수 선택사항입니다.');
+						return;
+					}
+					if(emp.levelCode === null || emp.levelCode === undefined || emp.levelCode === ''){
+						alert('레벨은 필수 입력 사항입니다.');
+						return;
+					}
+					if(emp.levelCode <= 0 || emp.levelCode >= 99) {
+						alert('레벨 입력 범위는 1 ~ 98 입니다.')
+						return;
+					}
+					if(!emp.empStatusCode) {
+						alert('재직상태는 필수 선택사항입니다.');
+						return;
+					}
 
                     try {
                         await http.post('/hrm', this._toPayload(emp));

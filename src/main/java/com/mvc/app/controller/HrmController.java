@@ -10,7 +10,15 @@ import java.util.Map;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mvc.app.domain.dto.HrmDto;
@@ -20,16 +28,6 @@ import com.mvc.app.service.HrmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * HrmController — 직원 통합관리
- *
- *  GET    /api/hrm                  직원 목록 조회 (검색 + 페이징)
- *  POST   /api/hrm                  직원 단건 등록
- *  PUT    /api/hrm/bulk             직원 벌크 수정
- *  DELETE /api/hrm                  직원 선택 삭제 (관리자 권한)
- *  GET    /api/hrm/excel/download   엑셀 다운로드
- *  POST   /api/hrm/excel/upload     엑셀 업로드 (관리자 권한)
- */
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -38,9 +36,7 @@ public class HrmController {
 
     private final HrmService hrmService;
 
-    // ──────────────────────────────────────────────
-    // [1] 직원 목록 조회 (GET /api/hrm)
-    // ──────────────────────────────────────────────
+    //직원 목록 조회 GET (/api/hrm)
     @GetMapping
     public ResponseEntity<?> getEmployeeList(
             @RequestParam(name = "page",           defaultValue = "1")     int currentPage,
@@ -86,15 +82,17 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [2] 직원 단건 등록 (POST /api/hrm)
-    // ──────────────────────────────────────────────
+    //직원 단건 등록 POST (/api/hrm)
     @PostMapping
     public ResponseEntity<?> createEmployee(
             @RequestBody HrmDto dto,
             @SessionAttribute("member") SessionInfo info) {
 
         try {
+        	if (info.getUserLevel() < 51) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("직원 등록 권한이 없습니다.");
+            }
             if (dto.getEmpId() == null || dto.getEmpId().isBlank()) {
                 return ResponseEntity.badRequest().body("사원번호는 필수입니다.");
             }
@@ -103,6 +101,18 @@ public class HrmController {
             }
             if (dto.getPassword() == null || dto.getPassword().isBlank()) {
                 return ResponseEntity.badRequest().body("비밀번호는 필수입니다.");
+            }
+            if(dto.getAuthorityCode() == null || dto.getAuthorityCode().isBlank()) {
+            	return ResponseEntity.badRequest().body("권한은 필수 선택입니다.");
+            }
+            if (dto.getLevelCode() == null) {
+                return ResponseEntity.badRequest().body("레벨은 필수 입력입니다.");
+            }
+            if (dto.getLevelCode() <= 0 || dto.getLevelCode() >= 99) {
+            	return ResponseEntity.badRequest().body("레벨은 입력 범위는 1 ~ 98 입니다.");
+            }
+            if (dto.getEmpStatusCode() == null || dto.getEmpStatusCode().isBlank()) {
+            	return ResponseEntity.badRequest().body("재직상태는 필수 입력입니다.");
             }
 
             dto.setRegEmpId(info.getEmpId());
@@ -118,15 +128,18 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [3] 직원 벌크 수정 (PUT /api/hrm/bulk)
-    // ──────────────────────────────────────────────
+    //직원 수정 PUT (/api/hrm/bulk)
     @PutMapping("/bulk")
     public ResponseEntity<?> updateEmployeesBulk(
             @RequestBody List<HrmDto> dtoList,
             @SessionAttribute("member") SessionInfo info) {
 
         try {
+        	if (info.getUserLevel() < 51) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("직원 정보 수정 권한이 없습니다.");
+            }
+        	
             hrmService.updateEmployees(dtoList);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -135,10 +148,7 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [4] 직원 선택 삭제 (DELETE /api/hrm)
-    //   - userLevel >= 51 만 삭제 가능
-    // ──────────────────────────────────────────────
+    //직원 선택 삭제 DELETE (/api/hrm)
     @DeleteMapping
     public ResponseEntity<?> deleteEmployees(
             @RequestBody Map<String, List<String>> body,
@@ -146,13 +156,16 @@ public class HrmController {
 
         try {
             List<String> ids = body.get("ids");
-            if (ids == null || ids.isEmpty()) {
-                return ResponseEntity.badRequest().body("삭제할 항목이 없습니다.");
-            }
+            
             if (info.getUserLevel() < 51) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("삭제 권한이 없습니다.");
             }
+            
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.badRequest().body("삭제할 항목이 없습니다.");
+            }
+            
             hrmService.deleteEmployees(ids);
             return ResponseEntity.ok().build();
 
@@ -162,9 +175,7 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [5] 엑셀 다운로드 (GET /api/hrm/excel/download)
-    // ──────────────────────────────────────────────
+    //엑셀 다운로드 GET (/api/hrm/excel/download)
     @GetMapping("/excel/download")
     public ResponseEntity<?> downloadExcel(
             @RequestParam(name = "name",          defaultValue = "") String name,
@@ -200,10 +211,7 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [6] 엑셀 업로드 (POST /api/hrm/excel/upload)
-    //   - userLevel >= 51 만 업로드 가능
-    // ──────────────────────────────────────────────
+    //엑셀 업로드 POST (/api/hrm/excel/upload)
     @PostMapping("/excel/upload")
     public ResponseEntity<?> uploadExcel(
             @RequestParam("file") MultipartFile file,
@@ -225,11 +233,8 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [7] 다음 사원번호 자동채번 (GET /api/hrm/next-emp-id)
-    //   EMPLOYEE1 테이블의 MAX(empId) + 1 을 11자리 zero-padding 으로 반환
-    //   ex) 현재 최댓값 "00000000005" → "00000000006"
-    // ──────────────────────────────────────────────
+    //사원번호 자동채번 GET (/api/hrm/next-emp-id)
+    //EMPLOYEE1 테이블의 MAX(empId) + 1
     @GetMapping("/next-emp-id")
     public ResponseEntity<?> getNextEmpId() {
         try {
@@ -241,11 +246,9 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [8-1] 엑셀 업로드 양식 다운로드 (GET /api/hrm/excel/template)
-    //   헤더 행(이름, 비밀번호, 부서코드, 직급코드, 권한코드, 권한레벨, 재직상태코드)만 있는 빈 양식 반환
-    //   ※ 사원번호·참여 프로젝트는 자동처리이므로 양식에 포함하지 않음
-    // ──────────────────────────────────────────────
+    //엑셀 업로드 양식 다운로드 GET /api/hrm/excel/template)
+    //헤더 : 이름, 비밀번호, 부서코드, 직급코드, 권한코드, 권한레벨, 재직상태코드
+    //사원번호, 참여 프로젝트 자동 할당
     @GetMapping("/excel/template")
     public ResponseEntity<?> downloadExcelTemplate() {
         try {
@@ -263,10 +266,7 @@ public class HrmController {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // [8] 공통코드 일괄 조회 (GET /api/hrm/codes)
-    //   화면 초기 로딩 시 부서·직급·재직상태 옵션 조회
-    // ──────────────────────────────────────────────
+    //공통코드 일괄 조회 GET (/api/hrm/codes)
     @GetMapping("/codes")
     public ResponseEntity<?> getCodes() {
         try {
@@ -281,9 +281,8 @@ public class HrmController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    // ──────────────────────────────────────────────
-    // 내부 헬퍼 — 검색 파라미터 Map 구성
-    // ──────────────────────────────────────────────
+    
+    //검색 파라미터 Map 구성
     private Map<String, Object> buildSearchParams(
             String name, String empNo, String project,
             String empStatusCode, String levelCode,

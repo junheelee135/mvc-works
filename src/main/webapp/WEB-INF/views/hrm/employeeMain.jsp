@@ -47,11 +47,10 @@
 		setup() {
 			const store = useHrmStore();
 
-			// 세션 정보 주입 (main.jsp 패턴과 동일)
 			store.sessionName = '${sessionScope.member.name}';
 
 			onMounted(() => {
-				store.loadCodes();   // 부서·직급·재직상태 공통코드 조회
+				store.loadCodes(); // 부서, 직급, 재직상태 공통코드
 				store.fetchList();
 			});
 
