@@ -27,18 +27,7 @@ public class HrmServiceImpl implements HrmService {
     private final HrmMapper       mapper;
     private final PasswordEncoder passwordEncoder;   // BCryptPasswordEncoder 빈 주입
 
-    /**
-     * 엑셀 컬럼 순서 (다운로드 헤더 / 업로드 파싱 공통)
-     * 0:사원번호 1:이름 2:비밀번호 3:부서코드 4:직급코드 5:권한레벨 6:재직상태 7:참여프로젝트
-     */
-    private static final String[] EXCEL_HEADERS = {
-        "사원번호", "이름", "비밀번호(신규)", "부서코드", "직급코드",
-        "권한레벨", "재직상태(ES01/ES02/ES03/ES04)", "참여프로젝트"
-    };
-
-    // ──────────────────────────────────────────────
-    // [1] 목록 조회
-    // ──────────────────────────────────────────────
+    //조회 건 수
     @Override
     public int dataCount(Map<String, Object> params) {
         int result = 0;
@@ -49,7 +38,8 @@ public class HrmServiceImpl implements HrmService {
         }
         return result;
     }
-
+    
+    //조회 리스트
     @Override
     public List<HrmDto> listEmployee(Map<String, Object> params) {
         List<HrmDto> list = new ArrayList<>();
@@ -63,9 +53,7 @@ public class HrmServiceImpl implements HrmService {
         return list;
     }
 
-    // ──────────────────────────────────────────────
-    // [2] 사원번호 중복 체크
-    // ──────────────────────────────────────────────
+    //사원번호 중복 체크
     @Override
     public boolean isDuplicateEmpId(String empId) {
         try {

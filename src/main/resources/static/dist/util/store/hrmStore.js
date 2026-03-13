@@ -339,7 +339,6 @@ export const useHrmStore = defineStore('hrm', {
             return { ES01: '재직', ES02: '휴직', ES03: '퇴직', ES04: '계약만료' }[code] || code;
         },
 
-        // 내부 헬퍼
         _wrapRow(emp) {
             return { ...emp, _checked: false, _editing: false, _dirty: false, _isNew: false };
         },
