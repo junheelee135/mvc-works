@@ -1,0 +1,734 @@
+@charset "UTF-8";
+
+/* ── 회의실 관리 전용 스타일 ── */
+
+/* 레이아웃 — 사이드바 오프셋 */
+#main-content {
+    margin-left: 240px !important;
+    padding: 8px 24px 14px;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background: #f8f9fc;
+}
+
+/* 추가 버튼 (doctype.jsp 유형추가 버튼과 동일) */
+.btn-add-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1bbfb0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s;
+}
+.btn-add-type:hover { background: #17ada0; }
+.btn-add-type .material-symbols-outlined { font-size: 18px; }
+
+/* 상단 헤더 */
+.room-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+.room-header h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #3a3f51;
+    margin: 0;
+}
+.room-header h4 .material-symbols-outlined {
+    font-size: 22px;
+    color: #4e73df;
+}
+.room-header p {
+    font-size: 12px;
+    color: #9aa0b4;
+    margin: 4px 0 0 30px;
+}
+
+/* 통계 카드 */
+.stat-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-item {
+    background: #fff;
+    border: 1px solid #e6eaf4;
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: center;
+    flex: 1;
+}
+.stat-item .stat-num {
+    font-size: 26px;
+    font-weight: 700;
+}
+.stat-item .stat-num.total { color: #4e73df; }
+.stat-item .stat-num.active { color: #1a9660; }
+.stat-item .stat-num.inactive { color: #9aa0b4; }
+.stat-item .stat-label {
+    font-size: 12px;
+    color: #9aa0b4;
+    margin-top: 4px;
+}
+
+/* 카드 그리드 */
+.room-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.empty-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 0;
+    color: #9aa0b4;
+    font-size: 13px;
+}
+
+/* 카드 */
+.room-card {
+    border: 1px solid #e6eaf4;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s;
+}
+.room-card:hover {
+    box-shadow: 0 4px 16px rgba(78, 115, 223, 0.10);
+}
+
+/* 사진 영역 */
+.room-card-img {
+    height: 160px;
+    background: #f8f9fd;
+    overflow: hidden;
+}
+.room-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.no-photo {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c5c9d2;
+}
+.no-photo .material-symbols-outlined {
+    font-size: 48px;
+}
+
+/* 정보 영역 */
+.room-card-body {
+    padding: 16px;
+    flex: 1;
+}
+.room-card-body h5 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #3a3f51;
+}
+.room-card-body .room-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 4px;
+    font-size: 12px;
+    color: #7b82a0;
+}
+.room-card-body .room-info .material-symbols-outlined {
+    font-size: 16px;
+    color: #9aa0b4;
+}
+
+/* 비품 뱃지 */
+.equip-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 10px 0;
+}
+.equip-badges .badge {
+    background: #eef1fd;
+    color: #4e73df;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+}
+
+/* 사용여부 뱃지 */
+.use-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.use-badge.on { background: #e0f5ef; color: #1a9660; }
+.use-badge.off { background: #f0f2f5; color: #9aa0b4; }
+
+/* 카드 푸터 버튼 */
+.room-card-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #f0f2f9;
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+.room-card-footer .btn-edit,
+.room-card-footer .btn-del {
+    background: none;
+    border: 1px solid #e6eaf4;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+}
+.room-card-footer .btn-edit { color: #4e73df; }
+.room-card-footer .btn-edit:hover { background: #f0f3ff; border-color: #4e73df; }
+.room-card-footer .btn-del { color: #d93025; }
+.room-card-footer .btn-del:hover { background: #fff0f0; border-color: #d93025; }
+
+/* 비품 체크박스 그룹 */
+.equip-check-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding: 8px 0;
+}
+
+/* 모달 오버라이드 */
+.modal-content {
+    border-radius: 10px;
+    border: 1px solid #e6eaf4;
+}
+.modal-header { border-bottom: 1px solid #e6eaf4; padding: 16px 20px; }
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #3a3f51;
+}
+.modal-title .material-symbols-outlined { font-size: 20px; color: #4e73df; }
+.modal-body label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3a3f51;
+    margin-bottom: 6px;
+}
+.modal-body input[type="text"],
+.modal-body input[type="number"],
+.modal-body select {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #3a3f51;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color .15s;
+}
+.modal-body input[type="text"]:focus,
+.modal-body input[type="number"]:focus,
+.modal-body select:focus { border-color: #4e73df; }
+.modal-footer { border-top: 1px solid #e6eaf4; padding: 12px 20px; }
+
+.btn-modal-cancel {
+    background: #fff;
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #7b82a0;
+    cursor: pointer;
+}
+.btn-modal-cancel:hover { background: #f8f9fc; }
+.btn-modal-save {
+    background: #4e73df;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+.btn-modal-save:hover { background: #3a5abf; }
+
+/* 파일 인풋 */
+.file-input-wrap input[type="file"] {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #3a3f51;
+    width: 100%;
+}
+.file-input-wrap small {
+    font-size: 11px;
+    color: #9aa0b4;
+    margin-top: 4px;
+    display: block;
+}
+
+/* ══════════════════════════════════════════
+   예약 현황 (reserve.jsp)
+   ══════════════════════════════════════════ */
+
+/* 날짜 네비 + 통계 툴바 */
+.reserve-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e6eaf4;
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+}
+.date-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+}
+.date-nav-btn {
+    background: none;
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 4px;
+    cursor: pointer;
+    color: #3a3f51;
+    display: flex;
+    align-items: center;
+    transition: all .15s;
+}
+.date-nav-btn:hover {
+    background: #f0f3ff;
+    border-color: #4e73df;
+    color: #4e73df;
+}
+.date-nav-btn .material-symbols-outlined { font-size: 20px; }
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #3a3f51;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background .15s;
+    user-select: none;
+}
+.date-display:hover { background: #f0f3ff; }
+.date-display .material-symbols-outlined {
+    font-size: 18px;
+    color: #4e73df;
+}
+.date-hidden-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+.btn-today {
+    background: #eef1fd;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4e73df;
+    cursor: pointer;
+    margin-left: 6px;
+    transition: background .15s;
+}
+.btn-today:hover { background: #dde3fb; }
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.btn-my-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff;
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7b82a0;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-my-filter .material-symbols-outlined { font-size: 16px; }
+.btn-my-filter:hover {
+    border-color: #4e73df;
+    color: #4e73df;
+}
+.btn-my-filter.active {
+    background: #4e73df;
+    border-color: #4e73df;
+    color: #fff;
+}
+.toolbar-stats {
+    display: flex;
+    gap: 16px;
+}
+.toolbar-stat {
+    font-size: 13px;
+    color: #7b82a0;
+}
+.toolbar-stat strong {
+    color: #4e73df;
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+/* 시간표 패널 */
+.timetable-panel {
+    background: #fff;
+    border: 1px solid #e6eaf4;
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 480px;
+}
+.schedule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e6eaf4;
+}
+.schedule-header h5 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #3a3f51;
+    margin: 0;
+}
+.schedule-header h5 .material-symbols-outlined {
+    font-size: 20px;
+    color: #4e73df;
+}
+.schedule-count {
+    background: #eef1fd;
+    color: #4e73df;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* 빈 일정 */
+.schedule-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: #c5c9d2;
+}
+.schedule-empty .material-symbols-outlined {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 8px;
+}
+.schedule-empty p {
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ── 컬럼식 시간표 ── */
+.timetable-wrap {
+    overflow-x: auto;
+}
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* 헤더 */
+.timetable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8f9fc;
+    border-bottom: 2px solid #e6eaf4;
+    padding: 10px 6px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3a3f51;
+}
+.tt-time-th {
+    width: 56px;
+    color: #9aa0b4 !important;
+}
+.tt-room-th {
+    min-width: 120px;
+}
+.tt-color-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+.tt-room-name {
+    vertical-align: middle;
+}
+.tt-room-th {
+    cursor: pointer;
+    transition: background .15s;
+}
+.tt-room-th:hover {
+    background: #eef1fd !important;
+}
+.tt-info-icon {
+    font-size: 14px !important;
+    color: #c5c9d2;
+    vertical-align: middle;
+    margin-left: 3px;
+    transition: color .15s;
+}
+.tt-room-th:hover .tt-info-icon {
+    color: #4e73df;
+}
+
+/* 회의실 상세 모달 */
+.room-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.room-detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    background: #f8f9fc;
+    border-radius: 8px;
+}
+.room-detail-item > .material-symbols-outlined {
+    font-size: 22px;
+    color: #4e73df;
+    margin-top: 2px;
+}
+.detail-label {
+    font-size: 11px;
+    color: #9aa0b4;
+    font-weight: 600;
+}
+.detail-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #3a3f51;
+    margin-top: 2px;
+}
+.room-detail-section {
+    margin-bottom: 16px;
+}
+.room-detail-equips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.equip-tag {
+    background: #eef1fd;
+    color: #4e73df;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.room-detail-photos {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+.room-detail-photos img {
+    width: 160px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e6eaf4;
+}
+
+/* 시간 컬럼 */
+.tt-time-td {
+    text-align: right;
+    padding: 0 8px 0 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9aa0b4;
+    border-right: 2px solid #e6eaf4;
+    height: 28px;
+    vertical-align: top;
+    line-height: 1;
+}
+/* 정시 행만 위쪽 구분선 */
+.tt-hour-row .tt-time-td,
+.tt-hour-row .tt-cell {
+    border-top: 1px solid #e6eaf4;
+}
+
+/* 셀 공통 */
+.tt-cell {
+    height: 28px;
+    border-right: 1px solid #f0f2f9;
+    border-bottom: 1px solid #f5f6fa;
+    padding: 0 4px;
+    vertical-align: top;
+    position: relative;
+}
+.tt-cell:last-child {
+    border-right: none;
+}
+
+/* 빈 셀 */
+.tt-free {
+    cursor: pointer;
+}
+.tt-free:hover {
+    background: #eef8e8 !important;
+}
+
+/* 예약 시작 셀 */
+.tt-start {
+    border-left: 3px solid;
+}
+.tt-start .tt-event {
+    padding: 2px 4px;
+}
+.tt-event-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #3a3f51;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+.tt-event-meta {
+    font-size: 10px;
+    color: #7b82a0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 예약 연속 셀 */
+.tt-cont {
+    border-left: 3px solid;
+}
+
+/* 내 예약만 보기 — 다른 사람 예약 흐리게 */
+.tt-dimmed {
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+/* 예약 셀 클릭 가능 */
+.tt-start, .tt-cont {
+    cursor: pointer;
+}
+.tt-start:hover, .tt-cont:hover {
+    filter: brightness(0.95);
+}
+
+/* 모달 date input */
+.modal-body input[type="date"] {
+    border: 1px solid #d8dde6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #3a3f51;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color .15s;
+}
+.modal-body input[type="date"]:focus { border-color: #4e73df; }
+
+/* ── 예약 상세 모달 ── */
+.reserve-detail-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3a3f51;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e6eaf4;
+}
+.reserve-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.reserve-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: #3a3f51;
+}
+.reserve-detail-row > .material-symbols-outlined {
+    font-size: 20px;
+    color: #4e73df;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.btn-modal-danger {
+    background: #d93025;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+.btn-modal-danger:hover { background: #c12717; }
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .reserve-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .timetable-panel {
+        min-height: auto;
+    }
+}

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.app.mapper.MeetingReserveMapper">
+
+    <!-- 날짜별 예약 목록 (roomId 선택적 필터) -->
+    <select id="listByDate" parameterType="map"
+            resultType="com.mvc.app.domain.dto.MeetingReserveDto">
+        SELECT r.reserveId, r.roomId, m.roomName,
+               TO_CHAR(r.reserveDate, 'YYYY-MM-DD') AS reserveDate,
+               r.startTime, r.endTime, r.title, r.memo, r.attendees,
+               r.reserveEmpId, r.reserveEmpName, r.reserveDeptName,
+               r.status,
+               TO_CHAR(r.regDate, 'YYYY-MM-DD HH24:MI') AS regDate
+        FROM meetingReserve r
+        JOIN meetingRoom m ON r.roomId = m.roomId
+        WHERE r.reserveDate = TO_DATE(#{reserveDate}, 'YYYY-MM-DD')
+          AND r.status = 'ACTIVE'
+        <if test="roomId != null and roomId != 0">
+          AND r.roomId = #{roomId}
+        </if>
+        ORDER BY r.startTime, m.roomName
+    </select>
+
+    <!-- 월별 예약 (캘린더 이벤트용) -->
+    <select id="listByMonth" parameterType="map"
+            resultType="com.mvc.app.domain.dto.MeetingReserveDto">
+        SELECT r.reserveId, r.roomId, m.roomName,
+               TO_CHAR(r.reserveDate, 'YYYY-MM-DD') AS reserveDate,
+               r.startTime, r.endTime, r.title,
+               r.reserveEmpId, r.reserveEmpName,
+               r.status
+        FROM meetingReserve r
+        JOIN meetingRoom m ON r.roomId = m.roomId
+        WHERE TO_CHAR(r.reserveDate, 'YYYY-MM') = #{yearMonth}
+          AND r.status = 'ACTIVE'
+        ORDER BY r.reserveDate, r.startTime
+    </select>
+
+    <!-- 예약 상세 -->
+    <select id="getReserve" parameterType="long"
+            resultType="com.mvc.app.domain.dto.MeetingReserveDto">
+        SELECT r.reserveId, r.roomId, m.roomName,
+               TO_CHAR(r.reserveDate, 'YYYY-MM-DD') AS reserveDate,
+               r.startTime, r.endTime, r.title, r.memo, r.attendees,
+               r.reserveEmpId, r.reserveEmpName, r.reserveDeptName,
+               r.status,
+               TO_CHAR(r.regDate, 'YYYY-MM-DD HH24:MI') AS regDate
+        FROM meetingReserve r
+        JOIN meetingRoom m ON r.roomId = m.roomId
+        WHERE r.reserveId = #{reserveId}
+    </select>
+
+    <!-- 예약 등록 -->
+    <insert id="insertReserve" parameterType="com.mvc.app.domain.dto.MeetingReserveDto">
+        <selectKey keyProperty="reserveId" resultType="long" order="BEFORE">
+            SELECT meetingReserve_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO meetingReserve
+            (reserveId, roomId, reserveDate, startTime, endTime,
+             title, memo, attendees, reserveEmpId, reserveEmpName,
+             reserveDeptName, status)
+        VALUES
+            (#{reserveId}, #{roomId}, TO_DATE(#{reserveDate}, 'YYYY-MM-DD'),
+             #{startTime}, #{endTime},
+             #{title}, #{memo}, #{attendees}, #{reserveEmpId}, #{reserveEmpName},
+             #{reserveDeptName}, 'ACTIVE')
+    </insert>
+
+    <!-- 예약 취소 -->
+    <update id="cancelReserve" parameterType="long">
+        UPDATE meetingReserve
+        SET status = 'CANCEL'
+        WHERE reserveId = #{reserveId}
+    </update>
+
+    <!-- 시간 중복 체크 -->
+    <select id="checkOverlap" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM meetingReserve
+        WHERE roomId = #{roomId}
+          AND reserveDate = TO_DATE(#{reserveDate}, 'YYYY-MM-DD')
+          AND status = 'ACTIVE'
+          AND startTime &lt; #{endTime}
+          AND endTime &gt; #{startTime}
+    </select>
+
+    <!-- 오늘 예약 수 -->
+    <select id="countToday" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM meetingReserve
+        WHERE reserveDate = TRUNC(SYSDATE)
+          AND status = 'ACTIVE'
+    </select>
+
+    <!-- 이번주 예약 수 -->
+    <select id="countWeek" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM meetingReserve
+        WHERE reserveDate BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 6
+          AND status = 'ACTIVE'
+    </select>
+
+    <!-- 이번달 예약 수 -->
+    <select id="countMonth" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM meetingReserve
+        WHERE TO_CHAR(reserveDate, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+          AND status = 'ACTIVE'
+    </select>
+
+</mapper>

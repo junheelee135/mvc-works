@@ -67,7 +67,6 @@
     <ul class="sub-menu" id="meetingSubMenu">
         <li><a href="${pageContext.request.contextPath}/meeting/room">회의실 관리</a></li>
         <li><a href="${pageContext.request.contextPath}/meeting/reserve">예약 현황</a></li>
-        <li><a href="${pageContext.request.contextPath}/meeting/mylist">내 예약</a></li>
     </ul>
 
     <a href="${pageContext.request.contextPath}/" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
