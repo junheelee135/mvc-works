@@ -59,6 +59,7 @@
         <li><a href="${pageContext.request.contextPath}/projects/create">프로젝트 생성관리</a></li>
     </ul>
 
+    <%-- 예약 관리 토글 메뉴 --%>
     <a href="#" class="nav-link nav-toggle" id="meetingToggle">
         <i class="fas fa-door-open"></i> 예약관리
         <i class="fas fa-chevron-down toggle-icon" id="meetingArrow"></i>

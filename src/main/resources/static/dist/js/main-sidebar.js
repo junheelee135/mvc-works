@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { toggleId: 'groupToggle',    subMenuId: 'groupSubMenu',    arrowId: 'groupArrow'    },
         { toggleId: 'approvalToggle', subMenuId: 'approvalSubMenu', arrowId: 'approvalArrow' },
         { toggleId: 'projectToggle',  subMenuId: 'projectSubMenu',  arrowId: 'projectArrow'  },
+		{ toggleId: 'meetingToggle',  subMenuId: 'meetingSubMenu',  arrowId: 'meetingArrow'  },
     ];
 
     toggleMenus.forEach(function (menu) {
