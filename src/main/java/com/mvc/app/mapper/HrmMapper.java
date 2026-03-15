@@ -14,7 +14,7 @@ public interface HrmMapper {
     List<HrmDto> listEmployee(Map<String, Object> map);
     HrmDto findById(String empId);
 
-    //사원 번호 중복 체크 조회(employee1)
+    //사원 번호 중복 체크 조회
     HrmDto findByEmpId(String empId);
 
     //사원 번호 자동체번 용
@@ -37,6 +37,11 @@ public interface HrmMapper {
     //다 건 삭제
     void deleteEmployees2(List<String> ids) throws SQLException;
     void deleteEmployees1(List<String> ids) throws SQLException;
+
+    //엑셀 업로드 배치
+    void batchInsertEmployee1(List<HrmDto> list) throws SQLException;
+    void batchInsertEmployee2(List<HrmDto> list) throws SQLException;
+    void batchInsertAuthority(List<HrmDto> list) throws SQLException;
 
     //공통코드 조회
     List<Map<String, String>> listCommonCode(String codeGroup);

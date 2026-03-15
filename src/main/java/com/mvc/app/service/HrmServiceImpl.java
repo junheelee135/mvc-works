@@ -6,9 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.context.ApplicationEventPublisher;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,11 @@ import java.util.Map;
 public class HrmServiceImpl implements HrmService {
 
     private final HrmMapper       mapper;
-    private final PasswordEncoder passwordEncoder;   // BCryptPasswordEncoder 빈 주입
+    private final PasswordEncoder passwordEncoder;   // BCryptPasswordEncoder 빈 주입 (strength 10, 단건 등록용)
+
+    // 엑셀 대량 업로드 전용 저강도 인코더 (strength 4 → 1회 약 5~10ms)
+    // 업로드 초기 비밀번호는 첫 로그인 후 변경을 전제로 하므로 strength 완화
+    private static final PasswordEncoder BULK_ENCODER = new BCryptPasswordEncoder(4);
 
     //조회 건 수
     @Override
@@ -162,7 +167,7 @@ public class HrmServiceImpl implements HrmService {
         params.put("size", Integer.MAX_VALUE);
         List<HrmDto> list = mapper.listEmployee(params);
 
-        try (Workbook wb = new XSSFWorkbook()) {
+        try (Workbook wb = new SXSSFWorkbook(100)) {
             Sheet sheet = wb.createSheet("직원목록");
 
             // 헤더 스타일
@@ -204,6 +209,8 @@ public class HrmServiceImpl implements HrmService {
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             wb.write(baos);
+            
+            ((SXSSFWorkbook) wb).dispose();
             return new ByteArrayResource(baos.toByteArray());
         }
     }
@@ -264,52 +271,73 @@ public class HrmServiceImpl implements HrmService {
         }
     }
 
-    // [8] 엑셀 업로드 (Apache POI)
+    // 엑셀 업로드 (Apache POI) — 배치 INSERT 방식
     @Override
     @Transactional
     public int importExcel(MultipartFile file) throws Exception {
         int count = 0;
         try (Workbook wb = WorkbookFactory.create(file.getInputStream())) {
-            Sheet sheet = wb.getSheetAt(0);
-            int lastRow = sheet.getLastRowNum();
+            Sheet sheet  = wb.getSheetAt(0);
+            int lastRow  = sheet.getLastRowNum();
+
+            // ① MAX(empId) 는 업로드 시작 전 딱 한 번만 조회
+            String maxStr  = mapper.findMaxEmpId();
+            long   nextSeq = Long.parseLong(maxStr) + 1;
+
+            List<HrmDto> batchList = new ArrayList<>();
 
             for (int i = 1; i <= lastRow; i++) {
-                Row row = sheet.getRow(i);	
+                Row row = sheet.getRow(i);
                 if (row == null) continue;
 
                 String name = cellStr(row, 0);
                 if (name.isBlank()) continue;
 
-                // 사원번호 자동채번
-                String nextEmpId = getNextEmpId();
+                // ② DB 호출 없이 Java에서 순번 증가
+                String nextEmpId = String.format("%011d", nextSeq++);
 
                 HrmDto dto = new HrmDto();
                 dto.setEmpId(nextEmpId);
                 dto.setName(name);
-                dto.setPassword(cellStr(row, 1));
                 dto.setDeptCode(cellStr(row, 2));
                 dto.setGradeCode(cellStr(row, 3));
                 dto.setAuthorityCode(cellStr(row, 4));
 
                 // 권한레벨
                 String levelStr = cellStr(row, 5);
-                if (!levelStr.isBlank()) {
-                    try {
-                    	dto.setLevelCode(Integer.parseInt(levelStr)); 
-	                }catch (NumberFormatException ignore) { dto.setLevelCode(1); }
-                } else {
-                    dto.setLevelCode(1);
-                }
+                dto.setLevelCode(!levelStr.isBlank() ? parseIntOrDefault(levelStr, 1) : 1);
 
                 // 재직상태코드 (기본값 ES01=재직)
                 String statusCode = cellStr(row, 6);
                 dto.setEmpStatusCode(statusCode.isBlank() ? "ES01" : statusCode);
 
-                insertEmployee(dto);
+                // ③ 엑셀 업로드 전용 저강도 인코더로 암호화 (strength 4)
+                //    단건 등록(strength 10, ~150ms)과 달리 대량 처리 성능 우선
+                String pw = cellStr(row, 1);
+                dto.setPassword(BULK_ENCODER.encode(pw.isBlank() ? "password123" : pw));
+
+                dto.setEnabled(1);
+                batchList.add(dto);
                 count++;
+            }
+
+            // ④ 1,000건 단위로 배치 INSERT (Oracle INSERT ALL 한계 고려)
+            int batchSize = 1000;
+            for (int i = 0; i < batchList.size(); i += batchSize) {
+                List<HrmDto> chunk = batchList.subList(i,
+                        Math.min(i + batchSize, batchList.size()));
+                mapper.batchInsertEmployee1(chunk);
+                mapper.batchInsertEmployee2(chunk);
+                mapper.batchInsertAuthority(chunk);
             }
         }
         return count;
+    }
+
+    // 헬퍼: 숫자 변환 실패 시 기본값 반환
+    private int parseIntOrDefault(String s, int defaultVal) {
+        try { return Integer.parseInt(s); }
+        catch (NumberFormatException e) { return defaultVal; }
     }
 
     //공통코드 조회

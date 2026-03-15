@@ -270,11 +270,16 @@ export const useHrmStore = defineStore('hrm', {
             formData.append('file', file);
 
             try {
+                const startTime = performance.now();
+
                 const res = await http.post('/hrm/excel/upload', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
+                    headers: { 'Content-Type': 'multipart/form-data' },
+					timeout: 300000
                 });
+
+                const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
                 const cnt = res.data?.insertedCount ?? '';
-                alert(`엑셀 업로드 완료${cnt !== '' ? ' (' + cnt + '건 등록)' : ''}`);
+                alert(`엑셀 업로드 완료${cnt !== '' ? ' (' + cnt + '건 등록)' : ''}\n소요 시간: ${elapsed}초`);
                 this.fetchList(1);
             } catch (error) {
                 console.error('엑셀 업로드 오류:', error);

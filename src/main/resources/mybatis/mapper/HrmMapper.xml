@@ -196,7 +196,7 @@
     </select>
 
     <!-- 사원번호 중복 체크 -->
-    <select id="findByEmpId)" parameterType="string" resultMap="employeeResultMap">
+    <select id="findByEmpId" parameterType="string" resultMap="employeeResultMap">
         SELECT empId
         FROM   employee1
         WHERE  empId = #{empId}
@@ -302,6 +302,60 @@
             #{id}
         </foreach>
     </update>
+
+    <!-- 엑셀 업로드 배치 INSERT — employee1 -->
+    <insert id="batchInsertEmployee1" parameterType="list">
+        INSERT ALL
+        <foreach collection="list" item="dto">
+            INTO employee1 (empId, password, levelCode, enabled, empStatusCode, regDate, updateDate)
+            VALUES (
+                #{dto.empId},
+                #{dto.password},
+                #{dto.levelCode,    jdbcType=NUMERIC},
+                #{dto.enabled,      jdbcType=NUMERIC},
+                #{dto.empStatusCode,jdbcType=CHAR},
+                SYSDATE, SYSDATE
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <!-- 엑셀 업로드 배치 INSERT — employee2 -->
+    <insert id="batchInsertEmployee2" parameterType="list">
+        INSERT ALL
+        <foreach collection="list" item="dto">
+            INTO employee2 (empId, name, birth, profilePhoto, tel,
+                            zip, addr1, addr2, email,
+                            hireDate, deptCode, gradeCode, regEmpId, regDate)
+            VALUES (
+                #{dto.empId},
+                #{dto.name},
+                #{dto.birth,        jdbcType=DATE},
+                #{dto.profilePhoto, jdbcType=VARCHAR},
+                #{dto.tel,          jdbcType=VARCHAR},
+                #{dto.zip,          jdbcType=VARCHAR},
+                #{dto.addr1,        jdbcType=VARCHAR},
+                #{dto.addr2,        jdbcType=VARCHAR},
+                #{dto.email,        jdbcType=VARCHAR},
+                SYSDATE,
+                #{dto.deptCode,     jdbcType=VARCHAR},
+                #{dto.gradeCode,    jdbcType=VARCHAR},
+                #{dto.regEmpId,     jdbcType=VARCHAR},
+                SYSDATE
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <!-- 엑셀 업로드 배치 INSERT — employeeAuthority -->
+    <insert id="batchInsertAuthority" parameterType="list">
+        INSERT ALL
+        <foreach collection="list" item="dto">
+            INTO employeeAuthority (empId, authority)
+            VALUES (#{dto.empId}, #{dto.authorityCode, jdbcType=VARCHAR})
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
 
     <!-- 공통코드 조회 -->
     <select id="listCommonCode" parameterType="string" resultType="map">
