@@ -55,9 +55,9 @@
 							placeholder="제목 또는 내용 검색">
 						<button @click="fetchList(1)" class="btn-search">검색</button>
 					</div>
-					<!-- 프로젝트 선택 + 매니저만 공지 등록 가능 -->
-					<button v-if="isManager" @click="openForm(null)"
-						class="btn-new-notice">+ 공지 등록</button>
+					<!-- 공지 등록 버튼 -->
+					<button v-if="isManager" @click="goToForm" class="btn-new-notice">+
+						공지 등록</button>
 				</div>
 
 				<div class="notice-panel">
@@ -117,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			this.fetchMyProjects()
 		},
 		methods: {
-			// 안전한 API 호출
 			async safeApi(url, options={}) {
 				const res = await fetch(ctx + url, {
 					credentials: "include",
@@ -128,76 +127,51 @@ document.addEventListener('DOMContentLoaded', function() {
 				if(res.status===403){ alert("권한이 없습니다."); return null }
 				return res
 			},
-
 			async fetchMyProjects() {
 				const res = await this.safeApi('/api/projectnotice/myprojects');
 				if(!res) return;
-				try {
-					this.myProjects = await res.json()
-				} catch(e) {
-					console.error("프로젝트 목록 로드 실패:", await res.text())
-				}
+				try { this.myProjects = await res.json() } catch(e){ console.error("프로젝트 목록 로드 실패:", await res.text()) }
 			},
-
 			onProjectChange() {
 				this.keyword = '';
 				this.list = [];
 				this.fetchList(1);
 			},
-
 			async fetchList(p) {
 			    if(!this.selectedProjectId) return;
 			    this.page = p;
-
 			    const params = new URLSearchParams({
 			        projectid: this.selectedProjectId,
 			        page: this.page,
 			        keyword: this.keyword || ''
 			    });
-
 			    try {
 			        const res = await fetch(ctx + '/api/projectnotice/list?' + params, {
 			            credentials: "include",
 			            headers: { "AJAX": "true", "Content-Type": "application/json" }
 			        });
-
-			        // JSON 응답 아닌 경우 처리
 			        const text = await res.text();
 			        try {
-			            const data = JSON.parse(text); // 정상 JSON이면
+			            const data = JSON.parse(text);
 			            this.list = data.list;
 			            this.total = data.total;
 			            this.isManager = data.isManager;
 			        } catch(e) {
 			            console.error("공지사항 JSON 파싱 실패:", text);
-			            if(text.includes("로그인 필요")) {
-			                alert("로그인이 필요합니다.");
-			                location.href = ctx + "/";
-			            } else if(text.includes("권한 없음")) {
-			                alert("권한이 없습니다.");
-			            } else {
-			                alert("공지사항을 불러오지 못했습니다.");
-			            }
+			            alert("공지사항을 불러오지 못했습니다.");
 			        }
 			    } catch(err) {
 			        console.error("fetch 오류:", err);
 			    }
 			},
-
 			async openDetail(noticenum) {
 				const res = await this.safeApi('/api/projectnotice/' + noticenum);
 				if(!res) return;
-				try {
-					this.detail = await res.json()
-				} catch(e) {
-					const text = await res.text();
-					console.error("공지사항 상세 JSON 파싱 실패:", text);
-					alert("공지사항 내용을 불러오지 못했습니다.");
-				}
+				try { this.detail = await res.json() }
+				catch(e){ console.error("공지사항 상세 JSON 파싱 실패"); alert("공지사항 내용을 불러오지 못했습니다."); }
 			},
-
-			openForm(item) {
-				alert("공지 등록/수정 폼 열기 기능 구현 필요");
+				goToForm() {
+				    window.location.href = ctx + '/projects/projectNotice/projectNoticeForm';
 			}
 		}
 	}).mount('#app')
