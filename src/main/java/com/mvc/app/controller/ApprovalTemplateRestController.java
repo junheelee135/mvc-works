@@ -39,7 +39,7 @@ public class ApprovalTemplateRestController {
             return ResponseEntity.ok(Map.of("msg", "템플릿 저장 완료"));
         } catch (Exception e) {
             log.info("save : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "템플릿 저장 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "템플릿 저장에 실패했습니다."));
         }
     }
 
@@ -52,7 +52,7 @@ public class ApprovalTemplateRestController {
             return ResponseEntity.ok(Map.of("list", list));
         } catch (Exception e) {
             log.info("list : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
 
@@ -64,7 +64,7 @@ public class ApprovalTemplateRestController {
             return ResponseEntity.ok(Map.of("lines", lines));
         } catch (Exception e) {
             log.info("detail : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "상세 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "상세 조회에 실패했습니다."));
         }
     }
 
@@ -76,7 +76,7 @@ public class ApprovalTemplateRestController {
             return ResponseEntity.ok(Map.of("msg", "템플릿 삭제 완료"));
         } catch (Exception e) {
             log.info("delete : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "템플릿 삭제 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "템플릿 삭제에 실패했습니다."));
         }
     }
 }

@@ -51,7 +51,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(Map.of("msg", "임시저장 완료"));
         } catch (Exception e) {
             log.info("saveDraft : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "임시저장 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "임시저장에 실패했습니다."));
         }
     }
     
@@ -82,7 +82,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.info("listDraft : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
     
@@ -112,7 +112,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.listSent(map));
         } catch (Exception e) {
             log.info("listSent : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
 
@@ -142,7 +142,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.listInbox(map));
         } catch (Exception e) {
             log.info("listInbox : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
     
@@ -171,7 +171,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.listRef(map));
         } catch (Exception e) {
             log.info("listRef : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
 
@@ -200,7 +200,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.listAll(map));
         } catch (Exception e) {
             log.info("listAll : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
     
@@ -213,7 +213,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(doc);
         } catch (Exception e) {
             log.info("getDoc : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "문서 조회에 실패했습니다."));
         }
     }
 
@@ -230,7 +230,7 @@ public class ApprovalDocRestController {
             }
         } catch (Exception e) {
             log.info("cancelDoc : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "취소 처리 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "취소 처리에 실패했습니다."));
         }
     }
 
@@ -246,7 +246,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "승인 권한이 없거나 이미 처리된 문서입니다."));
         } catch (Exception e) {
             log.info("approveDoc : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "승인 처리 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "승인 처리에 실패했습니다."));
         }
     }
 
@@ -266,7 +266,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "반려 권한이 없거나 이미 처리된 문서입니다."));
         } catch (Exception e) {
             log.info("rejectDoc : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "반려 처리 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "반려 처리에 실패했습니다."));
         }
     }
 
@@ -282,7 +282,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "보류 권한이 없거나 이미 처리된 문서입니다."));
         } catch (Exception e) {
             log.info("holdDoc : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "보류 처리 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "보류 처리에 실패했습니다."));
         }
     }
 
@@ -298,7 +298,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "참조자가 아닙니다."));
         } catch (Exception e) {
             log.info("refComment : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "의견 등록 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "의견 등록에 실패했습니다."));
         }
     }
 
@@ -328,7 +328,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.listPendingInbox(map));
         } catch (Exception e) {
             log.info("listPendingInbox : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
 
@@ -358,7 +358,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.listUnreadRef(map));
         } catch (Exception e) {
             log.info("listUnreadRef : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
 
@@ -372,7 +372,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(service.getBadgeCounts(map));
         } catch (Exception e) {
             log.info("badgeCounts : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "건수 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "건수 조회에 실패했습니다."));
         }
     }
 
@@ -385,7 +385,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.info("deputyCheck : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "대결 확인 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "대결 확인에 실패했습니다."));
         }
     }
 
@@ -398,7 +398,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.ok(Map.of("msg", "읽음 처리 완료"));
         } catch (Exception e) {
             log.info("markRead : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "읽음 처리 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "읽음 처리에 실패했습니다."));
         }
     }
 }

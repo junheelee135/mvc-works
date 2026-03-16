@@ -50,7 +50,7 @@ public class ApprovalNoticeRestController {
 			return ResponseEntity.ok(result);
 		} catch (Exception e) {
 			log.info("list : ", e);
-			return ResponseEntity.internalServerError().body(Map.of("msg","목록 조회 실패"));
+			return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class ApprovalNoticeRestController {
 			return ResponseEntity.ok(dto);
 		} catch (Exception e) {
             log.info("detail : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "조회에 실패했습니다."));
 		}
 	}
 	
@@ -84,7 +84,7 @@ public class ApprovalNoticeRestController {
             return ResponseEntity.ok(Map.of("msg", "등록 완료"));
 		} catch (Exception e) {
             log.info("insert : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "등록 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "등록에 실패했습니다."));
 		}
     }
     
@@ -103,7 +103,7 @@ public class ApprovalNoticeRestController {
             return ResponseEntity.ok(Map.of("msg", "수정 완료"));
 		} catch (Exception e) {
             log.info("update : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "수정 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "수정에 실패했습니다."));
 		}
     	
     }
@@ -120,7 +120,7 @@ public class ApprovalNoticeRestController {
             return ResponseEntity.ok(Map.of("msg", "삭제 완료"));
         } catch (Exception e) {
             log.info("delete : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "삭제 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "삭제에 실패했습니다."));
         }
     }
     
@@ -151,7 +151,7 @@ public class ApprovalNoticeRestController {
                     .body(resource);
         } catch (Exception e) {
             log.info("downloadFile : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "다운로드 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "다운로드에 실패했습니다."));
         }
     }
 

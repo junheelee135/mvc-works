@@ -43,7 +43,7 @@ public class ApprovalDeputyRestController {
             return ResponseEntity.ok(Map.of("msg", "부재 등록 완료"));
         } catch (Exception e) {
             log.info("registerDeputy : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "부재 등록 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "부재 등록에 실패했습니다."));
         }
     }
 
@@ -58,7 +58,7 @@ public class ApprovalDeputyRestController {
             return ResponseEntity.ok(Map.of("msg", "부재 수정 완료"));
         } catch (Exception e) {
             log.info("updateDeputy : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "부재 수정 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "부재 수정에 실패했습니다."));
         }
     }
 
@@ -72,7 +72,7 @@ public class ApprovalDeputyRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "취소할 수 없는 부재입니다."));
         } catch (Exception e) {
             log.info("cancelDeputy : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "취소 처리 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "취소 처리에 실패했습니다."));
         }
     }
 
@@ -90,7 +90,7 @@ public class ApprovalDeputyRestController {
             return ResponseEntity.ok(service.listDeputy(map));
         } catch (Exception e) {
             log.info("listDeputy : ", e);
-            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
 
@@ -103,7 +103,7 @@ public class ApprovalDeputyRestController {
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             log.info("getDeputy : ", e);
-            return ResponseEntity.internalServerError().body(Map.of("msg", "조회 실패"));
+            return ResponseEntity.badRequest().body(Map.of("msg", "조회에 실패했습니다."));
         }
     }
 }
