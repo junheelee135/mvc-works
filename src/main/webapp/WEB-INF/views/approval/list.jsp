@@ -67,7 +67,8 @@
                 if (item.docStatus === 'PENDING' && item.myLineStatus === 'APPROVED') {
                     return 'status-MYAPPROVED';
                 }
-                if (item.docStatus === 'PENDING' && item.approvedCount > 0) {
+                if (item.docStatus === 'PENDING' && item.approvedCount > 0 
+                    && item.myLineStatus !== 'APPROVED') {  // ← 내가 승인 안 했을 때만
                     return 'status-INPROGRESS';
                 }
                 return 'status-' + item.docStatus;

@@ -116,7 +116,7 @@
                     <th>동행자</th>
                     <td colspan="3">
                         <span v-for="(c, i) in store.detailData.companions" :key="c.empId">
-                            {{ c.name }}({{ c.dept }}){{ i < store.detailData.companions.length - 1 ? ', ' : '' }}
+                            {{ c.name }}({{ c.dept }}){{ i &lt; store.detailData.companions.length - 1 ? ', ' : '' }}
                         </span>
                     </td>
                 </tr>
