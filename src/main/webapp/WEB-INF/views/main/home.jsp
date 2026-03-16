@@ -186,7 +186,6 @@
 	</div>
 	</div>
 
-	</div>
 
 	<div class="card calendar-card">
 		<div class="calendar-header">
@@ -201,6 +200,8 @@
 		</div>
 		<div id="calendar"></div>
 	</div>
+	</div>
+
 
 
 

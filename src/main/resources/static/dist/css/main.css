@@ -1,13 +1,14 @@
 /* 대시보드 메인 */
 .dashboard {
 	margin-left: 260px;
+	width: calc(100% - 260px);
 	padding: 25px;
 	background: #f4f6f9;
-	display: flex !important; /* flex 강제 */
+	display: flex !important;
 	flex-direction: column !important;
 	gap: 20px;
+	box-sizing: border-box;
 }
-
 /* 1행: 프로필(1/3) + 할일(2/3) */
 .top-row {
 	display: flex !important;
@@ -297,11 +298,8 @@
 }
 
 /* 8. 캘린더 전용 스타일 */
-.calendar-card {
-	background: #ffffff !important;
-	border: none !important;
-	padding: 25px !important;
-	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05) !important;
+.fc-theme-standard td, .fc-theme-standard th {
+	border-color: #f0f0f0;
 }
 
 /* 캘린더 헤더: 레이아웃 고정 */
@@ -341,23 +339,34 @@
 	flex: 0 0 auto;
 }
 
-.notice-empty{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:90px;
-    color:#888;
-    font-size:14px;
+.notice-empty {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 90px;
+	color: #888;
+	font-size: 14px;
 }
 
-/* FullCalendar 기본 레이아웃 보정 */
-.fc {
-	height: auto !important;
+.calendar-card {
+	width: 100%;
+	min-width: 0;
 }
 
-.fc .fc-scroller {
-	height: auto !important;
-	overflow: visible !important;
+.calendar-card .fc {
+	width: 100% !important;
+}
+
+.calendar-card .fc-view-harness {
+	width: 100% !important;
+}
+
+.calendar-card .fc-scrollgrid {
+	width: 100% !important;
+}
+
+.fc-scrollgrid-sync-table {
+	width: 100% !important;
 }
 
 .fc-daygrid-body {
