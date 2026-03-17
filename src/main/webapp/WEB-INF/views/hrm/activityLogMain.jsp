@@ -50,6 +50,7 @@
             store.sessionName = '${sessionScope.member.name}';
 
             onMounted(() => {
+                store.loadCommonCodes();   // ★ 공통코드 사전 로드 (변경 전/후 표시용)
                 store.fetchList();
             });
 

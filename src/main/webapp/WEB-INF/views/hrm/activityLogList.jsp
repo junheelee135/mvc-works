@@ -364,14 +364,79 @@
 
             <!-- 변경 전 / 후 데이터 -->
             <div class="al-diff-wrap">
+
+                <!-- 변경 전 -->
                 <div class="al-diff-panel">
-                    <div class="al-diff-title"><i class="bi bi-arrow-left-circle"></i> 변경 전</div>
-                    <pre class="al-json-box al-before">{{ store.formatJson(store.detailItem.beforeData) }}</pre>
+                    <div class="al-diff-title">
+                        <i class="bi bi-arrow-left-circle"></i> 변경 전
+                    </div>
+
+                    <!-- 데이터 없음 -->
+                    <div v-if="!store.parseEmployeeData(store.detailItem.beforeData)"
+                         class="al-diff-empty">-</div>
+
+                    <!-- 단건 또는 복수 레코드 -->
+                    <template v-else
+                              v-for="(record, rIdx) in store.parseEmployeeData(store.detailItem.beforeData)"
+                              :key="rIdx">
+                        <!-- 복수 레코드일 때 사원번호 소제목 -->
+                        <div v-if="store.parseEmployeeData(store.detailItem.beforeData).length > 1"
+                             class="al-diff-record-title">
+                            사원번호: {{ record.empId }}
+                        </div>
+                        <table class="al-diff-table al-before-table">
+                            <tbody>
+                                <tr v-for="row in record.rows" :key="row.label">
+                                    <th class="al-diff-th">{{ row.label }}</th>
+                                    <td class="al-diff-td">
+                                        <!-- 코드명이 있으면 "이름 (코드)" 형태로, 없으면 값만 표시 -->
+                                        <span v-if="row.showBoth">
+                                            {{ row.name }}
+                                            <span class="al-diff-code">({{ row.code }})</span>
+                                        </span>
+                                        <span v-else>{{ row.code }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </template>
                 </div>
+
+                <!-- 변경 후 -->
                 <div class="al-diff-panel">
-                    <div class="al-diff-title"><i class="bi bi-arrow-right-circle"></i> 변경 후</div>
-                    <pre class="al-json-box al-after">{{ store.formatJson(store.detailItem.afterData) }}</pre>
+                    <div class="al-diff-title">
+                        <i class="bi bi-arrow-right-circle"></i> 변경 후
+                    </div>
+
+                    <!-- 데이터 없음 -->
+                    <div v-if="!store.parseEmployeeData(store.detailItem.afterData)"
+                         class="al-diff-empty">-</div>
+
+                    <!-- 단건 또는 복수 레코드 -->
+                    <template v-else
+                              v-for="(record, rIdx) in store.parseEmployeeData(store.detailItem.afterData)"
+                              :key="rIdx">
+                        <div v-if="store.parseEmployeeData(store.detailItem.afterData).length > 1"
+                             class="al-diff-record-title">
+                            사원번호: {{ record.empId }}
+                        </div>
+                        <table class="al-diff-table al-after-table">
+                            <tbody>
+                                <tr v-for="row in record.rows" :key="row.label">
+                                    <th class="al-diff-th">{{ row.label }}</th>
+                                    <td class="al-diff-td">
+                                        <span v-if="row.showBoth">
+                                            {{ row.name }}
+                                            <span class="al-diff-code">({{ row.code }})</span>
+                                        </span>
+                                        <span v-else>{{ row.code }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </template>
                 </div>
+
             </div>
         </div>
         <div class="al-modal-footer">

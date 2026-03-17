@@ -364,5 +364,29 @@
         WHERE  codegroup = #{codeGroup}
         ORDER BY code
     </select>
+    
+    <!--  before 데이터 단건 조회 (logUpdate용) -->
+	<select id="selectEmployee" parameterType="string" resultMap="employeeResultMap">
+	    SELECT
+	        <include refid="selectColumns"/>
+	    FROM   employee1 e1
+	    JOIN   employee2 e2 ON e1.empId = e2.empId
+	    LEFT JOIN employeeAuthority ea ON e1.empId = ea.empId
+	    WHERE  e1.empId = #{empId}
+	</select>
+	 
+	<!--  before 데이터 복수 조회 (logBulkUpdate / logDelete용)
+	      collection="list" : @Param 없이 List 단일 파라미터 전달 시 MyBatis 기본 키  -->
+	<select id="selectEmployeesByIds" resultMap="employeeResultMap">
+	    SELECT
+	        <include refid="selectColumns"/>
+	    FROM   employee1 e1
+	    JOIN   employee2 e2 ON e1.empId = e2.empId
+	    LEFT JOIN employeeAuthority ea ON e1.empId = ea.empId
+	    WHERE  e1.empId IN
+	    <foreach collection="list" item="id" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+	</select>
 
 </mapper>

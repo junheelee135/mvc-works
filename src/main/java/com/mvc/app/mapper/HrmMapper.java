@@ -45,4 +45,7 @@ public interface HrmMapper {
 
     //공통코드 조회
     List<Map<String, String>> listCommonCode(String codeGroup);
+    
+    HrmDto selectEmployee(String empId);
+    List<HrmDto> selectEmployeesByIds(List<String> ids);
 }

@@ -7,15 +7,15 @@ export const useActivityLogStore = defineStore('activityLog', {
         list: [],
         sessionName: '',
 
-		//검색 파라메터
+        // 검색 파라메터
         searchParams: {
-            actorEmpId: '',     // 사원번호
-            actorName:  '',     // 이름
-            targetMenu: '',     // 메뉴
-            result:     '',     // 처리결과
-            actionType: '',     // 작업유형
-            startDate:  '',     // 로그일 시작
-            endDate:    '',     // 로그일 종료
+            actorEmpId: '',
+            actorName:  '',
+            targetMenu: '',
+            result:     '',
+            actionType: '',
+            startDate:  '',
+            endDate:    '',
             page:       1
         },
 
@@ -29,11 +29,47 @@ export const useActivityLogStore = defineStore('activityLog', {
         // 상세 모달
         detailItem: null,
         showDetail: false,
+
+        // ★ 공통코드 맵 (code → codeName)
+        commonCodeMap: {
+            DEPT:      {},   // 부서
+            RANK:      {},   // 직급
+            EMPSTATUS: {},   // 재직상태
+            AUTHORITY: {},   // 권한
+        },
+
     }),
 
     actions: {
-		
-        // 목록 조회
+
+        // ── 공통코드 로드 ────────────────────────────────────────────────────────
+        // GET /api/hrm/codes — dept / rank / empStatus / authority 한 번에 반환
+        async loadCommonCodes() {
+            try {
+                const res = await http.get('/hrm/codes');
+                const data = res.data;
+
+                // 컨트롤러 응답 키 → commonCodeMap 키 매핑
+                const keyMap = {
+                    dept:      'DEPT',
+                    rank:      'RANK',
+                    empStatus: 'EMPSTATUS',
+                    authority: 'AUTHORITY',
+                };
+
+                Object.entries(keyMap).forEach(([resKey, storeKey]) => {
+                    const map = {};
+                    (data[resKey] || []).forEach(item => {
+                        map[item.CODE] = item.CODENAME;
+                    });
+                    this.commonCodeMap[storeKey] = map;
+                });
+            } catch (e) {
+                console.error('공통코드 로드 오류:', e);
+            }
+        },
+
+        // ── 목록 조회 ─────────────────────────────────────────────────────────
         async fetchList(page = this.searchParams.page) {
             this.loading = true;
             this.searchParams.page = page;
@@ -49,7 +85,6 @@ export const useActivityLogStore = defineStore('activityLog', {
                 });
 
                 this.list = res.data.list || [];
-
                 this.pageInfo.totalCount = res.data.totalCount;
                 this.pageInfo.totalPage  = res.data.totalPage;
 
@@ -66,12 +101,12 @@ export const useActivityLogStore = defineStore('activityLog', {
             }
         },
 
-        //검색
+        // 검색
         search() {
             this.fetchList(1);
         },
 
-        //검색 조건 초기화
+        // 검색 조건 초기화
         resetSearch() {
             this.searchParams = {
                 actorEmpId: '',
@@ -88,7 +123,7 @@ export const useActivityLogStore = defineStore('activityLog', {
             this.fetchList(1);
         },
 
-        //정렬
+        // 정렬
         sortBy(col) {
             if (this.sortCol === col) {
                 this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
@@ -103,7 +138,7 @@ export const useActivityLogStore = defineStore('activityLog', {
             return this.sortDir === 'asc' ? 'asc' : 'desc';
         },
 
-        //상세 모달
+        // 상세 모달
         openDetail(item) {
             this.detailItem = item;
             this.showDetail = true;
@@ -113,13 +148,13 @@ export const useActivityLogStore = defineStore('activityLog', {
             this.showDetail = false;
         },
 
-        //순번 계산
+        // 순번 계산
         getRowNo(index) {
             const offset = (this.searchParams.page - 1) * this.pageInfo.pageSize;
             return this.pageInfo.totalCount - offset - index;
         },
 
-        //한글 label
+        // 한글 label
         actionLabel(type) {
             const map = {
                 INSERT:       '등록',
@@ -131,17 +166,64 @@ export const useActivityLogStore = defineStore('activityLog', {
             return map[type] || type;
         },
 
-        //상세 모달 출력을 위한 JSON 포멧
-        formatJson(jsonStr) {
-            if (!jsonStr) return '-';
+        // ★ JSON 문자열 → 사용자 표시용 필드 배열로 파싱
+        //   단건(object) / 복수(array) 모두 처리
+        //   반환: [{ label, code, name }, ...]  행(row) 배열
+        parseEmployeeData(jsonStr) {
+            if (!jsonStr) return null;
+
+            // EXCEL_IMPORT 결과값 처리 (importedCount 형태)
             try {
-                return JSON.stringify(JSON.parse(jsonStr), null, 2);
+                const parsed = JSON.parse(jsonStr);
+                if (parsed && typeof parsed.importedCount === 'number') {
+                    return [{ single: true, rows: [{ label: '처리 건수', value: parsed.importedCount + '건' }] }];
+                }
+            } catch { /* 아래에서 재시도 */ }
+
+            let records;
+            try {
+                const parsed = JSON.parse(jsonStr);
+                records = Array.isArray(parsed) ? parsed : [parsed];
             } catch {
-                return jsonStr;
+                return null;
             }
+
+            // 출력할 필드 정의 (label + codeGroup: null이면 그대로 출력)
+            const FIELDS = [
+                { key: 'empId',         label: '사원번호',   codeGroup: null        },
+                { key: 'name',          label: '이름',       codeGroup: null        },
+                { key: 'levelCode',     label: '권한레벨',   codeGroup: null        },
+                { key: 'empStatusCode', label: '재직상태',   codeGroup: 'EMPSTATUS' },
+                { key: 'deptCode',      label: '부서',       codeGroup: 'DEPT'      },
+                { key: 'gradeCode',     label: '직급',       codeGroup: 'RANK'      },
+                { key: 'authorityCode', label: '권한',       codeGroup: 'AUTHORITY' },
+            ];
+
+            return records.map(record => {
+                const rows = FIELDS
+                    .filter(f => record[f.key] !== undefined && record[f.key] !== null && record[f.key] !== '')
+                    .map(f => {
+                        const raw = String(record[f.key]);
+                        let name = raw;
+
+                        if (f.codeGroup && this.commonCodeMap[f.codeGroup]) {
+                            name = this.commonCodeMap[f.codeGroup][raw] || raw;
+                        }
+
+                        return {
+                            label: f.label,
+                            code:  raw,
+                            name:  name,
+                            // code와 name이 같으면(미매핑) code만 표시
+                            showBoth: name !== raw,
+                        };
+                    });
+
+                return { empId: record.empId || '-', rows };
+            });
         },
 
-        //엑셀 다운로드
+        // 엑셀 다운로드
         excelDownload() {
             const { actorEmpId, actorName, targetMenu, result, actionType, startDate, endDate } = this.searchParams;
             const qs = new URLSearchParams({ actorEmpId, actorName, targetMenu, result, actionType, startDate, endDate });

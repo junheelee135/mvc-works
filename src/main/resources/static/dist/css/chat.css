@@ -1,0 +1,847 @@
+/* ====================================================================
+   chat.css  —  Duralux ERP 채팅 전용 스타일
+   위치: /dist/css/chat.css
+
+   의존:
+     - core.css     (--default-color, --accent-color, --surface-color 등)
+     - sidebar.css  (--sidebar-width, --primary-blue, --border-color, --text-gray 등)
+     - forms.css    (입력 컨트롤 기본 스타일)
+     - header.css   (navbar-custom, navbar-avatar 등)
+   ==================================================================== */
+
+/* ── 채팅 전용 CSS 변수 ─────────────────────────────────────────── */
+:root {
+    --chat-sidebar-width : 300px;
+    --chat-mine-bg       : #0061ff;   /* 내 메시지 배경 = primary-blue */
+    --chat-mine-color    : #ffffff;
+    --chat-other-bg      : #ffffff;
+    --chat-other-color   : var(--default-color);
+    --chat-unread-badge  : #ef4444;
+    --chat-bg            : #f4f7fe;   /* layout.css 의 body background와 통일 */
+    --status-online      : #22c55e;
+    --status-away        : #f59e0b;
+    --status-offline     : #94a3b8;
+}
+
+/* ====================================================================
+   레이아웃
+
+   구조:
+     #sidebar          (position:fixed, width:260px)  ← sidebar.css
+     .emp-content                                      ← 아래에서 정의
+       header > .navbar-custom
+       #vue-app > .chat-layout
+         .chat-user-panel
+         .chat-room-area
+
+   .al-content { margin-left: 260px; } 와 동일한 패턴 적용
+   ==================================================================== */
+
+/* ── .emp-content: 사이드바 너비만큼 밀어내기 (al-content 패턴 동일) ── */
+.emp-content {
+    margin-left    : var(--sidebar-width);   /* 260px — sidebar.css 변수 */
+    flex           : 1;
+    display        : flex;
+    flex-direction : column;
+    background     : var(--chat-bg);
+    min-height     : 100vh;
+}
+
+/* navbar-custom은 header.css에서 정의, 여기서 margin 초기화만 */
+.emp-content .navbar-custom { margin-left: 0; }
+
+/* ── #vue-app: emp-content 안에서 남은 높이 전부 사용 ── */
+#vue-app {
+    flex           : 1;
+    display        : flex;
+    flex-direction : column;
+    min-height     : 0;   /* flex 자식의 overflow 허용을 위해 필수 */
+}
+
+/* ── 채팅 전체 레이아웃: 직원패널 + 채팅방 ── */
+.chat-layout {
+    display        : flex;
+    flex           : 1;
+    height         : calc(100vh - 60px);   /* 60px = .navbar-custom height */
+    overflow       : hidden;
+}
+
+/* ====================================================================
+   왼쪽 직원 목록 패널
+   ==================================================================== */
+.chat-user-panel {
+    width          : var(--chat-sidebar-width);
+    flex-shrink    : 0;
+    display        : flex;
+    flex-direction : column;
+    background     : #ffffff;
+    border-right   : 1px solid var(--border-color);
+    overflow       : hidden;
+}
+
+/* -- 프로젝트 필터 -------------------------------------------------- */
+.chat-filter-area {
+    padding       : 16px 16px 0;
+    border-bottom : 1px solid var(--border-color);
+    flex-shrink   : 0;
+}
+
+.chat-filter-title {
+    font-size      : 0.75rem;
+    font-weight    : 700;
+    color          : #94a3b8;
+    text-transform : uppercase;
+    letter-spacing : 0.5px;
+    margin-bottom  : 8px;
+}
+
+.chat-project-select {
+    width              : 100%;
+    padding            : 8px 30px 8px 10px;
+    border             : 1px solid var(--border-color);
+    border-radius      : 6px;
+    font-size          : 0.85rem;
+    font-family        : var(--default-font);
+    color              : var(--default-color);
+    background-color   : #f8f9fc;
+    appearance         : none;
+    background-image   : url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2364748b' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat  : no-repeat;
+    background-position: right 10px center;
+    cursor             : pointer;
+    transition         : border-color 0.2s, box-shadow 0.2s;
+    margin-bottom      : 12px;
+}
+
+.chat-project-select:focus {
+    outline    : none;
+    border-color: var(--primary-blue);
+    box-shadow : 0 0 0 3px rgba(0, 97, 255, 0.08);
+}
+
+/* -- 검색바 --------------------------------------------------------- */
+.chat-search-wrap {
+    padding       : 12px 16px;
+    border-bottom : 1px solid var(--border-color);
+    flex-shrink   : 0;
+}
+
+.chat-search-inner {
+    position : relative;
+    display  : flex;
+    align-items: center;
+}
+
+.chat-search-inner i {
+    position  : absolute;
+    left      : 10px;
+    color     : #94a3b8;
+    font-size : 0.85rem;
+    pointer-events: none;
+}
+
+.chat-search-input {
+    width         : 100%;
+    padding       : 8px 10px 8px 32px;
+    border        : 1px solid var(--border-color);
+    border-radius : 20px;
+    font-size     : 0.85rem;
+    font-family   : var(--default-font);
+    color         : var(--default-color);
+    background    : #f8f9fc;
+    transition    : border-color 0.2s, box-shadow 0.2s;
+}
+
+.chat-search-input:focus {
+    outline      : none;
+    border-color : var(--primary-blue);
+    box-shadow   : 0 0 0 3px rgba(0, 97, 255, 0.08);
+    background   : #ffffff;
+}
+
+.chat-search-input::placeholder { color: #b0bac9; }
+
+/* -- 직원 목록 ------------------------------------------------------ */
+.chat-user-list {
+    flex       : 1;
+    overflow-y : auto;
+    padding    : 8px 0;
+}
+
+.chat-user-list::-webkit-scrollbar       { width: 4px; }
+.chat-user-list::-webkit-scrollbar-track { background: transparent; }
+.chat-user-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+
+/* 로딩 / 빈 상태 */
+.chat-list-loading,
+.chat-list-empty {
+    display         : flex;
+    flex-direction  : column;
+    align-items     : center;
+    justify-content : center;
+    gap             : 10px;
+    padding         : 32px 16px;
+    color           : #94a3b8;
+    font-size       : 0.85rem;
+}
+
+.chat-list-empty i { font-size: 2rem; }
+
+/* 직원 항목 */
+.chat-user-item {
+    display     : flex;
+    align-items : center;
+    gap         : 12px;
+    padding     : 10px 16px;
+    cursor      : pointer;
+    transition  : background 0.15s;
+    border-left : 3px solid transparent;
+}
+
+.chat-user-item:hover  { background: #f0f6ff; }
+
+.chat-user-item.active {
+    background   : #eef3ff;
+    border-left-color: var(--primary-blue);
+}
+
+/* 아바타 */
+.chat-avatar {
+    position   : relative;
+    flex-shrink: 0;
+}
+
+.chat-avatar-img {
+    width          : 42px;
+    height         : 42px;
+    border-radius  : 50%;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    font-weight    : 700;
+    font-size      : 0.9rem;
+    color          : #ffffff;
+    flex-shrink    : 0;
+}
+
+/* 아바타 색상 팔레트 (empId % 8 매핑 — chatStore.getAvatarColor()) */
+.avatar-color-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+.avatar-color-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.avatar-color-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.avatar-color-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.avatar-color-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
+.avatar-color-6 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+.avatar-color-7 { background: linear-gradient(135deg, #ffecd2, #fcb69f); color: #b45309; }
+.avatar-color-8 { background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #9d174d; }
+
+/* 온라인 상태 점 */
+.status-dot {
+    position      : absolute;
+    bottom        : 1px;
+    right         : 1px;
+    width         : 11px;
+    height        : 11px;
+    border-radius : 50%;
+    border        : 2px solid #ffffff;
+}
+
+.status-online  { background: var(--status-online);  }
+.status-away    { background: var(--status-away);    }
+.status-offline { background: var(--status-offline); }
+
+/* 직원 정보 영역 */
+.chat-user-info {
+    flex     : 1;
+    min-width: 0;
+}
+
+.chat-user-name {
+    font-size      : 0.88rem;
+    font-weight    : 600;
+    color          : var(--heading-color);
+    white-space    : nowrap;
+    overflow       : hidden;
+    text-overflow  : ellipsis;
+}
+
+.chat-user-meta {
+    display    : flex;
+    align-items: center;
+    gap        : 4px;
+    margin-top : 2px;
+    overflow   : hidden;
+    flex-wrap  : nowrap;
+}
+
+.chat-user-empid,
+.chat-user-dept,
+.chat-user-rank {
+    font-size   : 0.73rem;
+    color       : #94a3b8;
+    white-space : nowrap;
+}
+
+.chat-user-dept {
+    overflow      : hidden;
+    text-overflow : ellipsis;
+}
+
+/* 구분 점 */
+.meta-dot {
+    width        : 3px;
+    height       : 3px;
+    background   : #cbd5e1;
+    border-radius: 50%;
+    flex-shrink  : 0;
+}
+
+.chat-user-preview {
+    display    : flex;
+    align-items: center;
+    margin-top : 3px;
+}
+
+.chat-user-last-msg {
+    font-size     : 0.78rem;
+    color         : #94a3b8;
+    white-space   : nowrap;
+    overflow      : hidden;
+    text-overflow : ellipsis;
+    max-width     : 140px;
+}
+
+/* 오른쪽: 시간 + 배지 + 재직상태 */
+.chat-user-right {
+    display        : flex;
+    flex-direction : column;
+    align-items    : flex-end;
+    gap            : 4px;
+    flex-shrink    : 0;
+}
+
+.chat-user-time {
+    font-size  : 0.72rem;
+    color      : #b0bac9;
+    white-space: nowrap;
+}
+
+/* 미읽음 배지 */
+.chat-unread-badge {
+    background     : var(--chat-unread-badge);
+    color          : #ffffff;
+    font-size      : 0.68rem;
+    font-weight    : 700;
+    min-width      : 18px;
+    height         : 18px;
+    border-radius  : 9px;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    padding        : 0 5px;
+    animation      : badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 0   rgba(239, 68, 68, 0.4); }
+    50%       { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);   }
+}
+
+/* 재직상태 배지 */
+.emp-status-badge {
+    font-size    : 0.68rem;
+    font-weight  : 600;
+    padding      : 2px 6px;
+    border-radius: 10px;
+}
+
+.status-active   { background: #dcfce7; color: #16a34a; }
+.status-leave    { background: #fef9c3; color: #ca8a04; }
+.status-resigned { background: #fee2e2; color: #dc2626; }
+
+
+/* ====================================================================
+   오른쪽 채팅방 영역
+   ==================================================================== */
+.chat-room-area {
+    flex           : 1;
+    display        : flex;
+    flex-direction : column;
+    overflow       : hidden;
+    background     : var(--chat-bg);
+}
+
+/* -- 채팅방 미선택 상태 --------------------------------------------- */
+.chat-no-room {
+    display         : flex;
+    flex-direction  : column;
+    align-items     : center;
+    justify-content : center;
+    flex            : 1;
+    gap             : 16px;
+    color           : #94a3b8;
+    background      : var(--chat-bg);
+}
+
+.no-room-icon {
+    width           : 96px;
+    height          : 96px;
+    border-radius   : 50%;
+    background      : linear-gradient(135deg, #e0e9ff, #f0f6ff);
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    font-size       : 2.5rem;
+    color           : var(--primary-blue);
+    opacity         : 0.7;
+}
+
+.no-room-title {
+    font-size  : 1.1rem;
+    font-weight: 600;
+    color      : #64748b;
+}
+
+.no-room-desc {
+    font-size  : 0.87rem;
+    color      : #94a3b8;
+    text-align : center;
+    line-height: 1.6;
+}
+
+/* -- 채팅방 헤더 ---------------------------------------------------- */
+.chat-room-header {
+    background   : #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    padding      : 14px 24px;
+    display      : flex;
+    align-items  : center;
+    gap          : 14px;
+    flex-shrink  : 0;
+    box-shadow   : 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.chat-room-user-info {
+    flex     : 1;
+    min-width: 0;
+}
+
+.chat-room-name {
+    font-size  : 0.95rem;
+    font-weight: 700;
+    color      : var(--heading-color);
+}
+
+.chat-room-status-text {
+    font-size  : 0.78rem;
+    color      : #94a3b8;
+    display    : flex;
+    align-items: center;
+    gap        : 5px;
+    margin-top : 2px;
+}
+
+/* 헤더 내 작은 상태 점 */
+.status-dot-sm {
+    width        : 7px;
+    height       : 7px;
+    border-radius: 50%;
+    display      : inline-block;
+}
+
+.chat-room-divider { color: #cbd5e1; }
+
+.chat-room-actions {
+    display    : flex;
+    align-items: center;
+    gap        : 6px;
+}
+
+.chat-room-btn {
+    width           : 34px;
+    height          : 34px;
+    border          : none;
+    border-radius   : 8px;
+    background      : #f4f7fe;
+    color           : var(--text-gray);
+    font-size       : 1rem;
+    cursor          : pointer;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    transition      : all 0.2s;
+}
+
+.chat-room-btn:hover {
+    background : #e0e9ff;
+    color      : var(--primary-blue);
+}
+
+/* -- 메시지 영역 ---------------------------------------------------- */
+.chat-messages {
+    flex           : 1;
+    overflow-y     : auto;
+    padding        : 24px 24px 16px;
+    display        : flex;
+    flex-direction : column;
+    gap            : 0;
+}
+
+.chat-messages::-webkit-scrollbar       { width: 5px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+
+/* 메시지 로딩 스피너 */
+.chat-msg-loading {
+    display         : flex;
+    justify-content : center;
+    padding         : 24px;
+    color           : #94a3b8;
+    font-size       : 1.2rem;
+}
+
+/* 날짜 구분선 */
+.chat-date-divider {
+    display    : flex;
+    align-items: center;
+    gap        : 12px;
+    margin     : 16px 0;
+}
+
+.chat-date-divider::before,
+.chat-date-divider::after {
+    content   : '';
+    flex      : 1;
+    height    : 1px;
+    background: #e2e8f0;
+}
+
+.chat-date-divider span {
+    font-size    : 0.73rem;
+    color        : #94a3b8;
+    font-weight  : 600;
+    white-space  : nowrap;
+    padding      : 3px 10px;
+    background   : #edf2fb;
+    border-radius: 12px;
+}
+
+/* 시스템 메시지 */
+.msg-system {
+    text-align   : center;
+    font-size    : 0.75rem;
+    color        : #94a3b8;
+    margin       : 12px 0;
+    padding      : 5px 14px;
+    background   : #e8edf6;
+    border-radius: 12px;
+    align-self   : center;
+    max-width    : 320px;
+}
+
+/* 미읽음 구분선 */
+.unread-divider {
+    display    : flex;
+    align-items: center;
+    gap        : 10px;
+    margin     : 12px 0;
+}
+
+.unread-divider::before,
+.unread-divider::after {
+    content   : '';
+    flex      : 1;
+    height    : 1px;
+    background: #fca5a5;
+}
+
+.unread-divider span {
+    font-size    : 0.72rem;
+    color        : #ef4444;
+    font-weight  : 700;
+    white-space  : nowrap;
+    padding      : 3px 10px;
+    background   : #fee2e2;
+    border-radius: 12px;
+}
+
+/* -- 메시지 행 ------------------------------------------------------ */
+.msg-row {
+    display    : flex;
+    align-items: flex-end;
+    gap        : 8px;
+    margin-bottom: 2px;
+    animation  : msg-fade-in 0.18s ease;
+}
+
+.msg-row.mine { flex-direction: row-reverse; }
+
+@keyframes msg-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* 메시지 아바타 */
+.msg-avatar {
+    width          : 34px;
+    height         : 34px;
+    border-radius  : 50%;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    font-weight    : 700;
+    font-size      : 0.78rem;
+    color          : #ffffff;
+    flex-shrink    : 0;
+    align-self     : flex-end;
+    margin-bottom  : 2px;
+}
+
+.msg-avatar.hidden { visibility: hidden; }
+
+/* 메시지 내용 래퍼 */
+.msg-content-wrap {
+    display       : flex;
+    flex-direction: column;
+    max-width     : 60%;
+}
+
+.msg-row.mine .msg-content-wrap { align-items: flex-end; }
+
+/* 발신자 이름 (상대방 첫 메시지만) */
+.msg-sender-name {
+    font-size    : 0.75rem;
+    font-weight  : 600;
+    color        : #64748b;
+    margin-bottom: 4px;
+    padding-left : 2px;
+}
+
+/* 텍스트 버블 */
+.msg-bubble {
+    padding      : 10px 14px;
+    border-radius: 16px;
+    font-size    : 0.88rem;
+    line-height  : 1.55;
+    word-break   : break-word;
+    max-width    : 100%;
+}
+
+/* 상대방 버블 */
+.msg-row:not(.mine) .msg-bubble {
+    background   : var(--chat-other-bg);
+    color        : var(--chat-other-color);
+    border-radius: 4px 16px 16px 16px;
+    box-shadow   : 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+/* 내 버블 */
+.msg-row.mine .msg-bubble {
+    background   : var(--chat-mine-bg);
+    color        : var(--chat-mine-color);
+    border-radius: 16px 4px 16px 16px;
+}
+
+/* -- 파일 메시지 ---------------------------------------------------- */
+.msg-file {
+    display    : flex;
+    align-items: center;
+    gap        : 10px;
+    padding    : 10px 14px;
+    border-radius: 10px;
+    cursor     : pointer;
+    transition : background 0.2s;
+    min-width  : 180px;
+}
+
+/* 상대방 파일 */
+.msg-row:not(.mine) .msg-file {
+    background  : #f0f6ff;
+    border      : 1px solid #dbeafe;
+}
+
+.msg-row:not(.mine) .msg-file:hover { background: #dbeafe; }
+
+/* 내 파일: 파란색 배경 */
+.msg-row.mine .msg-file {
+    background  : var(--chat-mine-bg);
+    border      : 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.msg-row.mine .msg-file:hover { background: #0052d6; }
+
+.msg-file-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.msg-file-info { flex: 1; min-width: 0; }
+
+.msg-file-name {
+    font-size     : 0.83rem;
+    font-weight   : 600;
+    color         : var(--heading-color);
+    white-space   : nowrap;
+    overflow      : hidden;
+    text-overflow : ellipsis;
+}
+
+/* 내 파일 텍스트 — 흰색 */
+.msg-row.mine .msg-file .msg-file-name { color: #ffffff; }
+
+.msg-file-size { font-size: 0.72rem; color: #94a3b8; }
+
+/* -- 메시지 메타 (시간 + 읽음) -------------------------------------- */
+.msg-meta {
+    display    : flex;
+    align-items: center;
+    gap        : 4px;
+    margin-top : 3px;
+    padding    : 0 2px;
+}
+
+.msg-row.mine .msg-meta { justify-content: flex-end; }
+
+.msg-time {
+    font-size  : 0.7rem;
+    color      : #94a3b8;
+    white-space: nowrap;
+}
+
+.read-status       { font-size: 0.7rem; display: flex; align-items: center; }
+.read-status i     { font-size: 0.75rem; }
+.read-status.read  { color: var(--primary-blue); }   /* 읽음: 파란색 */
+.read-status.unread{ color: #94a3b8; }               /* 미읽음: 회색 */
+
+
+/* ====================================================================
+   채팅 입력 영역
+   ==================================================================== */
+.chat-input-area {
+    background : #ffffff;
+    border-top : 1px solid var(--border-color);
+    padding    : 14px 20px;
+    flex-shrink: 0;
+    box-shadow : 0 -2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.chat-input-inner {
+    display    : flex;
+    align-items: flex-end;
+    gap        : 8px;
+    background : #f4f7fe;
+    border     : 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding    : 8px 8px 8px 14px;
+    transition : border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Vue v-bind:class="{ focused: store.inputFocused }" 와 연동 */
+.chat-input-inner.focused {
+    border-color: var(--primary-blue);
+    box-shadow  : 0 0 0 3px rgba(0, 97, 255, 0.08);
+    background  : #ffffff;
+}
+
+.chat-textarea {
+    flex       : 1;
+    border     : none;
+    background : transparent;
+    resize     : none;
+    font-family: var(--default-font);
+    font-size  : 0.9rem;
+    color      : var(--default-color);
+    line-height: 1.5;
+    max-height : 120px;
+    min-height : 24px;
+    overflow-y : auto;
+    outline    : none;
+    padding    : 2px 0;
+}
+
+.chat-textarea::placeholder { color: #b0bac9; }
+
+.chat-textarea::-webkit-scrollbar       { width: 3px; }
+.chat-textarea::-webkit-scrollbar-thumb { background: #e2e8f0; }
+
+.chat-input-btns {
+    display    : flex;
+    align-items: center;
+    gap        : 4px;
+    flex-shrink: 0;
+}
+
+.chat-file-btn {
+    width           : 36px;
+    height          : 36px;
+    border          : none;
+    border-radius   : 8px;
+    background      : transparent;
+    color           : #94a3b8;
+    font-size       : 1.05rem;
+    cursor          : pointer;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    transition      : all 0.2s;
+}
+
+.chat-file-btn:hover {
+    background : #e0e9ff;
+    color      : var(--primary-blue);
+}
+
+.chat-send-btn {
+    width           : 36px;
+    height          : 36px;
+    border          : none;
+    border-radius   : 8px;
+    background      : var(--primary-blue);
+    color           : #ffffff;
+    font-size       : 1rem;
+    cursor          : pointer;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    transition      : all 0.2s;
+    flex-shrink     : 0;
+}
+
+.chat-send-btn:hover  { background: #0052d6; transform: scale(1.05); }
+.chat-send-btn:active { transform: scale(0.97); }
+
+.chat-send-btn:disabled {
+    background : #e2e8f0;
+    color      : #94a3b8;
+    cursor     : not-allowed;
+    transform  : none;
+}
+
+.chat-input-hint {
+    font-size  : 0.72rem;
+    color      : #b0bac9;
+    text-align : right;
+    margin-top : 6px;
+    padding-right: 4px;
+}
+
+/* ====================================================================
+   공통 유틸
+   ==================================================================== */
+
+/* 회전 스피너 */
+.chat-spin {
+    display          : inline-block;
+    animation        : chat-rotate 0.8s linear infinite;
+}
+
+@keyframes chat-rotate {
+    from { transform: rotate(0deg);   }
+    to   { transform: rotate(360deg); }
+}
+
+/* ====================================================================
+   스크롤바 공통 (webkit)
+   ==================================================================== */
+.chat-user-list,
+.chat-messages,
+.chat-textarea {
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+}

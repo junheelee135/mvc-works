@@ -20,7 +20,7 @@
     <ul class="sub-menu" id="groupSubMenu">
         <li><a href="${pageContext.request.contextPath}/groupware/notice">공지사항</a></li>
         <li><a href="${pageContext.request.contextPath}/report/list">주간보고서</a></li>
-        <li><a href="${pageContext.request.contextPath}/">채팅 - 미구현</a></li>
+        <li><a href="${pageContext.request.contextPath}/chat">채팅 - 구현 중</a></li>
     </ul>
 
     <%-- 인사관리 토글 메뉴 --%>
