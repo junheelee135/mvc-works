@@ -4,17 +4,19 @@
 
 <mapper namespace="com.mvc.app.mapper.ProjectNoticeMapper">
 
-	<!-- ───────────────── 매니저 여부 확인 -->
-
+	<!-- 매니저 여부 확인 -->
 	<select id="isManager" resultType="int">
 		SELECT COUNT(*)
 		FROM empproject
 		WHERE empid = #{empId}
-		AND projectid = #{projectid}
+		<if test="projectid != null">
+			AND projectid = #{projectid, jdbcType=NUMERIC}
+		</if>
 		AND UPPER(role) = 'M'
 	</select>
 
-	<!-- ───────────────── 등록 -->
+
+	<!-- 등록 -->
 	<insert id="insertNotice"
 		parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
 
@@ -36,7 +38,7 @@
 		)
 		VALUES(
 		#{noticenum},
-		#{projectid},
+		#{projectid, jdbcType=NUMERIC},
 		#{subject},
 		#{content},
 		0,
@@ -49,7 +51,7 @@
 	</insert>
 
 
-	<!-- ───────────────── 수정 -->
+	<!-- 수정 -->
 	<update id="updateNotice"
 		parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
 
@@ -66,29 +68,25 @@
 	</update>
 
 
-	<!-- ───────────────── 삭제 (소프트삭제) -->
+	<!-- 삭제 -->
 	<update id="deleteNotice" parameterType="long">
-
 		UPDATE projectnotice
 		SET
 		state = 0
 		WHERE noticenum = #{noticenum}
-
 	</update>
 
 
-	<!-- ───────────────── 조회수 -->
+	<!-- 조회수 -->
 	<update id="increaseHit" parameterType="long">
-
 		UPDATE projectnotice
 		SET
 		hitcount = hitcount + 1
 		WHERE noticenum = #{noticenum}
-
 	</update>
 
 
-	<!-- ───────────────── 목록 -->
+	<!-- 목록 -->
 	<select id="listNotice" parameterType="map"
 		resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
 
@@ -102,45 +100,36 @@
 		TO_CHAR(n.regdate,'YYYY-MM-DD') regdate,
 		TO_CHAR(n.updatedate,'YYYY-MM-DD') updatedate,
 		n.authorempid,
-		e.name
-		authorName
+		e.name authorName
 
 		FROM projectnotice n
 		LEFT JOIN employee2 e
-		ON n.authorempid =
-		e.empid
+		ON n.authorempid = e.empid
 
 		WHERE n.state = 1
-		AND n.projectid = #{projectid}
-
-		<if test="keyword != null and keyword != ''">
-			AND (
-			n.subject LIKE '%' || #{keyword} || '%'
-			OR n.content
-			LIKE '%' || #{keyword} || '%'
-			)
-		</if>
 
 		ORDER BY
 		n.isnotice DESC,
 		n.noticenum DESC
 
-		OFFSET #{offset} ROWS
-		FETCH
-		NEXT #{pageSize} ROWS ONLY
+		<if test="offset != null and pageSize != null">
+			OFFSET #{offset, jdbcType=NUMERIC} ROWS
+			FETCH NEXT #{pageSize, jdbcType=NUMERIC} ROWS ONLY
+		</if>
 
 	</select>
 
 
-	<!-- ───────────────── 총 건수 -->
+	<!-- 총 건수 -->
 	<select id="countNotice" parameterType="map" resultType="int">
 
 		SELECT COUNT(*)
 		FROM projectnotice
-
 		WHERE state = 1
-		AND projectid =
-		#{projectid}
+
+		<if test="projectid != null">
+			AND projectid = #{projectid, jdbcType=NUMERIC}
+		</if>
 
 		<if test="keyword != null and keyword != ''">
 			AND (
@@ -153,7 +142,7 @@
 	</select>
 
 
-	<!-- ───────────────── 단건 -->
+	<!-- 단건 -->
 	<select id="getNotice" parameterType="long"
 		resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
 
@@ -176,7 +165,6 @@
 		LEFT JOIN employee2
 		e
 		ON n.authorempid = e.empid
-
 		LEFT JOIN project p
 		ON n.projectid =
 		p.projectid
@@ -186,7 +174,7 @@
 	</select>
 
 
-	<!-- ───────────────── 내 프로젝트 목록 -->
+	<!-- 내 프로젝트 목록 -->
 	<select id="getMyProjects" parameterType="string"
 		resultType="map">
 
@@ -202,13 +190,12 @@
 
 		WHERE ep.empid
 		= #{empId}
-
 		ORDER BY p.title
 
 	</select>
 
 
-	<!-- ───────────────── 파일 등록 -->
+	<!-- 파일 등록 -->
 	<insert id="insertFile"
 		parameterType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
 
@@ -235,17 +222,15 @@
 	</insert>
 
 
-	<!-- ───────────────── 파일 삭제 -->
+	<!-- 파일 삭제 -->
 	<delete id="deleteFile" parameterType="long">
-
 		DELETE FROM
 		projectnoticefile
 		WHERE filenum = #{filenum}
-
 	</delete>
 
 
-	<!-- ───────────────── 파일 목록 -->
+	<!-- 파일 목록 -->
 	<select id="getFiles" parameterType="long"
 		resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
 
@@ -255,18 +240,15 @@
 		originalfilename,
 		filesize,
 		noticenum
-
 		FROM projectnoticefile
-
 		WHERE noticenum = #{noticenum}
-
 		ORDER BY
 		filenum
 
 	</select>
 
 
-	<!-- ───────────────── 파일 단건 -->
+	<!-- 파일 단건 -->
 	<select id="getFile" parameterType="long"
 		resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
 
@@ -276,9 +258,7 @@
 		originalfilename,
 		filesize,
 		noticenum
-
 		FROM projectnoticefile
-
 		WHERE filenum = #{filenum}
 
 	</select>

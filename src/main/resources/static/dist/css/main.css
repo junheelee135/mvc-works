@@ -32,11 +32,10 @@
 	display: flex !important;
 	gap: 20px;
 	width: 100%;
-	margin-top: 0;
 }
 
 .middle-row>.card {
-	flex: 0 0 calc(33.33% - 13.33px) !important; /* 정확히 1/3 너비 강제 */
+	flex: 1 1 0 !important; /* 핵심 */
 	min-width: 0;
 }
 
@@ -250,21 +249,39 @@
 /* 7. 결재 & 공지사항 상세 */
 .approval-grid {
 	display: flex;
-	gap: 12px;
+	gap: 10px; /* ✔ 간격 줄임 */
+	margin-top: 5px;
 }
 
 .approval-box {
 	flex: 1;
 	text-align: center;
-	padding: 18px;
-	border-radius: 10px;
+	padding: 20px 10px; /* ✔ 균형 맞춤 */
+	border-radius: 12px;
 	background: #f8f9fc;
 	cursor: pointer;
-	transition: .2s;
+	transition: all 0.2s ease;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px; /* ✔ 아이콘/텍스트 간격 */
 }
 
 .approval-box:hover {
 	background: #eef1ff;
+	transform: translateY(-2px);
+}
+
+.approval-icon {
+	position: relative;
+	font-size: 22px;
+}
+
+.box-label {
+	font-size: 13px;
+	color: #555;
+	font-weight: 500;
 }
 
 .approval-icon {
@@ -337,6 +354,16 @@
 	display: flex !important;
 	gap: 6px !important;
 	flex: 0 0 auto;
+}
+
+.notice-item {
+	cursor: pointer;
+	transition: background 0.15s ease;
+	border-radius: 8px;
+}
+
+.notice-item:hover {
+	background: #f5f7ff;
 }
 
 .notice-empty {
