@@ -44,10 +44,9 @@ public class NoticeRestController {
     @Value("${file.upload-root}")
     private String uploadPath;
 
-    // ── 관리자 여부 확인 (empProject.role = 'm') ──
+    // ── 관리자 여부 확인: userLevel = 99 ──
     private boolean isManager(SessionInfo info) {
-        // return "m".equals(info.getRole());
-    	return true;
+        return info.getUserLevel() == 99;
     }
 
     // ── 공지사항 등록 (관리자만) ──
@@ -106,28 +105,17 @@ public class NoticeRestController {
         }
     }
 
-    // ── 공지사항 목록 ──
+    // ── 공지사항 목록 (전사 공지 - 모든 직원 접근 가능) ──
     @GetMapping("/list")
     public ResponseEntity<?> list(
             @RequestParam(name = "pageNo",    defaultValue = "1")  int pageNo,
             @RequestParam(name = "pageSize",  defaultValue = "10") int pageSize,
-            @RequestParam(name = "keyword",   defaultValue = "")   String keyword,
-            @RequestParam(name = "projectId", required = false)    String projectId) {
+            @RequestParam(name = "keyword",   defaultValue = "")   String keyword) {
         try {
-            SessionInfo info = LoginMemberUtil.getSessionInfo();
             Map<String, Object> map = new HashMap<>();
             map.put("pageSize", pageSize);
             map.put("offset",  (pageNo - 1) * pageSize);
             map.put("keyword", keyword.isBlank() ? null : keyword);
-
-            // 일반 직원: 세션의 projectId 강제 적용 (프론트 조작 방지)
-            // 관리자:    select box에서 선택한 projectId 사용
-            if (isManager(info) && projectId != null) {
-                map.put("projectId", projectId);
-            } else {
-                // 신준안 작성중 map.put("projectId", info.getProjectId());
-            }
-
             return ResponseEntity.ok(service.listNotice(map));
         } catch (Exception e) {
             log.error("listNotice : ", e);

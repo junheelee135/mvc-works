@@ -48,7 +48,7 @@
         WHERE noticenum = #{noticenum}
     </update>
 
-    <!-- ── 공지사항 목록 ── -->
+    <!-- ── 공지사항 목록 (전사 공지) ── -->
     <select id="listNotice" parameterType="map" resultType="com.mvc.app.domain.dto.NoticeDto">
         SELECT n.noticenum,
                n.subject,

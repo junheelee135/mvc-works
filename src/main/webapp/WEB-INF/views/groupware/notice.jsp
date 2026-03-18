@@ -8,6 +8,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>
 <jsp:include page="/WEB-INF/views/layout/sidebarResources.jsp"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/noticelist.css" type="text/css">
 <meta name="ctx" content="${pageContext.request.contextPath}">
 </head>
@@ -38,15 +39,6 @@
                     공지 등록
                 </button>
             </div>
-        </div>
-
-        <div class="notice-tabs" v-if="isAdmin && myProjects.length > 0">
-            <button class="tab-btn" :class="{active: selectedProjectId === ''}" @click="filterByProject('')">전체</button>
-            <button v-for="p in myProjects" :key="p.projectId" 
-                    class="tab-btn" :class="{active: selectedProjectId === p.projectId}"
-                    @click="filterByProject(p.projectId)">
-                {{ p.projectName }}
-            </button>
         </div>
 
         <div class="notice-panel">
@@ -116,8 +108,19 @@
                     <span><b>조회</b> {{ detail.hitcount }}</span>
                 </div>
             </div>
-            <div class="detail-body" style="white-space: pre-wrap;">{{ detail.content }}</div>
-            
+            <div class="detail-body" v-html="detail.content"></div>
+
+            <!-- 첨부파일 -->
+            <div class="detail-files" v-if="detail.files && detail.files.length > 0">
+                <div class="detail-files-title">첨부파일</div>
+                <a v-for="file in detail.files" :key="file.filenum"
+                   :href="ctx + '/api/notice/file/' + file.filenum"
+                   class="file-item" target="_blank">
+                    <span class="material-symbols-outlined">attach_file</span>
+                    {{ file.originalfilename }}
+                </a>
+            </div>
+
             <div class="detail-footer">
                 <button class="btn-back" @click="view = 'list'">목록</button>
                 <div class="detail-footer-btns" v-if="isAdmin">
@@ -143,16 +146,6 @@
             </div>
             <div class="form-panel-body">
 
-                <div class="form-field" v-if="isAdmin">
-                    <label class="form-label">대상 프로젝트 <span class="required">*</span></label>
-                    <select class="form-input" v-model="form.projectId">
-                        <option value="">프로젝트 선택</option>
-                        <c:forEach var="p" items="${sessionScope.loginInfo.projectList}">
-                            <option value="${p.projectId}">${p.projectName}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-
                 <div class="form-field">
                     <label class="form-label">제목 <span class="required">*</span></label>
                     <input type="text" class="form-input" v-model="form.subject" placeholder="제목을 입력하세요">
@@ -160,13 +153,42 @@
 
                 <div class="form-field">
                     <label class="form-label">내용 <span class="required">*</span></label>
-                    <textarea class="form-textarea" v-model="form.content" placeholder="내용을 입력하세요"></textarea>
+                    <div id="quill-editor" style="height:300px; background:#fff;"></div>
                 </div>
 
                 <div class="form-check-row">
                     <input type="checkbox" id="isnotice" :checked="form.isnotice === 1"
                            @change="form.isnotice = $event.target.checked ? 1 : 0">
                     <label for="isnotice">상단 공지로 고정</label>
+                </div>
+
+                <!-- 파일 첨부 -->
+                <div class="form-field">
+                    <label class="form-label">첨부파일</label>
+                    <!-- 기존 파일 목록 (수정 시) -->
+                    <div class="file-preview-list" v-if="form.existingFiles && form.existingFiles.length > 0">
+                        <div class="file-preview-item" v-for="file in form.existingFiles" :key="file.filenum">
+                            <span><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">attach_file</span> {{ file.originalfilename }}</span>
+                            <button class="btn-remove-file" @click="removeExistingFile(file.filenum)" type="button">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 새 파일 선택 -->
+                    <div class="file-upload-area" @click="$refs.fileInput.click()">
+                        <span class="material-symbols-outlined">upload_file</span>
+                        <p>클릭하여 파일을 선택하세요</p>
+                        <input type="file" ref="fileInput" multiple @change="onFileChange" style="display:none;">
+                    </div>
+                    <!-- 새로 선택한 파일 미리보기 -->
+                    <div class="file-preview-list" v-if="form.newFiles && form.newFiles.length > 0">
+                        <div class="file-preview-item" v-for="(f, idx) in form.newFiles" :key="idx">
+                            <span><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">attach_file</span> {{ f.name }}</span>
+                            <button class="btn-remove-file" @click="form.newFiles.splice(idx, 1)" type="button">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-footer">
@@ -185,20 +207,17 @@
 <jsp:include page="/WEB-INF/views/vue/vue_cdn.jsp"/>
 
 <script type="module">
-import { createApp, ref, computed, onMounted } from 'vue';
+import { createApp, ref, computed, onMounted, watch } from 'vue';
 
 const ctx = document.querySelector('meta[name="ctx"]').content;
 
+let quill = null; // Quill 에디터 인스턴스
+
 const app = createApp({
     setup() {
-        // ── 권한 정보 (role 활용) ──
-        //const isAdmin = ref('${sessionScope.loginInfo.role}' === 'm'); 
-        const isAdmin = ref('true');
-        const myEmpId = ref('${sessionScope.loginInfo.empId}');
-        const myProjectId = ref('${sessionScope.loginInfo.projectId}');
-        
-        // 관리자가 관리하는 프로젝트 목록 (필요시 탭 렌더링용)
-        const myProjects = ref([]);
+        // ── 권한 정보: userLevel=99 이면 ADMIN (등록/수정/삭제 가능) ──
+        const isAdmin = ref('${sessionScope.member.userLevel}' === '99');
+        const myEmpId = ref('${sessionScope.member.empId}');
 
         // ── 상태 ──
         const view = ref('list');
@@ -207,7 +226,6 @@ const app = createApp({
         const pageNo = ref(1);
         const pageSize = ref(10);
         const keyword = ref('');
-        const selectedProjectId = ref(''); // 필터용
         const detail = ref(null);
 
         const form = ref({
@@ -227,27 +245,13 @@ const app = createApp({
             return Array.from({ length: end - start + 1 }, (_, i) => start + i);
         });
 
-        // ── 목록 조회 (프로젝트 필터 포함) ──
+        // ── 목록 조회 (전사 공지) ──
         const fetchList = async () => {
-            let url = `\${ctx}/api/notice/list?pageNo=\${pageNo.value}&pageSize=\${pageSize.value}&keyword=\${encodeURIComponent(keyword.value)}`;
-            
-            // 관리자가 탭을 선택했거나, 일반 사원인 경우 프로젝트 ID를 파라미터로 보냄
-            if (selectedProjectId.value) {
-                url += `&projectId=\${selectedProjectId.value}`;
-            } else if (!isAdmin.value) {
-                url += `&projectId=\${myProjectId.value}`;
-            }
-
+            const url = `\${ctx}/api/notice/list?pageNo=\${pageNo.value}&pageSize=\${pageSize.value}&keyword=\${encodeURIComponent(keyword.value)}`;
             const res = await fetch(url);
             const data = await res.json();
             noticeList.value = data.list || [];
             total.value = data.total || 0;
-        };
-
-        const filterByProject = (id) => {
-            selectedProjectId.value = id;
-            pageNo.value = 1;
-            fetchList();
         };
 
         const searchNotice = () => { pageNo.value = 1; fetchList(); };
@@ -266,15 +270,14 @@ const app = createApp({
                     subject: item.subject,
                     content: item.content,
                     isnotice: item.isnotice,
-                    projectId: item.projectId || '',
                     existingFiles: item.files ? [...item.files] : [],
-                    deleteFileNums: []
+                    deleteFileNums: [],
+                    newFiles: []
                 };
             } else {
                 form.value = { 
-                    noticenum: null, subject: '', content: '', isnotice: 0, 
-                    projectId: isAdmin.value ? '' : myProjectId.value, // 사원은 소속 프로젝트 고정
-                    existingFiles: [], deleteFileNums: [] 
+                    noticenum: null, subject: '', content: '', isnotice: 0,
+                    existingFiles: [], deleteFileNums: [], newFiles: []
                 };
             }
             view.value = 'form';
@@ -282,18 +285,54 @@ const app = createApp({
 
         const cancelForm = () => { view.value = form.value.noticenum ? 'detail' : 'list'; };
 
+        const onFileChange = (e) => {
+            const files = Array.from(e.target.files);
+            form.value.newFiles = [...(form.value.newFiles || []), ...files];
+            e.target.value = ''; // 같은 파일 재선택 가능하도록 초기화
+        };
+
+        const removeExistingFile = (filenum) => {
+            form.value.deleteFileNums.push(filenum);
+            form.value.existingFiles = form.value.existingFiles.filter(f => f.filenum !== filenum);
+        };
+
+        const deleteNotice = async (noticenum) => {
+            if (!confirm('공지사항을 삭제하시겠습니까?')) return;
+            const res = await fetch(`\${ctx}/api/notice/\${noticenum}`, { method: 'DELETE' });
+            if (res.ok) {
+                alert('삭제되었습니다.');
+                view.value = 'list';
+                fetchList();
+            } else {
+                alert('삭제 중 오류가 발생했습니다.');
+            }
+        };
+
         const submitForm = async () => {
             if (!form.value.subject.trim()) { alert('제목을 입력해주세요.'); return; }
-            if (isAdmin.value && !form.value.projectId) { alert('대상 프로젝트를 선택해주세요.'); return; }
+
+            // Quill 에디터 내용 반영
+            if (quill) {
+                form.value.content = quill.root.innerHTML;
+            }
 
             const fd = new FormData();
             fd.append('data', new Blob([JSON.stringify({
                 noticenum: form.value.noticenum,
                 subject: form.value.subject,
                 content: form.value.content,
-                isnotice: form.value.isnotice,
-                projectId: form.value.projectId
+                isnotice: form.value.isnotice
             })], { type: 'application/json' }));
+
+            // 새 첨부파일
+            if (form.value.newFiles && form.value.newFiles.length > 0) {
+                form.value.newFiles.forEach(f => fd.append('files', f));
+            }
+
+            // 삭제할 기존 파일 번호 (수정 시)
+            if (form.value.deleteFileNums && form.value.deleteFileNums.length > 0) {
+                fd.append('deleteFileNums', new Blob([JSON.stringify(form.value.deleteFileNums)], { type: 'application/json' }));
+            }
 
             const isEdit = !!form.value.noticenum;
             const url = isEdit ? `\${ctx}/api/notice/\${form.value.noticenum}` : `\${ctx}/api/notice`;
@@ -313,11 +352,41 @@ const app = createApp({
             fetchList();
         });
 
+        // 폼 뷰 전환 시 Quill 초기화
+        watch(view, (newView) => {
+            if (newView === 'form') {
+                setTimeout(() => {
+                    const container = document.getElementById('quill-editor');
+                    if (!container) return;
+                    quill = new Quill('#quill-editor', {
+                        theme: 'snow',
+                        placeholder: '내용을 입력하세요...',
+                        modules: {
+                            toolbar: [
+                                [{ 'header': [1, 2, 3, false] }],
+                                ['bold', 'italic', 'underline'],
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['link'],
+                                ['clean']
+                            ]
+                        }
+                    });
+                    // 수정 시 기존 내용 로드
+                    if (form.value.content) {
+                        quill.clipboard.dangerouslyPasteHTML(form.value.content);
+                    }
+                }, 100);
+            } else {
+                quill = null;
+            }
+        });
+
         return {
             ctx, isAdmin, myEmpId, view, noticeList, total, pageNo, pageSize, keyword,
-            totalPages, pageRange, detail, form, selectedProjectId, myProjects,
+            totalPages, pageRange, detail, form,
             fetchList, searchNotice, changePage, openDetail, openForm, cancelForm,
-            submitForm, filterByProject
+            submitForm, deleteNotice, onFileChange, removeExistingFile
         };
     }
 });
@@ -325,5 +394,6 @@ const app = createApp({
 app.mount('#vue-app');
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 </body>
 </html>

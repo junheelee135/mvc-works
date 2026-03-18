@@ -18,7 +18,6 @@
         <i class="fas fa-chevron-down toggle-icon" id="groupArrow"></i>
     </a>
     <ul class="sub-menu" id="groupSubMenu">
-        <li><a href="${pageContext.request.contextPath}/groupware/notice">공지사항</a></li>
         <li><a href="${pageContext.request.contextPath}/report/list">주간보고서</a></li>
         <li><a href="${pageContext.request.contextPath}/chat">채팅 - 구현 중</a></li>
     </ul>
@@ -71,7 +70,9 @@
         <li><a href="${pageContext.request.contextPath}/meeting/reserve">예약 현황</a></li>
     </ul>
 
-    <a href="${pageContext.request.contextPath}/" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+    <a href="${pageContext.request.contextPath}/groupware/notice" class="nav-link">
+        <i class="fas fa-bullhorn"></i> 공지사항
+    </a>
 </aside>
 
 <%-- sidebar 전용 Js --%>
