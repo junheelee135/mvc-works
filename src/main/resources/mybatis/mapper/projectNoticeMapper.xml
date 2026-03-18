@@ -93,6 +93,7 @@
 		SELECT
 		n.noticenum,
 		n.projectid,
+		p.title AS projectName,   <!-- ⭐ 추가 -->
 		n.subject,
 		n.hitcount,
 		n.isnotice,
@@ -100,13 +101,13 @@
 		TO_CHAR(n.regdate,'YYYY-MM-DD') regdate,
 		TO_CHAR(n.updatedate,'YYYY-MM-DD') updatedate,
 		n.authorempid,
-		e.name
-		authorName
+		e.name authorName
 
 		FROM projectnotice n
 		LEFT JOIN employee2 e
-		ON n.authorempid =
-		e.empid
+		ON n.authorempid = e.empid
+		LEFT JOIN project p           <!-- ⭐ 추가 -->
+		ON n.projectid = p.projectid
 
 		WHERE n.state = 1
 
@@ -117,9 +118,7 @@
 		<if test="keyword != null and keyword != ''">
 			AND (
 			n.subject LIKE '%' || #{keyword} || '%'
-			OR n.content
-			LIKE '%' ||
-			#{keyword} || '%'
+			OR n.content LIKE '%' || #{keyword} || '%'
 			)
 		</if>
 
@@ -129,8 +128,7 @@
 
 		<if test="offset != null and pageSize != null">
 			OFFSET #{offset, jdbcType=NUMERIC} ROWS
-			FETCH NEXT
-			#{pageSize, jdbcType=NUMERIC} ROWS ONLY
+			FETCH NEXT #{pageSize, jdbcType=NUMERIC} ROWS ONLY
 		</if>
 
 	</select>
@@ -216,9 +214,11 @@
 		ep.projectid,
 		p.title projectname,
 		ep.role
-		FROM empproject ep
+		FROM
+		empproject ep
 		JOIN project p ON ep.projectid = p.projectid
-		WHERE ep.empid = #{empId}
+		WHERE
+		ep.empid = #{empId}
 		AND UPPER(ep.role) = 'M'
 		ORDER BY p.title
 	</select>
