@@ -170,9 +170,9 @@ public class ProjectController {
 			map.put("schType", schType);
 			map.put("kwd", kwd);
 
-			int dataCount = service.dataCount(map);
+			int dataCount = taskService.myDataCount(map);
 
-			dataCount = service.dataCount(map);
+			dataCount = taskService.myDataCount(map);
 			if (dataCount != 0) {
 				total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
 			}
@@ -183,7 +183,7 @@ public class ProjectController {
 			map.put("offset", offset);
 			map.put("size", size);
 
-			List<ProjectsDto> list = service.projectslist(map);
+			List<ProjectsDto> list = taskService.myProjectslist(map);
 
 			String cp = RequestUtils.getContextPath();
 			String query = "";

@@ -19,7 +19,6 @@ public interface ProjectsMapper {
 	public void insertProjectStep(Map<String, Object> stage) throws SQLException;
 	List<Map<String,Object>> findStageByProjectId(@Param("projectId") Long projectId);
 	public void insertTasks(Map<String, Object> map) throws SQLException;
-
 	
 	public List<ProjectsDto> projectslist(Map<String, Object> map);
 	public int dataCount(Map<String, Object> map);	
@@ -29,5 +28,4 @@ public interface ProjectsMapper {
 
 	// 내가 참여한 프로젝트 조회
 	List<ProjectsDto> findProjectsByEmpId(@Param("empId") String empId);
-
 }

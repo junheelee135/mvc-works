@@ -206,4 +206,131 @@
 	    ORDER BY logDate ASC
 	</select>
 	
+	<!-- 프로젝트 진척도 업데이트 -->
+	<update id="projectUpdateProgress" parameterType="long">
+	    UPDATE PROJECT
+	    SET progress = (
+	        SELECT ROUND(
+	            COUNT(CASE WHEN t.taskStatus = '4' THEN 1 END) * 100.0 / NULLIF(COUNT(t.taskId), 0)
+	        )
+	        FROM task t
+	        JOIN stage s ON t.stageId = s.stageId
+	        WHERE s.projectId = #{projectId}
+	    )
+	    WHERE projectId = #{projectId}
+	</update>
+	
+	
+	<!-- task 상태 자동 업데이트 (지연 체크) -->
+	<update id="taskUpdateStatus" parameterType="String">
+	    UPDATE task
+	    SET taskStatus = (
+	        SELECT CASE
+	            WHEN latestStatus = 'S' THEN '3'
+	            WHEN completedDays >= totalDays THEN '4'
+	            WHEN latestStatus = 'I' THEN '5'
+	            ELSE taskStatus
+	        END
+	        FROM (
+	            SELECT 
+	                (SELECT logStatus FROM TASKDAILYLOG dl
+	                 JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
+	                 WHERE et.taskId = #{taskId}
+	                 ORDER BY logDate DESC
+	                 FETCH FIRST 1 ROW ONLY) AS latestStatus,
+	                (SELECT COUNT(*) FROM TASKDAILYLOG dl
+	                 JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
+	                 WHERE et.taskId = #{taskId}
+	                 AND dl.logStatus = 'F') AS completedDays,
+	                (SELECT taskEndDate - taskStartDate + 1 
+	                 FROM task WHERE taskId = #{taskId}) AS totalDays
+	            FROM DUAL
+	        )
+	    )
+	    WHERE taskId = #{taskId}
+	</update>
+	
+	<sql id="where-project">
+		<choose>
+			<when test="schType == 'title'">
+				INSTR(p.TITLE, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'manager'">
+				INSTR(e.NAME, #{kwd}) &gt; 0
+			</when>
+			<when test="schType == 'startDate'">
+				(INSTR(TO_CHAR(p.STARTDATE, 'YYYY/MM/DD'), #{kwd})
+				&gt; 0
+				OR INSTR(TO_CHAR(p.STARTDATE, 'YYYY-MM-DD'), #{kwd}) &gt; 0
+				OR
+				INSTR(TO_CHAR(p.STARTDATE, 'YYYYMMDD'), #{kwd}) &gt; 0)
+			</when>
+			<when test="schType == 'endDate'">
+				(INSTR(TO_CHAR(p.ENDDATE, 'YYYY/MM/DD'), #{kwd}) &gt;
+				0
+				OR INSTR(TO_CHAR(p.ENDDATE, 'YYYY-MM-DD'), #{kwd}) &gt; 0
+				OR
+				INSTR(TO_CHAR(p.ENDDATE, 'YYYYMMDD'), #{kwd}) &gt; 0)
+			</when>
+			<otherwise>
+				INSTR(${schType}, #{kwd}) &gt; 0
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<select id="myProjectslist" parameterType="map" resultType="com.mvc.app.domain.dto.ProjectsDto">
+	    SELECT
+	    p.PROJECTID,
+	    p.TITLE,
+	    p.PROJECTTYPE,
+	    CASE
+	    WHEN COUNT(e.NAME) > 1
+	    THEN MIN(e.NAME) || ' 외 ' || (COUNT(e.NAME) - 1) || '명'
+	    ELSE MIN(e.NAME)
+	    END AS managerName,
+	    TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
+	    TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
+	    TRUNC(p.ENDDATE - p.STARTDATE) AS totalDays,
+	    CASE
+	    WHEN p.STARTDATE > TRUNC(SYSDATE) THEN '시작 전'
+	    WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '0'
+	    ELSE TO_CHAR(GREATEST(TRUNC(p.ENDDATE - SYSDATE), 0)) || ' / ' ||
+	    TO_CHAR(TRUNC(p.ENDDATE - p.STARTDATE))
+	    END AS remainDays,
+	    p.PROGRESS,
+	    CASE
+	    WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '4'
+	    WHEN p.STARTDATE &lt;= TRUNC(SYSDATE) AND p.ENDDATE >= TRUNC(SYSDATE)
+	    THEN '2'
+	    ELSE p.STATUS
+	    END AS status
+	    FROM PROJECT p
+	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
+	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+	    WHERE p.PROJECTID IN (
+	        SELECT projectId FROM EMPPROJECT WHERE empId = #{empId}
+	    )
+	    AND ep.ROLE = 'M'
+	    <if test="kwd != null and kwd != ''">
+	        AND <include refid="where-project" />
+	    </if>
+	    GROUP BY p.PROJECTID, p.TITLE, p.PROJECTTYPE, p.STARTDATE, p.ENDDATE, p.PROGRESS, p.STATUS
+	    ORDER BY p.PROJECTID DESC
+	    OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+	</select>
+	
+	<select id="myDataCount" parameterType="map" resultType="Integer">
+	    SELECT NVL(COUNT(*), 0)
+	    FROM PROJECT p
+	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
+	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+	    WHERE p.PROJECTID IN (
+	        SELECT projectId FROM EMPPROJECT WHERE empId = #{empId}
+	    )
+	    AND ep.ROLE = 'M'
+	    <if test="kwd != null and kwd != ''">
+	        AND <include refid="where-project" />
+	    </if>
+	</select>
+	
 </mapper>

@@ -359,11 +359,6 @@ body {
 .member-info { display: flex; align-items: center; }
 .is-weekend { background-color: #f8fafc; color: #ef4444; }
 
-.task-name:hover {
-    color: var(--primary-blue);
-    text-decoration: underline;
-    cursor: pointer;
-}
 
 /* 단계명 뱃지 */
 .stage-badge {
@@ -563,4 +558,17 @@ input:disabled, select:disabled {
 .daily-btn-wrap:hover::after,
 .daily-btn-wrap:hover::before {
     opacity: 1;
+}
+
+.daily-tooltip-box {
+    margin: 0 14px 12px;
+    padding:12px 14px;
+    border-radius: 8px;
+    border: 1px solid #e4e7ec;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #1d2939;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
 }

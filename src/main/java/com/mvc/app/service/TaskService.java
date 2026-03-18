@@ -23,4 +23,7 @@ public interface TaskService {
 	
 	public void insertTaskDailylog(ProjectsDto dto) throws Exception;
 	public List<ProjectsDto> taskDailylist(@Param("empTaskId") String empTaskId) throws Exception;
+
+	List<ProjectsDto> myProjectslist(Map<String, Object> map) throws Exception;
+	int myDataCount(Map<String, Object> map) throws Exception;
 }

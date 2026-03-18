@@ -43,5 +43,12 @@ public interface TaskMapper {
 	public void insertTaskDailylog(ProjectsDto dto) throws SQLException;
 	public List<ProjectsDto> taskDailylist(@Param("empTaskId") String empTaskId) throws SQLException;
 
-
+	// 프로젝트 진척률
+	public void projectUpdateProgress(long projectId) throws SQLException;
+	// task 진행 체크
+	public void taskUpdateStatus(String taskId) throws SQLException;
+	
+	// 간트
+	public List<ProjectsDto> myProjectslist(Map<String, Object> map) throws SQLException;
+	public int myDataCount(Map<String, Object> map) throws SQLException;
 }

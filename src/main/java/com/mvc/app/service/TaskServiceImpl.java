@@ -31,6 +31,9 @@ public class TaskServiceImpl implements TaskService{
 			if (dto.getEmpId() != null && !dto.getEmpId().isEmpty()) {
 				mapper.insertEmpTask(dto);
 			}
+			mapper.taskUpdateStatus(dto.getTaskId());
+			mapper.projectUpdateProgress(dto.getProjectId());
+			
 		} catch (Exception e) {
 			log.info("insertProjectTask : ", e);
 		}
@@ -96,7 +99,10 @@ public class TaskServiceImpl implements TaskService{
 	            } else {
 	                mapper.insertEmpTask(dto);
 	            }
-			}
+			}	
+			
+			mapper.projectUpdateProgress(dto.getProjectId());
+			
 		} catch (Exception e) {
 			log.info("updateProjectTask : ", e);
 			throw e;
@@ -121,6 +127,10 @@ public class TaskServiceImpl implements TaskService{
 	public void insertTaskDailylog(ProjectsDto dto) throws Exception {
 		try {
 			mapper.insertTaskDailylog(dto);
+			
+	        mapper.taskUpdateStatus(dto.getTaskId());
+	        mapper.projectUpdateProgress(dto.getProjectId());
+			
 		} catch (Exception e) {
 			log.info("insertTaskDailylog : ", e);
 			throw e;
@@ -142,5 +152,31 @@ public class TaskServiceImpl implements TaskService{
 		return list;
 	}
 
+	@Override
+	public List<ProjectsDto> myProjectslist(Map<String, Object> map) throws Exception {
+		List<ProjectsDto> list = null;
+		
+		try {
+			list = mapper.myProjectslist(map);
+		} catch (Exception e) {
+			log.info("myProjectslist : ", e);
+			throw e;
+		}
+	    return list;
+	}
+
+	@Override
+	public int myDataCount(Map<String, Object> map) throws Exception {
+		int result = 0;
+		
+		try {
+			result = mapper.myDataCount(map);
+		} catch (Exception e) {
+			log.info("myDataCount : ", e);
+			throw e;
+		}
+		
+	    return result;
+	}
 
 }

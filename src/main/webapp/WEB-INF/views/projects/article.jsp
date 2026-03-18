@@ -52,18 +52,20 @@
             </div>
         </div>
 
-        <div class="card-progress">
-            <div class="progress-header">
-                <div class="progress-label">Projects 진척률
-                	
-                </div>
-                <div class="progress-stats text-muted">16(진행완)/25(전체task) Tasks Completed <span class="text-dark">(${dto.progress}%)</span></div>
-            </div>
-		    <div class="progress" style="cursor: pointer;" onclick="location.href='${pageContext.request.contextPath}/projects/ganttarticle'">
-		        <div class="progress-bar" role="progressbar" 
-		             style="width: ${dto.progress}%;" 
-		             aria-valuenow="${dto.progress}" aria-valuemin="0" aria-valuemax="100">
-		            ${dto.progress}%
+		<div class="card-progress">
+		    <div class="progress-header">
+		        <div class="progress-label">Projects 진척률</div>
+		        <div class="progress-stats text-muted">
+		            <span class="text-dark">${dto.progress}%</span>
+		        </div>
+		    </div>
+		    <div class="progress" style="cursor: pointer;" onclick="location.href='${pageContext.request.contextPath}/projects/task?projectId=${dto.projectId}&readOnly=true'">
+		        <c:set var="progressClass" value="range-low"/>
+		        <c:if test="${dto.progress == 0}"><c:set var="progressClass" value=""/></c:if>
+		        <c:if test="${dto.progress > 30}"><c:set var="progressClass" value="range-mid"/></c:if>
+		        <c:if test="${dto.progress > 70}"><c:set var="progressClass" value="range-high"/></c:if>
+		        <c:if test="${dto.progress == 100}"><c:set var="progressClass" value="range-complete"/></c:if>
+		        <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${dto.progress}%;" aria-valuenow="${dto.progress}" aria-valuemin="0" aria-valuemax="100">
 		        </div>
 		    </div>
 		</div>

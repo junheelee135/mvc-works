@@ -92,13 +92,24 @@ function renderGanttChart() {
                                 barWidth += isWe ? WEEKEND_W : CELL_W;
                             } else break;
                         }
-                        const bar = document.createElement('div');
-                        bar.className = 'task-bar';
-                        bar.style.width = (barWidth - 4) + 'px';
-                        bar.style.left = '2px';
-                        bar.style.background = barColor;
-                        bar.style.borderRadius = '4px';
-                        cell.appendChild(bar);
+						const bar = document.createElement('div');
+						bar.className = 'task-bar';
+						bar.style.width = (barWidth - 4) + 'px';
+						bar.style.left = '2px';
+						bar.style.background = barColor;
+						bar.style.borderRadius = '4px';
+						bar.style.cursor = 'pointer';
+						bar.addEventListener('click', () => {
+						    const taskId = row.dataset.taskId;
+						    const taskTitle = row.querySelector('.task-name').textContent.trim();
+						    const startStr = row.dataset.start;
+						    const endStr = row.dataset.end;
+						    const empTaskId = row.dataset.empTaskId || '';
+						    const empId = row.dataset.empId || '';
+						    const stgTitle = row.dataset.stgTitle || '';
+						    openTaskDailyModal(taskId, taskTitle, startStr, endStr, empId, stgTitle, projectTitle, empTaskId);
+						});
+						cell.appendChild(bar);
                     }
                     grid.appendChild(cell);
                 });
@@ -201,13 +212,17 @@ function renderGanttChart() {
                                 barWidth += c.type === 'weekend' ? WEEKEND_W : CELL_W;
                             } else break;
                         }
-                        const bar = document.createElement('div');
-                        bar.className = 'task-bar';
-                        bar.style.width = (barWidth - 4) + 'px';
-                        bar.style.left = '2px';
-                        bar.style.background = barColor;
-                        bar.style.borderRadius = '4px';
-                        cell.appendChild(bar);
+						bar.addEventListener('click', () => {
+						    const taskId = row.dataset.taskId;
+						    const taskTitle = row.querySelector('.task-name').textContent.trim();
+						    const startStr = row.dataset.start;
+						    const endStr = row.dataset.end;
+						    const empTaskId = row.dataset.empTaskId || '';
+						    const empId = row.dataset.empId || '';
+						    const stgTitle = row.dataset.stgTitle || '';
+						    openTaskDailyModal(taskId, taskTitle, startStr, endStr, empId, stgTitle, projectTitle, empTaskId);
+						});
+						cell.appendChild(bar);
                     }
                     grid.appendChild(cell);
                 });
@@ -264,9 +279,11 @@ function closeTaskDailyModal() {
     document.getElementById('taskDailyModal').style.display = 'none';
 }
 
+
 // 이벤트 바인딩
 document.addEventListener('DOMContentLoaded', function () {
 
+	projectTitle = document.getElementById('hiddenProjectTitle')?.value || '';
     applyStageColors();
     renderGanttChart();
 
@@ -355,6 +372,8 @@ let editMode = false;
 let currentTaskEmpId = '';
 let currentTaskId = '';
 let currentEmpTaskId = '';
+let currentLogMap = {};
+let projectTitle = '';
 
 function toggleEditMode() {
     const isManager = document.getElementById('hiddenIsManager').value === 'true';
@@ -449,7 +468,8 @@ function updateTask(taskId, type) {
             taskStartDate: startDate,
             taskEndDate: endDate,
             taskStatus: taskStatus,
-            empId: empId
+            empId: empId,
+            projectId: document.getElementById('hiddenProjectId').value
         }])
     })
     .then(res => {
@@ -458,6 +478,27 @@ function updateTask(taskId, type) {
         } else {
             row.dataset.start = startDate;
             row.dataset.end = endDate;
+			
+			if (currentTaskId === taskId) {
+			    currentTaskEmpId = empId;
+			}
+
+			const taskNameTd = row.querySelector('.task-name');
+			if (taskNameTd) {
+			    const onclick = taskNameTd.getAttribute('onclick');
+			    // 날짜(3,4번째) 업데이트
+			    let updated = onclick.replace(
+			        /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
+			        `openTaskDailyModal('$1', '$2', '${startDate}', '${endDate}'`
+			    );
+			    // 담당자(5번째) 업데이트
+			    updated = updated.replace(
+			        /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
+			        `openTaskDailyModal('$1', '$2', '$3', '$4', '${empId}'`
+			    );
+			    taskNameTd.setAttribute('onclick', updated);
+			}
+
             applyStageColors();
             renderGanttChart();
         }
@@ -478,13 +519,11 @@ function updateStatusStyle(select) {
     select.style.color = colors[select.value] || '#1d2939';
 }
 
-function openTaskDailyModal(taskId, title, startStr, endStr, status, assignee, assigneeEmpId, stgTitle, projectTitle, empTaskId) {
-	
-	const taskStatusMap = {
-        '1': '시작전', '2': '진행', '3': '승인대기',
-        '4': '종료', '5': '지연', '6': '중단'
-    };
-
+function openTaskDailyModal(taskId, title, startStr, endStr, assigneeEmpId, stgTitle, projectTitle, empTaskId) {
+	if (!startStr || !endStr) {
+	    toast('시작일과 종료일을 먼저 입력해주세요.');
+	    return;
+	}
     currentTaskId = taskId;
     currentTaskEmpId = assigneeEmpId;
     currentEmpTaskId = empTaskId;
@@ -500,8 +539,6 @@ function openTaskDailyModal(taskId, title, startStr, endStr, status, assignee, a
     }
     document.getElementById('dailyModalTitle').textContent = title;
     document.getElementById('dailyModalPeriod').textContent = startStr + ' ~ ' + endStr;
-    document.getElementById('dailyModalStatus').textContent = taskStatusMap[status] || status;
-    document.getElementById('dailyModalAssignee').textContent = assignee;
 
     const grid = document.getElementById('dailyGrid');
     grid.innerHTML = '';
@@ -551,13 +588,8 @@ function openTaskDailyModal(taskId, title, startStr, endStr, status, assignee, a
     });
 
 	const statusStyle = {
-	    // 세련된 파스텔 초록 (UI 톤앤매너에 맞춤)
 	    'F': { bg: '#f0fdf4', color: '#22c55e', text: '완료' }, 
-	    
-	    // 차분하고 현대적인 파란색
 	    'I': { bg: '#eff6ff', color: '#3b82f6', text: '진행' }, 
-	    
-	    // 쨍하지 않고 부드러운 분홍색 (중단 느낌)
 	    'S': { bg: '#fef2f2', color: '#f87171', text: '중단' }  
 	};
 
@@ -567,16 +599,24 @@ function openTaskDailyModal(taskId, title, startStr, endStr, status, assignee, a
 	    .then(res => res.json())
 	    .then(logs => {
 	        const logMap = {};
-	        logs.forEach(log => { logMap[log.logDate] = log.logStatus; });
+	        logs.forEach(log => { 
+	            logMap[log.logDate] = { status: log.logStatus, reason: log.logReason };
+	        });
+
+			currentLogMap = logMap;
+			
+	        const tooltipEl = document.getElementById('dailyTooltipText');
 
 	        allDates.forEach(d => {
 	            const isWe = d.getDay() === 0 || d.getDay() === 6;
 	            const dateStr = toStr(d);
-	            const st = statusStyle[logMap[dateStr]];
+	            const logData = logMap[dateStr];
+	            const st = logData ? statusStyle[logData.status] : null;
+	            const reason = logData ? logData.reason : null;
 
 	            const cell = document.createElement('div');
 	            cell.style.cssText = `
-	                border:1px solid #eaecf0; height:60px; /* 높이 통일 */
+	                border:1px solid #eaecf0; height:60px;
 	                background:${isWe ? '#f9fafb' : '#fff'};
 	                display:flex; flex-direction:column; align-items:center; justify-content:center;
 	                cursor:${isWe ? 'default' : 'pointer'}; transition:all 0.2s;
@@ -589,25 +629,48 @@ function openTaskDailyModal(taskId, title, startStr, endStr, status, assignee, a
 	                    width: 10px; height: 10px; border-radius: 50%;
 	                    background: ${st.color}; box-shadow: 0 0 4px ${st.color}44;
 	                `;
-	                
 	                const text = document.createElement('span');
 	                text.textContent = st.text;
 	                text.style.cssText = `
 	                    font-size: 0.65rem; font-weight: 700; color: ${st.color};
 	                `;
-
 	                cell.appendChild(dot);
 	                cell.appendChild(text);
 	                cell.style.background = isWe ? '#f2f4f7' : '#fcfdfd';
 	            }
 
 	            if (!isWe) {
-	                cell.addEventListener('mouseenter', () => { cell.style.background = '#f0f4ff'; });
-	                cell.addEventListener('mouseleave', () => { 
-	                    cell.style.background = st ? (isWe ? '#f2f4f7' : '#fcfdfd') : (isWe ? '#f9fafb' : '#fff'); 
+	                cell.addEventListener('mouseenter', () => {
+	                    cell.style.background = '#f0f4ff';
+	                    if (st && reason) {
+	                        tooltipEl.textContent = `${st.text} - ${reason}`;
+	                    } else if (st) {
+	                        tooltipEl.textContent = `${st.text}`;
+	                    } else {
+	                        tooltipEl.textContent = `해당 날짜는 진행 상태가 등록되지 않았습니다.`;
+	                    }
+	                });
+	                cell.addEventListener('mouseleave', () => {
+	                    cell.style.background = st ? '#fcfdfd' : '#fff';
+	                    tooltipEl.textContent = '해당 날짜의 진행 상태와 사유를 확인하세요.';
 	                });
 	                cell.addEventListener('click', () => openDailyCheckModal(dateStr));
 	            }
+	            grid.appendChild(cell);
+	        });
+	    })
+	    .catch(err => {
+	        console.error('dailylist 조회 실패:', err);
+	        allDates.forEach(d => {
+	            const isWe = d.getDay() === 0 || d.getDay() === 6;
+	            const cell = document.createElement('div');
+	            cell.style.cssText = `
+	                border:1px solid #eaecf0; height:60px;
+	                background:${isWe ? '#f0f0f0' : '#fff'};
+	                display:flex; align-items:center; justify-content:center;
+	                cursor:${isWe ? 'default' : 'pointer'};
+	            `;
+	            if (!isWe) cell.addEventListener('click', () => openDailyCheckModal(toStr(d)));
 	            grid.appendChild(cell);
 	        });
 	    })
@@ -638,20 +701,51 @@ function closeTaskDailyModal() {
 let selectedDailyType = null;
 
 function openDailyCheckModal(dateStr) {
+	console.log('loginEmpId:', document.getElementById('hiddenLoginEmpId').value);
+	console.log('currentTaskEmpId:', currentTaskEmpId);
+	
     const loginEmpId = document.getElementById('hiddenLoginEmpId').value;
     if (loginEmpId !== currentTaskEmpId) {
         toast('담당자만 체크할 수 있습니다.');
         return;
     }
-    selectedDailyType = null;
-    document.getElementById('checkDate').textContent = dateStr;
-    document.getElementById('dailyReason').value = '';
-    document.getElementById('dailyReason').style.border = '1px solid #d0d5dd';
-    document.getElementById('reasonRequired').style.display = 'none';
-    document.getElementById('reasonOptional').style.display = 'inline';
-    document.querySelectorAll('.daily-check-btn').forEach(b => b.classList.remove('selected'));
-    document.getElementById('taskDailyCheckModal').style.display = 'flex';
-}
+	
+	const logData = currentLogMap ? currentLogMap[dateStr] : null;
+	    if (logData) {
+	        if (logData.status === 'F' || logData.status === 'S') {
+	            toast('완료 또는 중단된 날짜는 수정할 수 없습니다.');
+	            return;
+	        }
+	        // 진행(I)인 경우 확인 팝업
+	        if (logData.status === 'I') {
+	            Swal.fire({
+	                text: '진행에서 완료로 수정하게 되면 수정이 불가합니다. 수정하시겠습니까?',
+	                icon: 'question',
+	                showCancelButton: true,
+					confirmButtonColor: '#4e73df',
+					cancelButtonColor: '#fff',
+	                confirmButtonText: '수정',
+	                cancelButtonText: '취소',
+	                width: '320px',
+	            }).then(result => {
+	                if (result.isConfirmed) openDailyCheckModalInner(dateStr);
+	            });
+	            return;
+	        }
+	    }
+	    openDailyCheckModalInner(dateStr);
+	}
+
+	function openDailyCheckModalInner(dateStr) {
+	    selectedDailyType = null;
+	    document.getElementById('checkDate').textContent = dateStr;
+	    document.getElementById('dailyReason').value = '';
+	    document.getElementById('dailyReason').style.border = '1px solid #d0d5dd';
+	    document.getElementById('reasonRequired').style.display = 'none';
+	    document.getElementById('reasonOptional').style.display = 'inline';
+	    document.querySelectorAll('.daily-check-btn').forEach(b => b.classList.remove('selected'));
+	    document.getElementById('taskDailyCheckModal').style.display = 'flex';
+	}
 
 function selectDailyType(type, btn) {
     selectedDailyType = type;
@@ -696,32 +790,60 @@ function submitDailyCheck() {
         return;
     }
 
-    const dateStr = document.getElementById('checkDate').textContent;
+	if (selectedDailyType === 'done' || selectedDailyType === 'stop') {
+	        const typeText = selectedDailyType === 'done' ? '완료' : '중단';
+	        Swal.fire({
+	            text: `${typeText}로 기록하면 수정할 수 없습니다. 저장하시겠습니까?`,
+	            icon: 'warning',
+	            showCancelButton: true,
+	            confirmButtonColor: '#4e73df',
+	            cancelButtonColor: '#fff',
+	            confirmButtonText: '저장',
+	            cancelButtonText: '취소',
+	            width: '320px',
+	        }).then(result => {
+	            if (result.isConfirmed) submitDailyCheckRequest();
+	        });
+	        return;
+	    }
 
-    fetch(contextPath + '/projects/task/dailyinsert', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            empTaskId: currentEmpTaskId,
-            logDate: dateStr,
-            logStatus: selectedDailyType === 'done' ? 'F' : selectedDailyType === 'progress' ? 'I' : 'S',
-            logReason: reason
-        })
-    })
-    .then(res => {
-        if (res.ok) {
-            const msg = selectedDailyType === 'done' ? '완료' : selectedDailyType === 'progress' ? '진행' : '중단';
-            toast(msg + '으로 기록되었습니다.');
-            closeDailyCheckModal();
-        } else {
-            toast('저장 실패. 다시 시도해주세요.');
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        toast('서버 오류가 발생했습니다.');
-    });
-}
+	    submitDailyCheckRequest();
+	}
+
+	function submitDailyCheckRequest() {
+	    const dateStr = document.getElementById('checkDate').textContent;
+	    const reason = document.getElementById('dailyReason').value.trim();
+
+	    fetch(contextPath + '/projects/task/dailyinsert', {
+	        method: 'POST',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify({
+	            empTaskId: currentEmpTaskId,
+	            taskId: currentTaskId,
+	            projectId: document.getElementById('hiddenProjectId').value,
+	            logDate: dateStr,
+	            logStatus: selectedDailyType === 'done' ? 'F' : selectedDailyType === 'progress' ? 'I' : 'S',
+	            logReason: reason
+	        })
+	    })
+	    .then(res => {
+	        if (res.ok) {
+	            const msg = selectedDailyType === 'done' ? '완료' : selectedDailyType === 'progress' ? '진행' : '중단';
+	            toast(msg + '으로 기록되었습니다.');
+	            setTimeout(() => {
+	                closeDailyCheckModal();
+	                closeTaskDailyModal();
+	                location.reload();
+	            }, 1500);
+	        } else {
+	            toast('저장 실패. 다시 시도해주세요.');
+	        }
+	    })
+	    .catch(err => {
+	        console.error(err);
+	        toast('서버 오류가 발생했습니다.');
+	    });
+	}
 
 function closeDailyCheckModal() {
     document.getElementById('taskDailyCheckModal').style.display = 'none';

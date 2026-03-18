@@ -141,14 +141,19 @@
                             <td>${p.startDate}</td>
                             <td>${p.endDate}</td>
                             <td>${p.remainDays}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="progress-container flex-grow-1" style="min-width: 100px;">
-                                        <div class="progress-bar" style="width: ${p.progress}%;"></div>
-                                    </div>
-                                    <span class="progress-text">${p.progress}%</span>
-                                </div>
-                            </td>
+	                        <td>
+							    <div class="d-flex align-items-center gap-2">
+							        <div class="progress-container flex-grow-1" style="min-width: 100px;">
+							            <c:set var="progressClass" value="range-low"/>
+							            <c:if test="${p.progress == 0}"><c:set var="progressClass" value=""/></c:if>
+							            <c:if test="${p.progress > 30}"><c:set var="progressClass" value="range-mid"/></c:if>
+							            <c:if test="${p.progress > 70}"><c:set var="progressClass" value="range-high"/></c:if>
+							            <c:if test="${p.progress == 100}"><c:set var="progressClass" value="range-complete"/></c:if>
+							            <div class="progress-bar ${progressClass}" style="width: ${p.progress}%;"></div>
+							        </div>
+							        <span class="progress-text">${p.progress}%</span>
+							    </div>
+							</td>
                             <td>
                                 <c:choose>
                                     <c:when test="${p.status == '1'}"><span class="status-badge badge-ready"><span class="status-dot"></span>시작전</span></c:when>

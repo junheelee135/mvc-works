@@ -35,12 +35,12 @@
                     <input type="hidden" name="projectId" value="${projectId}">
                     <div class="search-box">
                         <select name="schType">
-                            <option value="taskTitle"     ${schType == 'taskTitle'     ? 'selected' : ''}>태스크명</option>
-                            <option value="stgTitle"      ${schType == 'stgTitle'      ? 'selected' : ''}>단계명</option>
+                            <option value="taskTitle" ${schType == 'taskTitle' ? 'selected' : ''}>태스크명</option>
+                            <option value="stgTitle" ${schType == 'stgTitle' ? 'selected' : ''}>단계명</option>
                             <option value="taskStartDate" ${schType == 'taskStartDate' ? 'selected' : ''}>시작일</option>
-                            <option value="taskEndDate"   ${schType == 'taskEndDate'   ? 'selected' : ''}>종료일</option>
-                            <option value="taskCreater"   ${schType == 'taskCreater'   ? 'selected' : ''}>생성자</option>
-                            <option value="member"        ${schType == 'member'        ? 'selected' : ''}>담당자</option>
+                            <option value="taskEndDate" ${schType == 'taskEndDate' ? 'selected' : ''}>종료일</option>
+                            <option value="taskCreater" ${schType == 'taskCreater' ? 'selected' : ''}>생성자</option>
+                            <option value="member" ${schType == 'member' ? 'selected' : ''}>담당자</option>
                         </select>
                         <input type="text" name="kwd" placeholder="Task 검색..." value="${kwd}">
                         <i class="fas fa-search"></i>
@@ -55,6 +55,8 @@
 				    <button type="button" class="btn-icon btn-edit" id="editBtn" onclick="toggleEditMode()"><i class="fas fa-check"></i></button>
 				    <button type="button" class="btn-icon btn-delete"><i class="fas fa-trash-alt"></i></button>
 				</c:if>
+
+
             </div>
         </div>
 
@@ -78,12 +80,9 @@
 						    <c:choose>
 						        <c:when test="${not empty list}">
 						            <c:forEach var="t" items="${list}" varStatus="status">
-						            <tr data-task-id="${t.taskId}" data-start="${t.taskStartDate}" data-end="${t.taskEndDate}">
+						            <tr data-task-id="${t.taskId}" data-start="${t.taskStartDate}" data-end="${t.taskEndDate}" data-emp-task-id="${t.empTaskId}" data-emp-id="${t.empId}" data-stg-title="${t.stgTitle}">
 						                <td class="text-center">${status.count}</td>
-						                <td class="fw-bold task-name"
-    											onclick="openTaskDailyModal('${t.taskId}', '${t.taskTitle}', '${t.taskStartDate}', 
-    												'${t.taskEndDate}', '${t.taskStatus}', '${t.name}', '${t.empId}', 
-    												'${t.stgTitle}', '${projectTitle}', '${t.empTaskId}')">
+						                <td class="fw-bold task-name" style="cursor: default;">
 						                    <c:if test="${not empty t.stgTitle}">
 						                        <span class="stage-badge" data-stage="${t.stageId}">${t.stgTitle}</span>
 						                    </c:if>
@@ -260,29 +259,18 @@
 		                    <span style="font-size:1.05rem; font-weight:600; color:#344054;" id="dailyModalPeriod">-</span>
 		                </div>
 		             </div>  
-		             
-		                
-		                <div style="padding:12px 14px; border-radius:8px;">
-		                <%-- 3줄: 상태 + 매니저 --%>
-			                <div style="display:flex; align-items:center; gap:100px;">
-			                    <div style="display:flex; align-items:center; gap:6px;">
-			                        <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">상태</span>
-			                        <span style="font-size:0.95rem; font-weight:600; color:#344054;" id="dailyModalStatus">-</span>
-			                    </div>
-			                    <div style="display:flex; align-items:center; gap:6px;">
-			                        <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">매니저</span>
-			                        <span style="font-size:0.95rem; font-weight:600; color:#1d2939;" id="dailyModalAssignee">-</span>
-			                    </div>
-			                </div>
-			            </div>
-
-		            		
+		             		            		
 		            <%-- 날짜별 표 --%>
 		            <div style="overflow-x:auto; padding:12px 14px; align-items:center; border-radius:8px;">
 		            <span style="font-size:0.95rem; font-weight:700; color:#1d2939; flex:1;">Task 진행표</span>
 		                <div id="dailyGrid" style="display:grid;  padding-top: 10px; min-width:max-content;"></div>
 		            </div>
+		            
+			        <%-- 툴팁 표시 영역 --%>
+	            	<div id="dailyTooltipText" class="daily-tooltip-box">해당 날짜의 진행 상태와 사유를 확인하세요.</div>
+	            	
 		        </div>
+		        
 		        
 		        <div class="modal-footer">
 		            <button class="btn-cancel" onclick="closeTaskDailyModal()">닫기</button>
@@ -350,6 +338,7 @@
 <input type="hidden" id="hiddenProjectStart" value="${projectStart}">
 <input type="hidden" id="hiddenProjectEnd" value="${projectEnd}">
 <input type="hidden" id="hiddenLoginEmpId" value="${loginEmpId}">
+<input type="hidden" id="hiddenProjectTitle" value="${projectTitle}">
 
 <script>
     const contextPath = '${pageContext.request.contextPath}';

@@ -21,7 +21,7 @@ public class ProjectsDto {
 	private String endDate;
 	private String createdDate;
 	private String status;
-	private int progress; // project 진척도
+	private long progress; // project 진척도
 	
 	
 	private List<Map<String, Object>> members; 

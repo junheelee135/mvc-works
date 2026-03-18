@@ -272,5 +272,5 @@ FROM JSON_TABLE(
 		ON p.projectId =
 		ep.projectId
 		WHERE ep.empId = #{empId}
-	</select>
+	</select>	
 </mapper>

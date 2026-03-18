@@ -361,3 +361,33 @@ body {
     color: var(--gt-primary-blue); /* 마우스 올렸을 때 색상 변화 (선택사항) */
     text-decoration: underline;    /* 밑줄 추가 (선택사항) */
 }
+
+.progress-bar {
+    transition: width 0.6s ease;
+    border-radius: 4px;
+}
+
+/* 0% */
+.progress-bar[aria-valuenow="0"] {
+    background: #e0e0e0;
+}
+
+/* 1~30% 빨강 파스텔 */
+.progress-bar.range-low {
+    background: #ffb3b3;
+}
+
+/* 31~70% 주황/노랑 파스텔 */
+.progress-bar.range-mid {
+    background: #ffd699;
+}
+
+/* 71~99% 파랑 파스텔 */
+.progress-bar.range-high {
+    background: #99c2ff;
+}
+
+/* 100% 초록 파스텔 */
+.progress-bar.range-complete {
+    background: #99e6b3;
+}

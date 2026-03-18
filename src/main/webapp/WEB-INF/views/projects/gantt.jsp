@@ -53,13 +53,13 @@
             <table class="project-table">
                 <thead>
                     <tr>
-                        <th width="40">No</th>
+                        <th width="60">No</th>
                         <th>프로젝트</th>
                         <th>매니저</th>
                         <th>시작일</th>
                         <th>종료일</th>
                         <th>잔여/전체일</th>
-                        <th class="text-center">진척도</th>
+                        <th>진척도</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,18 +71,23 @@
                                 ${p.title}
                             </a>
                         </td>
-                        <td><span class="member-badge">${p.managerName}</span></td>
+                        <td><span class="member-badge" style="margin-left: 2px;">${p.managerName}</span></td>
                         <td>${p.startDate}</td>
                         <td>${p.endDate}</td>
                         <td>${p.remainDays}</td>
                         <td>
-                            <div class="d-flex align-items-center">
-                                <div class="progress-container flex-grow-1" style="min-width: 100px;">
-                                    <div class="progress-bar" style="width: ${p.progress}%;"></div>
-                                </div>
-                                <span class="progress-text">${p.progress}%</span>
-                            </div>
-                        </td>
+						    <div class="d-flex align-items-center gap-2">
+						        <div class="progress-container flex-grow-1" style="min-width: 100px;">
+						            <c:set var="progressClass" value="range-low"/>
+						            <c:if test="${p.progress == 0}"><c:set var="progressClass" value=""/></c:if>
+						            <c:if test="${p.progress > 30}"><c:set var="progressClass" value="range-mid"/></c:if>
+						            <c:if test="${p.progress > 70}"><c:set var="progressClass" value="range-high"/></c:if>
+						            <c:if test="${p.progress == 100}"><c:set var="progressClass" value="range-complete"/></c:if>
+						            <div class="progress-bar ${progressClass}" style="width: ${p.progress}%;"></div>
+						        </div>
+						        <span class="progress-text">${p.progress}%</span>
+						    </div>
+						</td>
                     </tr>
                     </c:forEach>
                     <c:if test="${empty list}">
