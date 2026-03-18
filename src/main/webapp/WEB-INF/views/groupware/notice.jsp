@@ -45,12 +45,12 @@
             <table class="notice-table">
                 <thead>
                     <tr>
-                        <th style="width:60px;">번호</th>
+                        <th style="width:70px; text-align:center;">번호</th>
                         <th>제목</th>
-                        <th style="width:100px;">작성자</th>
-                        <th style="width:110px;">작성일</th>
-                        <th style="width:70px;">조회수</th>
-                        <th style="width:50px;">파일</th>
+                        <th style="width:70px; text-align:center;">작성자</th>
+                        <th style="width:70px; text-align:center;">작성일</th>
+                        <th style="width:80px; text-align:center;">조회수</th>
+                        <th style="width:50px; text-align:center;">파일</th>
                     </tr>
                 </thead>
                 <tbody>
