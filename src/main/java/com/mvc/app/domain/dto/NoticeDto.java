@@ -25,5 +25,7 @@ public class NoticeDto {
 
     // 첨부파일 목록 (목록/상세 조회 시 포함)
     private List<NoticeFileDto> files;
+    private int fileCount;      // 목록 조회 시 첨부파일 수
+    private Long firstFilenum;  // 목록 조회 시 첫 번째 파일번호
 }
 

@@ -49,7 +49,7 @@
                         <th>제목</th>
                         <th style="width:100px;">작성자</th>
                         <th style="width:110px;">작성일</th>
-                        <th style="width:70px;">조회</th>
+                        <th style="width:70px;">조회수</th>
                         <th style="width:50px;">파일</th>
                     </tr>
                 </thead>
@@ -61,17 +61,20 @@
                     </tr>
                     <tr v-for="item in noticeList" :key="item.noticenum"
                         @click="openDetail(item.noticenum)">
-                        <td class="td-date">{{ item.noticenum }}</td>
+                        <td class="td-date" style="text-align:center;">{{ item.noticenum }}</td>
                         <td class="td-subject">
                             <span class="badge-notice" v-if="item.isnotice === 1">공지</span>
                             {{ item.subject }}
                         </td>
                         <td class="td-author">{{ item.authorName }}</td>
                         <td class="td-date">{{ item.regdate }}</td>
-                        <td class="td-hit">{{ item.hitcount }}</td>
-                        <td class="td-file">
-                            <span class="material-symbols-outlined"
-                                  v-if="item.files && item.files.length > 0">attach_file</span>
+                        <td class="td-hit" style="text-align:center;">{{ item.hitcount }}</td>
+                        <td class="td-file" @click.stop>
+                            <a v-if="item.fileCount > 0"
+                               :href="ctx + '/api/notice/file/' + item.firstFilenum"
+                               @click.stop>
+                                <span class="material-symbols-outlined" style="color:#9aa0b4;">attach_file</span>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
@@ -260,6 +263,9 @@ const app = createApp({
         const openDetail = async (noticenum) => {
             const res = await fetch(`\${ctx}/api/notice/\${noticenum}`);
             detail.value = await res.json();
+            // 목록의 조회수도 실시간 반영
+            const item = noticeList.value.find(n => n.noticenum === noticenum);
+            if (item) item.hitcount = detail.value.hitcount;
             view.value = 'detail';
         };
 

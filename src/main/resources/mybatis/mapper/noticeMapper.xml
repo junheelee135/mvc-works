@@ -58,7 +58,9 @@
                TO_CHAR(n.regdate,   'YYYY-MM-DD') AS regdate,
                TO_CHAR(n.updatedate, 'YYYY-MM-DD') AS updateDate,
                n.authorEmpId,
-               e2.name AS authorName
+               e2.name AS authorName,
+               (SELECT COUNT(*) FROM noticefile f WHERE f.noticenum = n.noticenum) AS fileCount,
+               (SELECT MIN(f2.filenum) FROM noticefile f2 WHERE f2.noticenum = n.noticenum) AS firstFilenum
         FROM notice n
         LEFT JOIN employee2 e2 ON n.authorEmpId = e2.empId
         WHERE n.state = 1
