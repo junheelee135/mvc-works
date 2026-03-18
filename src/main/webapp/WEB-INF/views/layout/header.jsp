@@ -4,7 +4,14 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <nav class="navbar-custom">
-    <div class="navbar-left"></div>
+    <div class="navbar-left">
+        <div class="notice-ticker" id="noticeTicker">
+            <span class="ticker-badge">공지</span>
+            <div class="ticker-wrap">
+                <span class="ticker-text" id="tickerText">공지사항을 불러오는 중...</span>
+            </div>
+        </div>
+    </div>
     <div class="navbar-right">
         <span>${sessionScope.member.name} ${sessionScope.member.gradeName}님 환영합니다.</span>
 
@@ -66,3 +73,60 @@
 </nav>
 
 <script src="${pageContext.request.contextPath}/dist/js/notification.js"></script>
+
+<script>
+(function() {
+    const ctx = '${pageContext.request.contextPath}';
+    let notices = [];
+    let currentIndex = 0;
+
+    async function fetchNotices() {
+        try {
+            const res = await fetch(ctx + '/api/notice/list?pageNo=1&pageSize=20');
+            const data = await res.json();
+            console.log('[ticker] 공지 목록:', data.list);
+            // isnotice=1 인 공지만 필터
+            notices = (data.list || []).filter(n => n.isnotice === 1);
+            console.log('[ticker] 필터된 공지:', notices);
+            if (notices.length === 0) {
+                document.getElementById('noticeTicker').style.display = 'none';
+            } else {
+                showTicker(true); // 첫 로드는 즉시 표시
+            }
+        } catch(e) {
+            console.error('[ticker] 공지 불러오기 실패:', e);
+            document.getElementById('noticeTicker').style.display = 'none';
+        }
+    }
+
+    function showTicker(immediate) {
+        const el = document.getElementById('tickerText');
+        if (!el || notices.length === 0) return;
+
+        const update = () => {
+            const notice = notices[currentIndex];
+            el.textContent = notice.subject;
+            el.onclick = () => {
+                window.location.href = ctx + '/groupware/notice';
+            };
+            el.classList.remove('ticker-fade');
+            currentIndex = (currentIndex + 1) % notices.length;
+        };
+
+        if (immediate) {
+            update();
+        } else {
+            el.classList.add('ticker-fade');
+            setTimeout(update, 400);
+        }
+    }
+
+    // 페이지 로드 시 공지 불러오기
+    fetchNotices();
+
+    // 5초마다 다음 공지로 전환
+    setInterval(() => {
+        if (notices.length > 1) showTicker(false);
+    }, 5000);
+})();
+</script>

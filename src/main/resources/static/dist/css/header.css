@@ -1,68 +1,86 @@
-/* ================================================
-   header.css - Duralux ERP
-   상단 Navbar 전용 스타일
-   ================================================ */
-
-/* --- Navbar --- */
+/* --- Navbar 기본 틀 --- */
 .navbar-custom {
-    background: #fff;
-    border-bottom: 1px solid var(--border-color);
-    padding: 12px 24px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 999;
+    height: 64px;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid #dee2e6;
 }
 
+/* 1. 왼쪽 영역: 로고만 딱 들어가는 크기 */
 .navbar-left {
-    display: flex;
+    display: flex !important;
     align-items: center;
-    gap: 16px;
+    flex: 1 !important;           /* 남는 중앙 공간을 이 바구니가 다 차지함 */
+    margin-left: 20px !important;  /* 로고와 겹치지 않게 여백 부여 */
+    min-width: 0;                  /* 내부 요소 짤림 방지 */
 }
 
-.navbar-right {
-    display: flex;
+/* 2. 중앙 영역: 공지사항이 들어갈 빈 공간 전체 */
+.notice-ticker {
+    display: flex !important;
     align-items: center;
     gap: 12px;
+    background-color: #f2f5f9;
+    padding: 6px 16px;
+    border-radius: 50px;
+    /* ───── 이 부분이 핵심입니다 ───── */
+    margin-left: 250px !important;  /* 로고(MVC)를 피해서 오른쪽으로 200px 밀어냄 */
+    flex: 1 !important;             /* 남는 공간을 차지하게 함 */
+    max-width: 600px !important;    /* 너무 길어지지 않게 제한 */
+    /* ────────────────────────────── */
+
+    overflow: hidden;
+    min-width: 0;
 }
 
-.nav-icon-btn {
-    color: var(--text-gray);
-    background: none;
-    border: none;
-    font-size: 1.2rem;
+/* 3. 오른쪽 영역: 사용자 메뉴가 짤리지 않게 고정 */
+.navbar-right {
+    display: flex !important;
+    align-items: center;
+    flex-shrink: 0 !important;     /* 왼쪽 요소가 아무리 커져도 절대 밀리지 않음 */
+}
+
+/* --- 공지 내부 상세 스타일 --- */
+.ticker-badge {
+    flex-shrink: 0;
+    background: #f59e0b;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.ticker-wrap {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.ticker-text {
+    display: block !important;
+    font-size: 14px;
+    color: #1d2939 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 글자가 길면 ... 처리 */
+    opacity: 1 !important;   /* 무조건 보이게 */
     cursor: pointer;
-    transition: color 0.2s;
 }
 
-.nav-icon-btn:hover {
-    color: var(--primary-blue);
+.ticker-text:hover {
+    color: #4e73df !important;
+    text-decoration: underline;
 }
 
-.navbar-mega-menu {
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-
-/* 알림 배지 */
-.navbar-badge {
-    font-size: 0.5rem;
-}
-
-/* 프로필 아바타 */
+/* 프로필 이미지 */
 .navbar-avatar {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    margin-left: 4px;
-    cursor: pointer;
     object-fit: cover;
-    border: 2px solid var(--border-color);
-    transition: border-color 0.2s;
-}
-
-.navbar-avatar:hover {
-    border-color: var(--primary-blue);
+    border: 1px solid #dee2e6;
 }
