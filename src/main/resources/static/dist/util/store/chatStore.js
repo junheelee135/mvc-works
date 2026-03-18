@@ -308,23 +308,34 @@ export const useChatStore = defineStore('chat', {
         connectWebSocket() {
             if (this.stompClient && this.wsConnected) return;
 
-            const socket = new SockJS('/ws/chat');
-            this.stompClient = Stomp.over(socket);
-            this.stompClient.debug = null; // 콘솔 디버그 출력 비활성화
+            // @stomp/stompjs 6.x : StompJs.Client 사용
+            this.stompClient = new StompJs.Client({
+                // SockJS를 transport로 사용
+                webSocketFactory: () => new SockJS('/ws/chat'),
 
-            this.stompClient.connect(
-                {},
-                () => {
+                // 재연결 간격 (ms)
+                reconnectDelay: 5000,
+
+                // 콘솔 디버그 출력 비활성화
+                debug: () => {},
+
+                onConnect: () => {
                     this.wsConnected = true;
                     console.log('[Chat] WebSocket 연결됨');
                 },
-                (error) => {
+
+                onDisconnect: () => {
                     this.wsConnected = false;
-                    console.error('[Chat] WebSocket 오류:', error);
-                    // 5초 후 재연결 시도
-                    setTimeout(() => this.connectWebSocket(), 5000);
-                }
-            );
+                    console.log('[Chat] WebSocket 연결 해제');
+                },
+
+                onStompError: (frame) => {
+                    this.wsConnected = false;
+                    console.error('[Chat] STOMP 오류:', frame);
+                },
+            });
+
+            this.stompClient.activate();
         },
 
         /* ── 채팅방 구독 ── */

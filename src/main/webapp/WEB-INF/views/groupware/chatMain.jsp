@@ -17,7 +17,7 @@
 <%-- 채팅 전용 CSS --%>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/chat.css" type="text/css">
 
-<%-- SockJS + STOMP CDN --%>
+<%-- SockJS + @stomp/stompjs 6.x CDN --%>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.1.2/bundles/stomp.umd.min.js"></script>
 </head>
@@ -108,7 +108,7 @@
                 /* 페이지 이탈 시 WebSocket 정리 */
                 store._closeCurrentRoom();
                 if (store.stompClient) {
-                    store.stompClient.disconnect();
+                    store.stompClient.deactivate(); // 6.x API
                 }
             });
 
