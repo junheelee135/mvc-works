@@ -11,7 +11,9 @@
     </a>
 
     <a href="${pageContext.request.contextPath}/home" class="nav-link"><i class="fas fa-th-large"></i> 대시보드</a>
-
+    
+    <a href="${pageContext.request.contextPath}/projects/list" class="nav-link"><i class="bi bi-folder"></i> 전사 프로젝트</a>
+    
     <%-- 그룹웨어 토글 메뉴 --%>
     <a href="#" class="nav-link nav-toggle" id="groupToggle">
         <i class="fas fa-file-invoice"></i> 그룹웨어
@@ -53,11 +55,9 @@
         <i class="fas fa-chevron-down toggle-icon" id="projectArrow"></i>
     </a>
     <ul class="sub-menu" id="projectSubMenu">
+        <li><a href="${pageContext.request.contextPath}/projects/create">프로젝트 생성</a></li>
     	<li><a href="${pageContext.request.contextPath}/projects/projectNotice">프로젝트 공지사항</a></li>
-        <li><a href="${pageContext.request.contextPath}/projects/list">프로젝트 목록</a></li>
-        <li><a href="${pageContext.request.contextPath}/projects/gantt">프로젝트 차트관리</a></li>
-        <li><a href="${pageContext.request.contextPath}/projects/task">프로젝트 테스크</a></li>
-        <li><a href="${pageContext.request.contextPath}/projects/create">프로젝트 생성관리</a></li>
+        <li><a href="${pageContext.request.contextPath}/projects/gantt">프로젝트 태스크 관리</a></li>
     </ul>
 
     <%-- 예약 관리 토글 메뉴 --%>
