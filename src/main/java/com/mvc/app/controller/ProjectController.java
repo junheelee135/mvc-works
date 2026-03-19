@@ -405,7 +405,6 @@ public class ProjectController {
 			// ✅ 프로젝트 리스트 조회
 			List<ProjectsDto> list = service.myProjectsList(map);
 
-			// ✅ 통계 계산
 			long totalProjects = dataCount;
 			long activeProjects = list.stream().filter(p -> "2".equals(p.getStatus())).count();
 			long finishedProjects = list.stream().filter(p -> "4".equals(p.getStatus())).count();
