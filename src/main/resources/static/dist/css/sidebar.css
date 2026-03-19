@@ -25,22 +25,21 @@
 }
 
 .sidebar-brand {
-    padding: 24px;
-    font-family: "Roboto", "Raleway", sans-serif;
-    font-weight: 800;
-    font-size: 1.7rem;
-    color: var(--primary-blue);
+    height: 64px;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: 1px;
-    text-decoration: none;
+    align-items: center;      /* 세로 중앙 */
+    justify-content: center;  /* 가로 중앙 */    
+    border-bottom: 1px solid var(--border-color);
+  
 }
 
 .sidebar-logo {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
+    height: 100%;
+    max-width: 100%;
+}
+
+.sidebar-logo:hover {
+    transform: scale(1.05);
 }
 
 .nav-section {
