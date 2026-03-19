@@ -93,7 +93,7 @@
 		SELECT
 		n.noticenum,
 		n.projectid,
-		p.title AS projectName,   <!-- ⭐ 추가 -->
+		p.title AS projectName,
 		n.subject,
 		n.hitcount,
 		n.isnotice,
@@ -104,17 +104,25 @@
 		e.name authorName
 
 		FROM projectnotice n
-		LEFT JOIN employee2 e
-		ON n.authorempid = e.empid
-		LEFT JOIN project p           <!-- ⭐ 추가 -->
-		ON n.projectid = p.projectid
+		LEFT JOIN employee2 e ON n.authorempid = e.empid
+		LEFT JOIN project p ON n.projectid = p.projectid
 
 		WHERE n.state = 1
 
-		<if test="projectid != null">
+		<!-- ⭐ 내가 속한 프로젝트만 -->
+		AND EXISTS (
+		SELECT 1
+		FROM empproject ep
+		WHERE ep.projectid = n.projectid
+		AND ep.empid = #{empId}
+		)
+
+		<!-- 프로젝트 선택 -->
+		<if test="projectid != null and projectid != ''">
 			AND n.projectid = #{projectid}
 		</if>
 
+		<!-- 검색 -->
 		<if test="keyword != null and keyword != ''">
 			AND (
 			n.subject LIKE '%' || #{keyword} || '%'
@@ -138,18 +146,25 @@
 	<select id="countNotice" parameterType="map" resultType="int">
 
 		SELECT COUNT(*)
-		FROM projectnotice
-		WHERE state = 1
+		FROM projectnotice n
+		WHERE n.state = 1
 
-		<if test="projectid != null">
-			AND projectid = #{projectid, jdbcType=NUMERIC}
+		<!-- ⭐ 동일하게 적용 -->
+		AND EXISTS (
+		SELECT 1
+		FROM empproject ep
+		WHERE ep.projectid = n.projectid
+		AND ep.empid = #{empId}
+		)
+
+		<if test="projectid != null and projectid != ''">
+			AND n.projectid = #{projectid, jdbcType=NUMERIC}
 		</if>
 
 		<if test="keyword != null and keyword != ''">
 			AND (
-			subject LIKE '%' || #{keyword} || '%'
-			OR content LIKE
-			'%' || #{keyword} || '%'
+			n.subject LIKE '%' || #{keyword} || '%'
+			OR n.content LIKE '%' || #{keyword} || '%'
 			)
 		</if>
 
