@@ -26,6 +26,7 @@
 
 .sidebar-brand {
     padding: 24px;
+    font-family: "Roboto", "Raleway", sans-serif;
     font-weight: 800;
     font-size: 1.7rem;
     color: var(--primary-blue);
@@ -33,6 +34,7 @@
     align-items: center;
     gap: 8px;
     letter-spacing: 1px;
+    text-decoration: none;
 }
 
 .sidebar-logo {
