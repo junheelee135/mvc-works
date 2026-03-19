@@ -2,104 +2,105 @@
    sidebar.css - Duralux ERP
    사이드바 전용 스타일
    ================================================ */
-
 :root {
-    --sidebar-width: 260px;
-    --primary-blue: #0061ff;
-    --bg-light: #f4f7fe;
-    --border-color: #eaecf0;
-    --text-gray: #64748b;
+	--sidebar-width: 260px;
+	--primary-blue: #0061ff;
+	--bg-light: #f4f7fe;
+	--border-color: #eaecf0;
+	--text-gray: #64748b;
 }
 
 /* --- Sidebar --- */
 #sidebar {
-    width: var(--sidebar-width);
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: #fff;
-    border-right: 1px solid var(--border-color);
-    z-index: 1000;
-    overflow-y: auto;
+	width: var(--sidebar-width);
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: #fff;
+	border-right: 1px solid var(--border-color);
+	z-index: 1000;
+	overflow-y: auto;
 }
 
 .sidebar-brand {
-    height: 64px;
-    display: flex;
-    align-items: center;      /* 세로 중앙 */
-    justify-content: center;  /* 가로 중앙 */    
-    border-bottom: 1px solid var(--border-color);
-  
+	height: 64px;
+	display: flex;
+	align-items: center; /* 세로 중앙 */
+	justify-content: center; /* 가로 중앙 */
+	margin-top: 6px;
+	margin-bottom: 14px;
 }
 
 .sidebar-logo {
-    height: 100%;
-    max-width: 100%;
+	width: 80%; /* ← 가로 꽉 채우기 (핵심) */
+	height: auto; /* 비율 유지 */
+	max-height: 100%; /* 64px 넘지 않게 제한 */
+	object-fit: contain;
 }
 
 .sidebar-logo:hover {
-    transform: scale(1.05);
+	transform: scale(1.05);
 }
 
 .nav-section {
-    padding: 12px 24px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #94a3b8;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+	padding: 12px 24px;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	color: #94a3b8;
+	font-weight: 700;
+	letter-spacing: 0.5px;
 }
 
 .nav-link {
-    padding: 10px 24px;
-    color: var(--text-gray);
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.2s;
+	padding: 10px 24px;
+	color: var(--text-gray);
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	font-size: 0.9rem;
+	font-weight: 500;
+	transition: all 0.2s;
 }
 
 .nav-link i {
-    margin-right: 12px;
-    width: 18px;
-    text-align: center;
+	margin-right: 12px;
+	width: 18px;
+	text-align: center;
 }
 
 .nav-link:hover {
-    color: var(--primary-blue);
-    background: #f0f6ff;
+	color: var(--primary-blue);
+	background: #f0f6ff;
 }
 
 .nav-link.active {
-    color: var(--primary-blue);
-    background: #f0f6ff;
-    border-right: 3px solid var(--primary-blue);
+	color: var(--primary-blue);
+	background: #f0f6ff;
+	border-right: 3px solid var(--primary-blue);
 }
 
 .sub-menu {
-    padding-left: 54px;
-    list-style: none;
-    margin-bottom: 8px;
-    padding-right: 0;
+	padding-left: 54px;
+	list-style: none;
+	margin-bottom: 8px;
+	padding-right: 0;
 }
 
 .sub-menu a {
-    display: block;
-    padding: 6px 0;
-    color: var(--text-gray);
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: color 0.2s;
+	display: block;
+	padding: 6px 0;
+	color: var(--text-gray);
+	text-decoration: none;
+	font-size: 0.85rem;
+	transition: color 0.2s;
 }
 
 .sub-menu a:hover {
-    color: var(--primary-blue);
+	color: var(--primary-blue);
 }
 
 .sub-menu a.active {
-    color: var(--primary-blue);
-    font-weight: 600;
+	color: var(--primary-blue);
+	font-weight: 600;
 }

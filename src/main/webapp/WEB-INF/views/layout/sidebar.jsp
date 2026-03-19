@@ -8,7 +8,7 @@
 
 <aside id="sidebar">
 	<a href="${pageContext.request.contextPath}/home" class="sidebar-brand">
-		<img src="${pageContext.request.contextPath}/dist/images/logo.png"
+		<img src="${pageContext.request.contextPath}/dist/images/logo_full.png"
 		alt="MVC" class="sidebar-logo">
 	</a> 
 	
