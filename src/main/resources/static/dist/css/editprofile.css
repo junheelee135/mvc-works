@@ -1,13 +1,17 @@
+/* -------------------- 기본 -------------------- */
 body {
 	background: #f6f8fb;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		sans-serif;
+	margin: 0;
+	padding: 0;
 }
 
-/* 카드 */
+/* -------------------- 카드 -------------------- */
 .profile-card {
 	background: #ffffff;
 	border-radius: 18px;
-	box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 	padding: 50px;
 	width: 100%;
 	max-width: 920px;
@@ -35,67 +39,101 @@ body {
 	border-radius: 50%;
 	object-fit: cover;
 	border: 5px solid #f1f5f9;
-	box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s ease;
 }
 
-/* input */
+.large-avatar:hover {
+	transform: scale(1.05);
+}
+
+/* -------------------- 입력폼 -------------------- */
+/* -------------------- 입력폼 -------------------- */
 .form-control {
-	border-radius: 12px;
-	height: 46px;
-	border: 1px solid #e5e7eb;
-	padding-left: 14px;
-	font-size: 14px;
-	transition: all 0.2s ease;
+    border-radius: 24px;      /* 기존 12px → 24px로 둥글게 */
+    height: 46px;
+    border: 1px solid #e5e7eb;
+    padding-left: 16px;       /* 좌측 여백 살짝 넓힘 */
+    font-size: 14px;
+    transition: all 0.2s ease;
 }
 
 .form-control:focus {
-	border-color: #2563eb;
-	box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-/* 파일 업로드 */
-input[type="file"] {
-	border-radius: 10px;
-	font-size: 14px;
+/* select나 textarea도 동일하게 적용 */
+select.form-control,
+textarea.form-control {
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-size: 14px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
 }
 
-/* 버튼 공통 */
+select.form-control:focus,
+textarea.form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+/* -------------------- 파일 업로드 -------------------- */
+.input-file-wrapper {
+	position: relative;
+	display: inline-bloc k;
+	width: 200px;
+}
+
+.input-file-wrapper input[type="file"] {
+	width: 100%;
+	height: 44px;
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	cursor: pointer;
+}
+
+.input-file-label {
+	display: inline-block;
+	width: 100%;
+	padding: 10px 16px;
+	background: #eef1ff;
+	color: #1d2939;
+	border-radius: 12px;
+	text-align: center;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.input-file-label:hover {
+	background: #dde4ff;
+}
+
+/* -------------------- 버튼 -------------------- */
 button {
 	transition: all 0.2s ease;
 }
 
-/* 삭제 버튼 */
-.btn-outline-danger {
-	border-radius: 10px;
-	font-size: 13px;
-	padding: 6px 14px;
-}
-
-/* 저장 버튼 */
 .btn-save {
-	background: linear-gradient(135deg,#3b82f6,#2563eb);
-	color: white;
-	padding: 11px 26px;
+	background: linear-gradient(135deg, #3b82f6, #2563eb);
+	color: #fff;
+	padding: 12px 28px;
 	border-radius: 12px;
 	border: none;
 	font-weight: 500;
 	font-size: 15px;
-	box-shadow: 0 4px 10px rgba(37,99,235,0.25);
+	box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
 }
 
 .btn-save:hover {
-	background: linear-gradient(135deg,#2563eb,#1d4ed8);
+	background: linear-gradient(135deg, #2563eb, #1d4ed8);
 	transform: translateY(-1px);
-	box-shadow: 0 6px 16px rgba(37,99,235,0.35);
+	box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
 
-/* 하단 버튼 영역 */
-.action-footer {
-	text-align: right;
-	margin-top: 35px;
-}
-
-/* 취소 버튼 */
 .btn-cancel {
 	background: #f3f4f6;
 	color: #374151;
@@ -103,15 +141,31 @@ button {
 	border-radius: 12px;
 	border: none;
 	font-weight: 500;
-	margin-right: 10px;
 }
 
 .btn-cancel:hover {
 	background: #e5e7eb;
 }
 
-.form-label{
-	font-weight:500;
-	color:#374151;
-	margin-bottom:6px;
+.action-footer {
+	text-align: right;
+	margin-top: 35px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+/* -------------------- 반응형 -------------------- */
+@media ( max-width : 768px) {
+	.profile-card {
+		padding: 30px;
+	}
+	.large-avatar {
+		width: 90px;
+		height: 90px;
+	}
+	.btn-save, .btn-cancel {
+		padding: 10px 20px;
+		font-size: 14px;
+	}
 }
