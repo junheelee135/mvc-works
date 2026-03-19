@@ -74,7 +74,11 @@
     <a href="${pageContext.request.contextPath}/groupware/notice" class="nav-link">
         <i class="fas fa-bullhorn"></i> 공지사항
     </a>
+    
+    <%@ include file="/WEB-INF/views/layout/lunchLadder_v2.jsp" %>
+    
 </aside>
 
 <%-- sidebar 전용 Js --%>
 <script src="${pageContext.request.contextPath}/dist/js/main-sidebar.js"></script>
+
