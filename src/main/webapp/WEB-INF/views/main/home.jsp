@@ -180,7 +180,7 @@
 
 	<!-- 공지 -->
 	<div class="card notice-card">
-		<div class="card-title">공지사항</div>
+		<div class="card-title">프로젝트 공지사항</div>
 
 		<c:choose>
 			<c:when test="${empty noticeList}">
