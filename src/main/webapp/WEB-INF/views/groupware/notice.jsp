@@ -356,6 +356,12 @@ const app = createApp({
 
         onMounted(() => {
             fetchList();
+            // URL 파라미터 ?num=123 → 해당 공지 상세 자동 열기
+            const params = new URLSearchParams(window.location.search);
+            const num = params.get('num');
+            if (num) {
+                openDetail(Number(num));
+            }
         });
 
         // 폼 뷰 전환 시 Quill 초기화

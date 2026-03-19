@@ -103,22 +103,33 @@
         const el = document.getElementById('tickerText');
         if (!el || notices.length === 0) return;
 
-        const update = () => {
-            const notice = notices[currentIndex];
-            el.textContent = notice.subject;
-            el.onclick = () => {
-                window.location.href = ctx + '/groupware/notice';
-            };
-            el.classList.remove('ticker-fade');
-            currentIndex = (currentIndex + 1) % notices.length;
-        };
+        const notice = notices[currentIndex];
+        currentIndex = (currentIndex + 1) % notices.length;
 
         if (immediate) {
-            update();
-        } else {
-            el.classList.add('ticker-fade');
-            setTimeout(update, 400);
+            el.textContent = notice.subject;
+            el.onclick = () => { window.location.href = ctx + '/groupware/notice?num=' + notice.noticenum; };
+            return;
         }
+
+        // 1) 현재 텍스트를 위로 밀어 올림
+        el.classList.add('ticker-slide-up');
+
+        // 2) 올라간 뒤 → 텍스트 교체 + 아래에서 대기
+        setTimeout(() => {
+            el.textContent = notice.subject;
+            el.onclick = () => { window.location.href = ctx + '/groupware/notice?num=' + notice.noticenum; };
+            el.classList.remove('ticker-slide-up');
+            el.classList.add('ticker-slide-ready');  // 아래에 즉시 배치 (transition: none)
+
+            // 3) 다음 프레임에서 아래→제자리로 올라오는 애니메이션
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    el.classList.remove('ticker-slide-ready');
+                    // transition 복원되면서 translateY(100%) → translateY(0) 애니메이션 실행
+                });
+            });
+        }, 400);
     }
 
     // 페이지 로드 시 공지 불러오기

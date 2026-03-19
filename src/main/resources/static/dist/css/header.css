@@ -41,6 +41,7 @@
     display: flex !important;
     align-items: center;
     flex-shrink: 0 !important;     /* 왼쪽 요소가 아무리 커져도 절대 밀리지 않음 */
+    gap: 12px;                     /* 요소 간 간격 */
 }
 
 /* --- 공지 내부 상세 스타일 --- */
@@ -58,6 +59,8 @@
     flex: 1;
     min-width: 0;
     overflow: hidden;
+    height: 22px;              /* 한 줄 높이 고정 */
+    position: relative;
 }
 
 .ticker-text {
@@ -66,14 +69,66 @@
     color: #1d2939 !important;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* 글자가 길면 ... 처리 */
-    opacity: 1 !important;   /* 무조건 보이게 */
+    text-overflow: ellipsis;
     cursor: pointer;
+    position: absolute;
+    left: 0;
+    right: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* 위로 빠져나가는 상태 */
+.ticker-text.ticker-slide-up {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+/* 아래에서 대기 → 올라오기 전 위치 */
+.ticker-text.ticker-slide-ready {
+    transform: translateY(100%);
+    opacity: 0;
+    transition: none;          /* 위치 세팅할 때는 애니메이션 없이 즉시 이동 */
 }
 
 .ticker-text:hover {
     color: #4e73df !important;
     text-decoration: underline;
+}
+
+/* 아이콘 버튼 (알림벨, 로그아웃 등) */
+.nav-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: none;
+    color: #5a6474;
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+    position: relative;
+}
+
+.nav-icon-btn:hover {
+    background: #f2f5f9;
+    color: #1d2939;
+}
+
+/* 알림 뱃지 위치 보정 — 벨 아이콘 우상단에 밀착 */
+.nav-icon-btn .navbar-badge {
+    font-size: 10px !important;
+    padding: 2px 5px !important;
+    line-height: 1;
+    top: 2px !important;
+    left: auto !important;
+    right: -2px !important;
+    transform: none !important;
 }
 
 /* 프로필 이미지 */

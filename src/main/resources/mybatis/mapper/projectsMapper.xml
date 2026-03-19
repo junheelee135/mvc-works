@@ -107,7 +107,8 @@
 		TASKCREATEDDATE
 		)
 		SELECT
-		'TSK' || LPAD(TASK_SEQ.NEXTVAL, 8, '0'),
+		'TSK' ||
+		LPAD(TASK_SEQ.NEXTVAL, 8, '0'),
 		#{stageId},
 		jt.taskTitle,
 		'',
@@ -236,7 +237,8 @@
 		SELECT ep.EMPID AS empId, e.NAME AS name, ep.ROLE AS role
 		FROM EMPPROJECT ep
 		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-		WHERE ep.PROJECTID = #{projectId}
+		WHERE
+		ep.PROJECTID = #{projectId}
 	</select>
 
 	<select id="findById" parameterType="long"
@@ -285,9 +287,9 @@
 		p.TITLE,
 		p.PROJECTTYPE,
 		CASE
-		WHEN COUNT(e.NAME) > 1 THEN MIN(e.NAME) || ' 외 ' || (COUNT(e.NAME) - 1) ||
-		'명'
-		ELSE MIN(e.NAME)
+		WHEN COUNT(e_m.NAME) &gt; 1 THEN MIN(e_m.NAME) || ' 외 ' ||
+		(COUNT(e_m.NAME) - 1) || '명'
+		ELSE MIN(e_m.NAME)
 		END AS managerName,
 		TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
 		TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
@@ -306,14 +308,18 @@
 		ELSE p.STATUS
 		END AS status
 		FROM PROJECT p
-		JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
-		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-		WHERE ep.EMPID = #{empId}  <!-- 나의 프로젝트만 조회 -->
+		JOIN EMPPROJECT ep_user
+		ON p.PROJECTID = ep_user.PROJECTID
+		AND ep_user.EMPID = #{empId}
+		JOIN EMPPROJECT ep_m
+		ON p.PROJECTID = ep_m.PROJECTID
+		AND ep_m.ROLE = 'M'
+		JOIN EMPLOYEE2 e_m
+		ON ep_m.EMPID = e_m.EMPID
 		GROUP BY
 		p.PROJECTID, p.TITLE, p.PROJECTTYPE, p.STARTDATE, p.ENDDATE, p.PROGRESS, p.STATUS
 		ORDER BY p.PROJECTID DESC
-		OFFSET #{offset} ROWS
-		FETCH FIRST #{size} ROWS ONLY
+		OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
 	</select>
 
 	<!-- 나의 프로젝트 개수 조회 -->
@@ -321,7 +327,8 @@
 		resultType="int">
 		SELECT NVL(COUNT(*), 0)
 		FROM PROJECT p
-		JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
+		JOIN EMPPROJECT ep ON
+		p.PROJECTID = ep.PROJECTID
 		WHERE ep.EMPID = #{empId}
 	</select>
 </mapper>
