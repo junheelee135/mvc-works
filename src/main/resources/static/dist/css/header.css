@@ -139,3 +139,68 @@
     object-fit: cover;
     border: 1px solid #dee2e6;
 }
+
+/* -------------------- 드롭다운 메뉴 개선 -------------------- */
+.dropdown-menu {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    padding: 8px 0;
+    min-width: 180px;
+    font-size: 14px;
+    color: #333;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu .dropdown-item {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    border-radius: 8px;
+}
+
+.dropdown-menu .dropdown-item i {
+    font-size: 16px;
+    flex-shrink: 0;
+    color: #4e73df;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background: #eef1ff;
+    color: #1d2939;
+}
+
+.dropdown-menu .dropdown-item.text-danger i {
+    color: #f44336;
+}
+
+.dropdown-menu .dropdown-item.text-danger:hover {
+    background: #fdecea;
+    color: #b71c1c;
+}
+
+/* 아바타 버튼과 드롭다운 연동 개선 */
+.navbar-avatar.dropdown-toggle {
+    cursor: pointer;
+    border: 2px solid #4e73df;
+    padding: 2px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.navbar-avatar.dropdown-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* 모바일/태블릿에서도 메뉴가 잘 보이도록 */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        right: 0 !important;
+        left: auto !important;
+    }
+}
