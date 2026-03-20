@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { toggleId: 'approvalToggle', subMenuId: 'approvalSubMenu', arrowId: 'approvalArrow' },
         { toggleId: 'projectToggle',  subMenuId: 'projectSubMenu',  arrowId: 'projectArrow'  },
 		{ toggleId: 'meetingToggle',  subMenuId: 'meetingSubMenu',  arrowId: 'meetingArrow'  },
+		{ toggleId: 'surveyToggle',  subMenuId: 'surveySubMenu',  arrowId: 'surveyArrow'  },
     ];
 
     toggleMenus.forEach(function (menu) {
