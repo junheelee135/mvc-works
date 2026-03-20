@@ -4,7 +4,7 @@
 
 /* 레이아웃 — 사이드바 오프셋 */
 #main-content {
-    margin-left: 240px !important;
+    margin-left: 260px !important;
     padding: 8px 24px 14px;
     box-sizing: border-box;
     min-height: 100vh;

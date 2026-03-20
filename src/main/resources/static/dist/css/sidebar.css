@@ -21,6 +21,73 @@
 	border-right: 1px solid var(--border-color);
 	z-index: 1000;
 	overflow-y: auto;
+	transition: transform 0.3s ease;
+}
+
+/* ── 사이드바 가장자리 토글 버튼 (접기/펼치기 통합) ── */
+.sidebar-edge-btn {
+	position: fixed;
+	top: 50%;
+	left: 260px;
+	transform: translate(-50%, -50%);
+	z-index: 1001;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+	border: 1px solid #e6eaf4;
+	border-radius: 50%;
+	font-size: 11px;
+	color: #94a3b8;
+	cursor: pointer;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+	transition: left 0.3s ease, background 0.2s, color 0.2s;
+}
+.sidebar-edge-btn:hover {
+	background: #f0f3ff;
+	color: #4e73df;
+}
+/* 접혔을 때: 왼쪽 끝으로 이동 + 아이콘 방향 전환 */
+body.sidebar-collapsed .sidebar-edge-btn {
+	left: 0;
+	transform: translate(0, -50%);
+	border-radius: 0 50% 50% 0;
+	border-left: none;
+}
+body.sidebar-collapsed .sidebar-edge-btn i {
+	transform: rotate(180deg);
+}
+
+/* ── body.sidebar-collapsed 일 때 ── */
+body.sidebar-collapsed #sidebar {
+	transform: translateX(-260px);
+}
+
+/* 콘텐츠 영역 transition (접기/펼치기 양방향 부드럽게) */
+.dashboard,
+#main-content,
+.main-content,
+.al-content,
+.emp-content,
+.rp-content {
+	transition: margin-left 0.3s ease;
+}
+
+/* 모든 콘텐츠 영역 margin 제거 — 한 곳에서 통합 관리 */
+body.sidebar-collapsed .dashboard,
+body.sidebar-collapsed #main-content,
+body.sidebar-collapsed .main-content,
+body.sidebar-collapsed .al-content,
+body.sidebar-collapsed .emp-content,
+body.sidebar-collapsed .rp-content {
+	margin-left: 0 !important;
+}
+
+/* 헤더: collapsed 시 padding 축소 */
+body.sidebar-collapsed .navbar-custom {
+	padding-left: 24px;
 }
 
 .sidebar-brand {

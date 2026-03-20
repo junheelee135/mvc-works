@@ -1,114 +1,112 @@
-<%-- lunchLadderGames.jsp - include this in lunchLadder.jsp --%>
-<%-- All text is ASCII only - safe for ISO-8859-1 projects --%>
-
-<%-- ========== MODAL 1: LADDER ========== --%>
+<%-- lunchLadderGames.jsp --%>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%-- ========== MODAL 1: 사다리 타기 ========== --%>
 <div id="modal-ladder" class="ll-overlay" onclick="if(event.target===this)closeModal('ladder')">
   <div class="ll-modal">
     <div class="ll-mheader">
       <div>
-        <div class="ll-mtitle">Lunch Ladder</div>
-        <div class="ll-msub">Who pays for lunch today?</div>
+        <div class="ll-mtitle">사다리 타기</div>
+        <div class="ll-msub">오늘의 점심 쏘기 당첨자는 ??</div>
       </div>
       <button class="ll-mclose" onclick="closeModal('ladder')">x</button>
     </div>
 
     <div id="ld-setup" class="ll-mbody">
       <div class="ll-section">
-        <div class="ll-slabel">Participants <span id="ld-pcount">0 / 8</span></div>
+        <div class="ll-slabel">인원 <span id="ld-pcount">0 / 8</span></div>
         <div class="ll-tags" id="ld-tags"></div>
         <div class="ll-irow">
-          <input id="ld-pinp" maxlength="8" placeholder="Enter name + Enter" />
-          <button class="ll-badd" onclick="ldAddP()">Add</button>
+          <input id="ld-pinp" maxlength="8" placeholder="이름 입력 후 Enter" />
+          <button class="ll-badd" onclick="ldAddP()">추가</button>
         </div>
       </div>
       <div class="ll-section">
-        <div class="ll-slabel">Prize <span>leave blank for default</span></div>
+        <div class="ll-slabel">규칙 정하기</div>
         <div id="ld-plist" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
         <div class="ll-irow">
-          <input id="ld-zinp" maxlength="12" placeholder="e.g. Buy lunch, Buy coffee" />
-          <button class="ll-badd" onclick="ldAddZ()">Add</button>
+          <input id="ld-zinp" maxlength="12" placeholder="예: 점심 사기, 커피 사기" />
+          <button class="ll-badd" onclick="ldAddZ()">추가</button>
         </div>
       </div>
-      <button id="ld-btnstart" class="ll-bprimary" disabled onclick="ldStart()">Start!</button>
+      <button id="ld-btnstart" class="ll-bprimary" disabled onclick="ldStart()">시작!</button>
     </div>
 
     <div id="ld-game" class="ll-mbody" style="display:none;">
       <div class="ll-cwrap"><canvas id="ld-cv"></canvas></div>
       <div id="ld-result" class="ll-result" style="display:none;">
-        <div class="ll-rlabel">Today's victim</div>
+        <div class="ll-rlabel">당첨!!!</div>
         <div class="ll-rname" id="ld-rname"></div>
-        <div class="ll-rmsg"  id="ld-rmsg"></div>
       </div>
       <div class="ll-brow">
-        <button class="ll-bsec" onclick="ldReset()">Reset</button>
-        <button id="ld-btntrace" class="ll-bprimary" onclick="ldTrace()">Show Result</button>
+        <button class="ll-bsec" onclick="ldReset()">리셋</button>
+        <button id="ld-btntrace" class="ll-bprimary" onclick="ldTrace()">결과 보기</button>
       </div>
     </div>
   </div>
 </div>
 
-<%-- ========== MODAL 2: ROULETTE ========== --%>
+<%-- ========== MODAL 2: 돌림판 ========== --%>
 <div id="modal-roulette" class="ll-overlay" onclick="if(event.target===this)closeModal('roulette')">
   <div class="ll-modal">
     <div class="ll-mheader">
       <div>
-        <div class="ll-mtitle">Roulette</div>
-        <div class="ll-msub">Spin the wheel and let fate decide</div>
+        <div class="ll-mtitle">돌림판</div>
+        <div class="ll-msub">돌림판을 돌려 운명을 결정하세요</div>
       </div>
       <button class="ll-mclose" onclick="closeModal('roulette')">x</button>
     </div>
     <div class="ll-mbody">
       <div class="ll-section">
-        <div class="ll-slabel">Participants <span id="rl-pcount">0 / 8</span></div>
+        <div class="ll-slabel">인원 <span id="rl-pcount">0 / 8</span></div>
         <div class="ll-tags" id="rl-tags"></div>
         <div class="ll-irow">
-          <input id="rl-pinp" maxlength="8" placeholder="Enter name + Enter" />
-          <button class="ll-badd" onclick="rlAddP()">Add</button>
+          <input id="rl-pinp" maxlength="8" placeholder="이름 입력 후 Enter" />
+          <button class="ll-badd" onclick="rlAddP()">추가</button>
         </div>
       </div>
       <div class="roulette-wrap">
         <canvas id="rouletteCanvas" width="280" height="280"></canvas>
-        <button id="rl-spinbtn" class="spin-btn" onclick="rlSpin()">Spin!</button>
+        <button id="rl-spinbtn" class="spin-btn" onclick="rlSpin()">돌리기!</button>
       </div>
       <div id="rl-result" class="roulette-result" style="display:none;">
-        <div class="ll-rlabel">Selected!</div>
+        <div class="ll-rlabel">당첨!</div>
         <div class="ll-rname" id="rl-rname"></div>
       </div>
     </div>
   </div>
 </div>
 
-<%-- ========== MODAL 3: LUCKY DRAW ========== --%>
+<%-- ========== MODAL 3: 카드 뽑기 ========== --%>
 <div id="modal-luckydraw" class="ll-overlay" onclick="if(event.target===this)closeModal('luckydraw')">
   <div class="ll-modal">
     <div class="ll-mheader">
       <div>
-        <div class="ll-mtitle">Lucky Draw</div>
-        <div class="ll-msub">Pick a card and reveal your fate</div>
+        <div class="ll-mtitle">카드 뽑기</div>
+        <div class="ll-msub">카드를 골라 운명을 확인하세요</div>
       </div>
       <button class="ll-mclose" onclick="closeModal('luckydraw')">x</button>
     </div>
     <div class="ll-mbody">
       <div class="ll-section">
-        <div class="ll-slabel">Participants <span id="lk-pcount">0 / 8</span></div>
+        <div class="ll-slabel">인원 <span id="lk-pcount">0 / 8</span></div>
         <div class="ll-tags" id="lk-tags"></div>
         <div class="ll-irow">
-          <input id="lk-pinp" maxlength="8" placeholder="Enter name + Enter" />
-          <button class="ll-badd" onclick="lkAddP()">Add</button>
+          <input id="lk-pinp" maxlength="8" placeholder="이름 입력 후 Enter" />
+          <button class="ll-badd" onclick="lkAddP()">추가</button>
         </div>
       </div>
       <div id="lk-dealwrap" style="display:none;">
-        <div style="font-size:13px;color:#6b7280;margin-bottom:10px;text-align:center;">Pick a card!</div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:10px;text-align:center;">카드를 골라보세요!</div>
         <div class="card-grid" id="lk-cardgrid"></div>
       </div>
       <div id="lk-result" class="lucky-result" style="display:none;">
-        <div class="ll-rlabel">Lucky winner!</div>
+        <div class="ll-rlabel">당첨!</div>
         <div class="ll-rname" id="lk-rname"></div>
         <div class="ll-rmsg"  id="lk-rmsg"></div>
       </div>
       <div class="ll-brow">
-        <button class="ll-bsec" onclick="lkReset()">Reset</button>
-        <button id="lk-btnstart" class="ll-bprimary" disabled onclick="lkDeal()">Deal Cards</button>
+        <button class="ll-bsec" onclick="lkReset()">리셋</button>
+        <button id="lk-btnstart" class="ll-bprimary" disabled onclick="lkDeal()">카드 나눠주기</button>
       </div>
     </div>
   </div>
@@ -124,7 +122,6 @@ window.closeModal = function(type) {
     document.getElementById('modal-'+type).style.display = 'none';
 };
 
-var DEF_PRIZES = ['Buy Lunch','Buy Coffee','Buy Snacks','Pay Parking','Plan Dinner','Buy Drinks','Prep Snacks','Buy Dessert'];
 var COLS = ['#E24B4A','#378ADD','#1D9E75','#EF9F27','#7F77DD','#D85A30','#639922','#D4537E'];
 
 function shuffle(a) {
@@ -143,7 +140,7 @@ function mkTagHTML(p, i) {
 /* ============================================================
    GAME 1 : LADDER
    ============================================================ */
-var ldP = ['Member1','Member2','Member3','Member4'];
+var ldP = ['1','2','3','4'];
 var ldZ = [];
 var ldData = null, ldAnimId = null, ldBusy = false;
 var PT=52, PB=52, PS=40;
@@ -181,11 +178,6 @@ window.ldAddZ = function(){
 document.getElementById('ld-pinp').onkeydown = function(e){ if(e.key==='Enter') ldAddP(); };
 document.getElementById('ld-zinp').onkeydown = function(e){ if(e.key==='Enter') ldAddZ(); };
 
-function ldGetPrizes(n) {
-    var base = ldZ.length ? ldZ.slice() : [];
-    var extra = DEF_PRIZES.filter(function(d){ return base.indexOf(d)<0; });
-    return shuffle(base.concat(extra)).slice(0,n);
-}
 function ldBuild(n) {
     var ROWS = Math.max(10, n*4);
     var grid = [];
@@ -199,7 +191,7 @@ function ldBuild(n) {
     }
     return grid;
 }
-function ldTrace(start, grid, n) {
+function ldTracePath(start, grid, n) {
     var col = start;
     var pts = [{col:col,row:0}];
     for(var r=0; r<grid.length; r++){
@@ -215,7 +207,7 @@ function ldRowY(r,ROWS){ return PT+r*(320-PT-PB)/ROWS; }
 function ldDraw(hl) {
     var cv = document.getElementById('ld-cv');
     if(!cv||!ldData) return;
-    var n=ldData.n, grid=ldData.grid, prizes=ldData.prizes, ROWS=grid.length;
+    var n=ldData.n, grid=ldData.grid, ROWS=grid.length;
     var W=cv.offsetWidth||500, dpr=window.devicePixelRatio||1;
     cv.width=W*dpr; cv.height=320*dpr; cv.style.height='320px';
     var ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
@@ -247,10 +239,20 @@ function ldDraw(hl) {
         });
         ctx.lineWidth=1.5;
     }
+    /* 상단 이름 */
     ctx.font='500 13px Pretendard,-apple-system,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(0,0,0,0.7)';
     for(var c=0;c<n;c++) ctx.fillText(ldP[c],ldColX(c,W,n),30);
-    ctx.font='12px Pretendard,-apple-system,sans-serif'; ctx.fillStyle='rgba(0,0,0,0.5)';
-    for(var c=0;c<n;c++) ctx.fillText(prizes[c],ldColX(c,W,n),313);
+    /* 하단 O/X - 애니메이션 완료 후에만 표시 */
+    var done = hl && hl[0] && hl[0].p >= 1;
+    if(done){
+        ctx.font='bold 16px Pretendard,-apple-system,sans-serif';
+        for(var c=0;c<n;c++){
+            var isWinner = (ldData.results[c] === 0);
+            ctx.fillStyle = isWinner ? '#E24B4A' : '#9ca3af';
+            ctx.fillText(isWinner ? 'O' : 'X', ldColX(c,W,n), 313);
+        }
+    }
+    /* 도트 */
     for(var c=0;c<n;c++){
         [PT,ldRowY(ROWS,ROWS)].forEach(function(y){
             ctx.beginPath(); ctx.arc(ldColX(c,W,n),y,5,0,Math.PI*2); ctx.fillStyle=COLS[c%COLS.length]; ctx.fill();
@@ -258,15 +260,15 @@ function ldDraw(hl) {
     }
 }
 window.ldStart = function(){
-    var n=ldP.length, grid=ldBuild(n), ap=ldGetPrizes(n);
+    var n=ldP.length, grid=ldBuild(n);
     var routes=[], i;
-    for(i=0;i<n;i++) routes.push(ldTrace(i,grid,n));
+    for(i=0;i<n;i++) routes.push(ldTracePath(i,grid,n));
     var results=routes.map(function(r){ return r[r.length-1].col; });
-    ldData={n:n,grid:grid,routes:routes,results:results,prizes:ap,winnerIdx:results.indexOf(0)};
+    ldData={n:n,grid:grid,routes:routes,results:results,winnerIdx:results.indexOf(0)};
     document.getElementById('ld-setup').style.display='none';
     document.getElementById('ld-game').style.display='flex';
     document.getElementById('ld-result').style.display='none';
-    document.getElementById('ld-btntrace').textContent='Show Result';
+    document.getElementById('ld-btntrace').textContent='결과 보기';
     document.getElementById('ld-btntrace').disabled=false;
     ldBusy=false;
     setTimeout(function(){ ldDraw(null); },30);
@@ -283,7 +285,7 @@ window.ldTrace = function(){
     if(ldBusy) return;
     ldBusy=true;
     var btn=document.getElementById('ld-btntrace');
-    btn.disabled=true; btn.textContent='Tracing...';
+    btn.disabled=true; btn.textContent='추적중.....';
     document.getElementById('ld-result').style.display='none';
     var start=performance.now(), dur=1600;
     function step(now){
@@ -294,9 +296,8 @@ window.ldTrace = function(){
         else {
             var wi=ldData.winnerIdx;
             document.getElementById('ld-rname').textContent=ldP[wi]+'!';
-            document.getElementById('ld-rmsg').textContent='"'+ldData.prizes[0]+'" Winner :)';
             document.getElementById('ld-result').style.display='block';
-            btn.textContent='Retrace'; btn.disabled=false; ldBusy=false;
+            btn.textContent='다시보기'; btn.disabled=false; ldBusy=false;
         }
     }
     ldAnimId=requestAnimationFrame(step);
@@ -305,7 +306,7 @@ window.ldTrace = function(){
 /* ============================================================
    GAME 2 : ROULETTE
    ============================================================ */
-var rlP = ['Member1','Member2','Member3','Member4'];
+var rlP = ['1','2','3','4'];
 var rlAngle = 0, rlSpinning = false;
 
 function rlRenderP(){
@@ -357,15 +358,10 @@ window.rlSpin=function(){
     document.getElementById('rl-spinbtn').disabled=true;
     var n=rlP.length;
     var slice=(2*Math.PI)/n;
-    // -- ---- -- -- --
     var winnerIdx=Math.floor(Math.random()*n);
-    // ---- --(-- -PI/2 = 270-)- ---
-    // winnerIdx --- --- --- -- --- -- --
     var targetAngle = -Math.PI/2 - (winnerIdx*slice + slice/2);
-    // -- -- ---- -- 5-- -- -- --
     var fullSpins = (5+Math.floor(Math.random()*4)) * Math.PI*2;
     var extra = fullSpins + (targetAngle - (rlAngle % (Math.PI*2)));
-    // extra- -- --- --- -
     if(extra < Math.PI*2) extra += Math.PI*2;
     var startAngle=rlAngle;
     var startTime=performance.now(), dur=3500+Math.random()*1000;
@@ -389,7 +385,7 @@ window.rlSpin=function(){
 /* ============================================================
    GAME 3 : LUCKY DRAW
    ============================================================ */
-var lkP=['Member1','Member2','Member3','Member4'];
+var lkP=['1','2','3','4'];
 var lkDealt=false, lkWinner=-1;
 
 function lkRenderP(){
@@ -423,7 +419,7 @@ window.lkDeal=function(){
     }).join('');
     document.getElementById('lk-dealwrap').style.display='block';
     document.getElementById('lk-result').style.display='none';
-    document.getElementById('lk-btnstart').textContent='Reset';
+    document.getElementById('lk-btnstart').textContent='리셋';
     document.getElementById('lk-btnstart').onclick=lkReset;
 };
 window.lkFlip=function(i){
@@ -434,7 +430,7 @@ window.lkFlip=function(i){
     if(i===lkWinner){
         setTimeout(function(){
             document.getElementById('lk-rname').textContent=lkP[i]+'!';
-            document.getElementById('lk-rmsg').textContent='Better luck next time :)';
+            document.getElementById('lk-rmsg').textContent='다음 기회에~~ :)';
             document.getElementById('lk-result').style.display='block';
         },400);
     }
@@ -445,7 +441,7 @@ window.lkReset=function(){
     document.getElementById('lk-result').style.display='none';
     document.getElementById('lk-cardgrid').innerHTML='';
     var btn=document.getElementById('lk-btnstart');
-    btn.textContent='Deal Cards'; btn.onclick=lkDeal;
+    btn.textContent='카드 나눠주기'; btn.onclick=lkDeal;
     lkRenderP();
 };
 

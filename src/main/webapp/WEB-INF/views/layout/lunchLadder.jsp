@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Game Zone</title>
+<title>점심 내기 게임 고고!!</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>
 <jsp:include page="/WEB-INF/views/layout/sidebarResources.jsp"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/lunchLadder.css">
@@ -18,8 +18,8 @@
     <div class="gz-wrap">
 
         <div class="gz-header">
-            <h4><i class="fas fa-gamepad"></i> Game Zone</h4>
-            <p class="gz-desc">Team games for lunch picks and more</p>
+            <h4><i class="fas fa-gamepad"></i>점심내기 한판?</h4>
+            <p class="gz-desc">오늘은 누가 걸릴지 두둥!!</p>
         </div>
 
         <div class="game-grid">
@@ -29,10 +29,10 @@
                     <i class="fas fa-grip-lines"></i>
                 </div>
                 <div class="game-info">
-                    <div class="game-name">Lunch Ladder</div>
-                    <div class="game-desc">Classic ladder game to pick who pays</div>
+                    <div class="game-name">사다리 타기</div>
+                    <div class="game-desc">누가 점심 값을 내었는가?</div>
                 </div>
-                <div class="game-badge">2 - 8 players</div>
+                <div class="game-badge">2 - 8명 가능</div>
             </div>
 
             <div class="game-card" onclick="openModal('roulette')">
@@ -40,10 +40,10 @@
                     <i class="fas fa-circle-notch"></i>
                 </div>
                 <div class="game-info">
-                    <div class="game-name">Roulette</div>
-                    <div class="game-desc">Spin the wheel and let fate decide</div>
+                    <div class="game-name">돌려 돌려 돌림판</div>
+                    <div class="game-desc">누가 커피를 쏘았는가?</div>
                 </div>
-                <div class="game-badge">2 - 8 players</div>
+                <div class="game-badge">2 - 8명 가능</div>
             </div>
 
             <div class="game-card" onclick="openModal('luckydraw')">
@@ -51,10 +51,10 @@
                     <i class="fas fa-ticket-alt"></i>
                 </div>
                 <div class="game-info">
-                    <div class="game-name">Lucky Draw</div>
-                    <div class="game-desc">Flip a card and reveal your fate</div>
+                    <div class="game-name">카드 뽑기</div>
+                    <div class="game-desc">누가 회식비를 내었는가?</div>
                 </div>
-                <div class="game-badge">2 - 8 players</div>
+                <div class="game-badge">2 - 8명 가능</div>
             </div>
 
         </div>

@@ -10,7 +10,7 @@
 	<a href="${pageContext.request.contextPath}/home" class="sidebar-brand">
 		<img src="${pageContext.request.contextPath}/dist/images/logo_full.png"
 		alt="MVC" class="sidebar-logo">
-	</a> 
+	</a>
 	
 	<a href="${pageContext.request.contextPath}/home" class="nav-link"><i
 		class="fas fa-th-large"></i> 대시보드</a> <a
@@ -97,13 +97,31 @@
 	<hr />
 	<a href="${pageContext.request.contextPath}/groupware/notice"
 		class="nav-link"> <i class="fas fa-bullhorn"></i> 공지사항
-	</a> <a href="${pageContext.request.contextPath}/qnaBot" class="nav-link">
+	</a>
+
+	<%-- 설문관리 토글 메뉴 --%>
+	<a href="#" class="nav-link nav-toggle" id="surveyToggle">
+		<i class="fas fa-poll"></i> 설문관리
+		<i class="fas fa-chevron-down toggle-icon" id="surveyArrow"></i>
+	</a>
+	<ul class="sub-menu" id="surveySubMenu">
+		<li><a href="${pageContext.request.contextPath}/survey/list">설문 목록</a></li>
+		<li><a href="${pageContext.request.contextPath}/survey/respond">설문 응답</a></li>
+		<li><a href="${pageContext.request.contextPath}/survey/result">결과 통계</a></li>
+	</ul>
+
+	<a href="${pageContext.request.contextPath}/qnaBot" class="nav-link">
 		<i class="fa-solid fa-question"></i> 질문봇
 	</a> <a href="${pageContext.request.contextPath}/layout/lunchLadder"
 		class="nav-link"> <i class="fa-solid fa-gamepad"></i> 쉬어가기
 	</a>
 
 </aside>
+
+<!-- 사이드바 토글 버튼 (접기/펼치기 하나로 통합) -->
+<button class="sidebar-edge-btn" id="sidebarEdgeBtn" title="사이드바 토글">
+	<i class="fas fa-chevron-left"></i>
+</button>
 
 <%-- sidebar 전용 Js --%>
 <script src="${pageContext.request.contextPath}/dist/js/main-sidebar.js"></script>

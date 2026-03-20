@@ -1,6 +1,21 @@
 /* 사이드바 토글 스크립트 - URL 기반 상태 유지 */
 document.addEventListener('DOMContentLoaded', function () {
 
+    // ── 사이드바 접기/펼치기 ──
+    // 페이지 로드 시 저장된 상태 복원
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        document.body.classList.add('sidebar-collapsed');
+    }
+
+    function toggleSidebar() {
+        document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', document.body.classList.contains('sidebar-collapsed'));
+    }
+
+    // 사이드바 가장자리 토글 버튼 (접기/펼치기 통합)
+    const edgeBtn = document.getElementById('sidebarEdgeBtn');
+    if (edgeBtn) edgeBtn.addEventListener('click', toggleSidebar);
+
     // 현재 페이지 경로
     const currentPath = window.location.pathname;
 
@@ -11,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { toggleId: 'approvalToggle', subMenuId: 'approvalSubMenu', arrowId: 'approvalArrow' },
         { toggleId: 'projectToggle',  subMenuId: 'projectSubMenu',  arrowId: 'projectArrow'  },
 		{ toggleId: 'meetingToggle',  subMenuId: 'meetingSubMenu',  arrowId: 'meetingArrow'  },
+		{ toggleId: 'surveyToggle',  subMenuId: 'surveySubMenu',  arrowId: 'surveyArrow'  },
     ];
 
     toggleMenus.forEach(function (menu) {

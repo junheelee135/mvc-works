@@ -251,14 +251,17 @@
                                  v-html="store.formatMsgText(item.content)"></div>
 
                             <!-- 메타: 읽음 + 시간 -->
-							<div class="msg-meta">
-							    <span v-if="item.isMine"
-							          class="read-status"
-							          :class="item.isRead === 'Y' ? 'read' : 'unread'">
-							        {{ item.isRead === 'Y' ? '읽음' : '미읽음' }}
-							    </span>
-							    <span class="msg-time">{{ store.formatMsgTime(item.sentAt) }}</span>
-							</div>
+                            <div class="msg-meta">
+                                <span v-if="item.isMine"
+                                      class="read-status"
+                                      :class="item.isRead === 'Y' ? 'read' : 'unread'"
+                                      :title="item.isRead === 'Y' ? '읽음' : '미읽음'">
+                                    <i :class="item.isRead === 'Y'
+                                        ? 'bi bi-check2-all'
+                                        : 'bi bi-check2'"></i>
+                                </span>
+                                <span class="msg-time">{{ store.formatMsgTime(item.sentAt) }}</span>
+                            </div>
 
                         </div>
                     </div>

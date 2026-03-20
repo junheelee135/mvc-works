@@ -4,7 +4,7 @@
    레이아웃 - 사이드바 오른쪽 영역
 ─────────────────────────────── */
 #main-content {
-    margin-left: 240px !important;
+    margin-left: 260px !important;
     padding: 24px 32px !important;
     box-sizing: border-box;
     min-height: 100vh;
@@ -315,7 +315,8 @@
 /* ───────────────────────────────
    뱃지 카운트
 ─────────────────────────────── */
-.badge-count {
+.filter-link .badge-count {
+    position: static;              /* main.css의 absolute 덮어쓰기 */
     background: #e74c3c;
     color: #fff;
     border-radius: 10px;

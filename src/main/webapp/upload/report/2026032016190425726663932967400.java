@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,20 +17,31 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@RestController
+@Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/chat")
+@RequestMapping("/chat")
 public class ChatController {
 
     private final ChatService chatService;
+
+    /* ── 채팅 메인 페이지 뷰 ── */
+    @GetMapping
+    public String chatMain() {
+        return "groupware/chatMain";
+    }
+
+    /* ==========================================================
+       REST API (/api/chat/...)
+       ========================================================== */
 
     /**
      * 내가 참여 중인 프로젝트 목록
      * GET /api/chat/projects
      */
-    @GetMapping("/projects")
+    @GetMapping("/api/chat/projects")
+    @ResponseBody
     public ResponseEntity<?> getMyProjects(
-            @SessionAttribute(name = "member") SessionInfo info) {
+            @SessionAttribute("member") SessionInfo info) {
         try {
             List<Map<String, Object>> projects = chatService.listMyProjects(info.getEmpId());
             return ResponseEntity.ok(projects);
@@ -43,13 +55,14 @@ public class ChatController {
      * 직원 목록 (무한스크롤)
      * GET /api/chat/users
      */
-    @GetMapping("/users")
+    @GetMapping("/api/chat/users")
+    @ResponseBody
     public ResponseEntity<?> getChatUsers(
-            @RequestParam(name = "projectId", defaultValue = "")   String projectId,
-            @RequestParam(name = "keyword",   defaultValue = "")   String keyword,
-            @RequestParam(name = "offset",    defaultValue = "0")  int    offset,
-            @RequestParam(name = "size",      defaultValue = "20") int    size,
-            @SessionAttribute(name = "member") SessionInfo info) {
+            @RequestParam(defaultValue = "")  String projectId,
+            @RequestParam(defaultValue = "")  String keyword,
+            @RequestParam(defaultValue = "0") int    offset,
+            @RequestParam(defaultValue = "20") int   size,
+            @SessionAttribute("member") SessionInfo  info) {
         try {
             ChatUserDto params = new ChatUserDto();
             params.setMyEmpId(info.getEmpId());
@@ -73,10 +86,11 @@ public class ChatController {
      * 채팅방 조회 또는 생성
      * POST /api/chat/rooms
      */
-    @PostMapping("/rooms")
+    @PostMapping("/api/chat/rooms")
+    @ResponseBody
     public ResponseEntity<?> getOrCreateRoom(
-            @RequestBody Map<String, String>       body,
-            @SessionAttribute(name = "member") SessionInfo info) {
+            @RequestBody Map<String, String>      body,
+            @SessionAttribute("member") SessionInfo info) {
         try {
             String targetEmpId = body.get("targetEmpId");
             if (targetEmpId == null || targetEmpId.isBlank()) {
@@ -98,12 +112,13 @@ public class ChatController {
      * 채팅 메시지 목록 조회 (무한스크롤)
      * GET /api/chat/rooms/{roomId}/messages
      */
-    @GetMapping("/rooms/{roomId}/messages")
+    @GetMapping("/api/chat/rooms/{roomId}/messages")
+    @ResponseBody
     public ResponseEntity<?> getMessages(
-            @PathVariable(name = "roomId") Long roomId,
-            @RequestParam(name = "offset", defaultValue = "0")  int offset,
-            @RequestParam(name = "size",   defaultValue = "20") int size,
-            @SessionAttribute(name = "member") SessionInfo info) {	
+            @PathVariable Long roomId,
+            @RequestParam(defaultValue = "0")  int offset,
+            @RequestParam(defaultValue = "20") int size,
+            @SessionAttribute("member") SessionInfo info) {
         try {
             // 17-2: 채팅방 참여자 검증
             if (!chatService.isRoomMember(roomId, info.getEmpId())) {
@@ -126,12 +141,14 @@ public class ChatController {
      * 파일 업로드 (채팅)
      * POST /api/chat/rooms/{roomId}/files
      */
-    @PostMapping("/rooms/{roomId}/files")
+    @PostMapping("/api/chat/rooms/{roomId}/files")
+    @ResponseBody
     public ResponseEntity<?> uploadFile(
-            @PathVariable(name = "roomId") Long roomId,
-            @RequestParam(name = "file") MultipartFile file,
-            @SessionAttribute(name = "member") SessionInfo info) {
+            @PathVariable Long roomId,
+            @RequestParam("file") MultipartFile file,
+            @SessionAttribute("member") SessionInfo info) {
         try {
+            // 권한 검증
             if (!chatService.isRoomMember(roomId, info.getEmpId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("채팅방 접근 권한이 없습니다.");
@@ -154,10 +171,11 @@ public class ChatController {
      * 파일 다운로드
      * GET /api/chat/files/{fileId}/download
      */
-    @GetMapping("/files/{fileId}/download")
+    @GetMapping("/api/chat/files/{fileId}/download")
+    @ResponseBody
     public ResponseEntity<?> downloadFile(
-            @PathVariable(name = "fileId") Long fileId,
-            @SessionAttribute(name = "member") SessionInfo info) {
+            @PathVariable Long fileId,
+            @SessionAttribute("member") SessionInfo info) {
         try {
             return chatService.downloadFile(fileId);
         } catch (Exception e) {

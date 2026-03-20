@@ -4,9 +4,10 @@
     align-items: center;
     justify-content: space-between;
     height: 64px;
-    padding: 0 24px;
+    padding: 0 24px 0 270px;   /* left = 사이드바(260px) + 여유 10px */
     background: #fff;
     border-bottom: 1px solid #dee2e6;
+    transition: padding-left 0.3s ease;
 }
 
 /* 1. 왼쪽 영역: 로고만 딱 들어가는 크기 */
@@ -26,8 +27,7 @@
     background-color: #f2f5f9;
     padding: 6px 16px;
     border-radius: 50px;
-    /* ───── 이 부분이 핵심입니다 ───── */
-    margin-left: 250px !important;  /* 로고(MVC)를 피해서 오른쪽으로 200px 밀어냄 */
+    /* navbar padding-left가 사이드바 오프셋 처리 → 별도 margin 불필요 */
     flex: 1 !important;             /* 남는 공간을 차지하게 함 */
     max-width: 600px !important;    /* 너무 길어지지 않게 제한 */
     /* ────────────────────────────── */

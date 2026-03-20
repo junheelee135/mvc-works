@@ -76,10 +76,12 @@ public class ProjectNoticeRestController {
 		int offset = (page - 1) * pageSize;
 
 		Map<String, Object> param = new HashMap<>();
+		param.put("empId", empId);
 		param.put("projectid", projectid);
 		param.put("keyword", keyword);
 		param.put("offset", offset);
 		param.put("pageSize", pageSize);
+		param.put("limit", pageSize);
 
 		List<ProjectNoticeDto> list = service.listNotice(param);
 		int total = service.countNotice(param);
