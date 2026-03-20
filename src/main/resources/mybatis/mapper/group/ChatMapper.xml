@@ -108,12 +108,12 @@
          ============================================================ -->
     <select id="listMyProjects" resultType="map">
         SELECT DISTINCT
-            p.projectId,
-            p.title AS projectName
+            p.projectId AS "projectId",
+            p.title AS "projectName"
         FROM project p
         JOIN empProject ep ON ep.projectId = p.projectId
         WHERE ep.empId = #{empId}
-          AND p.status = 'I'   -- 진행 중
+          AND p.status = '2'   -- 진행 중
         ORDER BY p.title
     </select>
 

@@ -61,6 +61,8 @@
     import { createApp, onMounted, onUnmounted } from 'vue';
     import { createPinia }                        from 'pinia';
     import { useChatStore }                       from 'chatStore';
+	
+	const pinia = createPinia();
 
     const app = createApp({
         setup() {
@@ -116,7 +118,6 @@
         }
     });
 
-    const pinia = createPinia();
     app.use(pinia);
     app.mount('#vue-app');
 </script>
