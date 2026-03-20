@@ -47,84 +47,82 @@ public class ProjectController {
 			@RequestParam(name = "status", defaultValue = "") String status,
 			@RequestParam(name = "kwd", defaultValue = "") String kwd, Model model) throws Exception {
 
-		try {
-			int size = 10;
-			int total_page = 0;
+	    try {
+	        service.projectAutoStart();
+	        service.projectAutoDelay();
+	        taskService.taskAutoDelay();
 
-			kwd = myUtil.decodeUrl(kwd);
+	        int size = 10;
+	        int total_page = 0;
 
-			SessionInfo info = LoginMemberUtil.getSessionInfo();
+	        kwd = myUtil.decodeUrl(kwd);
+	        SessionInfo info = LoginMemberUtil.getSessionInfo();
 
-			Map<String, Object> map = new HashMap<>();
-			map.put("empId", info.getEmpId());
-			map.put("schType", schType);
-			map.put("kwd", kwd);
-			map.put("status", status);
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("empId", info.getEmpId());
+	        map.put("schType", schType);
+	        map.put("kwd", kwd);
+	        map.put("status", status);
 
-			int dataCount = service.dataCount(map);
-			dataCount = service.dataCount(map);
-			if (dataCount != 0) {
-				total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
-			}
-			current_page = Math.min(current_page, total_page);
-			int offset = (current_page - 1) * size;
-			if (offset < 0)
-				offset = 0;
-			map.put("offset", offset);
-			map.put("size", size);
+	        int dataCount = service.dataCount(map);
+	        if (dataCount != 0) {
+	            total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
+	        }
+	        current_page = Math.min(current_page, total_page);
+	        int offset = (current_page - 1) * size;
+	        if (offset < 0) offset = 0;
+	        map.put("offset", offset);
+	        map.put("size", size);
 
-			List<ProjectsDto> list = service.projectslist(map);
+	        List<ProjectsDto> list = service.projectslist(map);
 
-			Map<String, Object> emptyMap = new HashMap<>();
-			List<ProjectsDto> allList = service.statusCount(emptyMap);
+	        Map<String, Object> emptyMap = new HashMap<>();
+	        List<ProjectsDto> allList = service.statusCount(emptyMap);
 
-			long totalProjects = allList.size();
-			long activeProjects = allList.stream().filter(p -> "2".equals(p.getStatus())).count();
-			long finishedProjects = allList.stream().filter(p -> "4".equals(p.getStatus())).count();
-			long delayedProjects = allList.stream().filter(p -> "5".equals(p.getStatus())).count();
-			
-			String cp = RequestUtils.getContextPath();
-			String query = "";
-			String listUrl = cp + "/projects/list";
-			String articleUrl = cp + "/projects/article?page=" + current_page;
+	        long totalProjects = allList.size();
+	        long activeProjects = allList.stream().filter(p -> "2".equals(p.getStatus())).count();
+	        long finishedProjects = allList.stream().filter(p -> "4".equals(p.getStatus())).count();
+	        long delayedProjects = allList.stream().filter(p -> "5".equals(p.getStatus())).count();
 
-			if (!kwd.isBlank() || !status.isBlank()) { 
-			    query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
-			    if (!status.isBlank()) {
-			        query += "&status=" + status;  
-			    }
-			    listUrl += "?" + query;
-			    articleUrl += "&" + query;
-			}
+	        String cp = RequestUtils.getContextPath();
+	        String query = "";
+	        String listUrl = cp + "/projects/list";
+	        String articleUrl = cp + "/projects/article?page=" + current_page;
 
-			String paging = paginateUtil.paging(current_page, total_page, listUrl);
+	        if (!kwd.isBlank() || !status.isBlank()) {
+	            query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
+	            if (!status.isBlank()) {
+	                query += "&status=" + status;
+	            }
+	            listUrl += "?" + query;
+	            articleUrl += "&" + query;
+	        }
 
-			model.addAttribute("list", list);
-			model.addAttribute("dataCount", dataCount);
-			model.addAttribute("size", size);
-			model.addAttribute("total_page", total_page);
-			model.addAttribute("page", current_page);
+	        String paging = paginateUtil.paging(current_page, total_page, listUrl);
 
-			model.addAttribute("paging", paging);
-			model.addAttribute("articleUrl", articleUrl);
+	        model.addAttribute("list", list);
+	        model.addAttribute("dataCount", dataCount);
+	        model.addAttribute("size", size);
+	        model.addAttribute("total_page", total_page);
+	        model.addAttribute("page", current_page);
+	        model.addAttribute("paging", paging);
+	        model.addAttribute("articleUrl", articleUrl);
+	        model.addAttribute("schType", schType);
+	        model.addAttribute("kwd", kwd);
+	        model.addAttribute("status", status);
+	        model.addAttribute("totalProjects", totalProjects);
+	        model.addAttribute("activeProjects", activeProjects);
+	        model.addAttribute("finishedProjects", finishedProjects);
+	        model.addAttribute("delayedProjects", delayedProjects);
 
-			model.addAttribute("schType", schType);
-			model.addAttribute("kwd", kwd);
-			model.addAttribute("status", status);
-			
-			
-			model.addAttribute("totalProjects", totalProjects);
-			model.addAttribute("activeProjects", activeProjects);
-			model.addAttribute("finishedProjects", finishedProjects);
-			model.addAttribute("delayedProjects", delayedProjects);
+	    } catch (Exception e) {
+	        log.info("projectlist : ", e);
+	    }
 
-		} catch (Exception e) {
-			log.info("projectlist : ", e);
-		}
-
-		return "projects/list";
+	    return "projects/list";
 	}
-
+	
+	
 	@GetMapping("create")
 	public String projectCreate(Model model) {
 		SessionInfo info = LoginMemberUtil.getSessionInfo();
@@ -174,65 +172,63 @@ public class ProjectController {
 			@RequestParam(name = "schType", defaultValue = "all") String schType,
 			@RequestParam(name = "kwd", defaultValue = "") String kwd, Model model) throws Exception {
 
-		try {
-			int size = 10;
-			int total_page = 0;
+		 try {
+		        service.projectAutoStart();
+		        service.projectAutoDelay();
+		        taskService.taskAutoDelay();
 
-			kwd = myUtil.decodeUrl(kwd);
+		        int size = 10;
+		        int total_page = 0;
 
-			SessionInfo info = LoginMemberUtil.getSessionInfo();
+		        kwd = myUtil.decodeUrl(kwd);
+		        SessionInfo info = LoginMemberUtil.getSessionInfo();
 
-			Map<String, Object> map = new HashMap<>();
-			map.put("empId", info.getEmpId());
-			map.put("schType", schType);
-			map.put("kwd", kwd);
+		        Map<String, Object> map = new HashMap<>();
+		        map.put("empId", info.getEmpId());
+		        map.put("schType", schType);
+		        map.put("kwd", kwd);
 
-			int dataCount = taskService.myDataCount(map);
+		        int dataCount = taskService.myDataCount(map);
+		        if (dataCount != 0) {
+		            total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
+		        }
+		        current_page = Math.min(current_page, total_page);
+		        int offset = (current_page - 1) * size;
+		        if (offset < 0) offset = 0;
+		        map.put("offset", offset);
+		        map.put("size", size);
 
-			dataCount = taskService.myDataCount(map);
-			if (dataCount != 0) {
-				total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
-			}
-			current_page = Math.min(current_page, total_page);
-			int offset = (current_page - 1) * size;
-			if (offset < 0)
-				offset = 0;
-			map.put("offset", offset);
-			map.put("size", size);
+		        List<ProjectsDto> list = taskService.myProjectslist(map);
 
-			List<ProjectsDto> list = taskService.myProjectslist(map);
+		        String cp = RequestUtils.getContextPath();
+		        String query = "";
+		        String listUrl = cp + "/projects/gantt";
+		        String articleUrl = cp + "/projects/task?page=" + current_page;
 
-			String cp = RequestUtils.getContextPath();
-			String query = "";
-			String listUrl = cp + "/projects/gantt";
-			String articleUrl = cp + "/projects/task?page=" + current_page;
+		        if (!kwd.isBlank()) {
+		            query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
+		            listUrl += "?" + query;
+		            articleUrl += "&" + query;
+		        }
 
-			if (!kwd.isBlank()) {
-				query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
+		        String paging = paginateUtil.paging(current_page, total_page, listUrl);
 
-				listUrl += "?" + query;
-				articleUrl += "&" + query;
-			}
+		        model.addAttribute("list", list);
+		        model.addAttribute("dataCount", dataCount);
+		        model.addAttribute("size", size);
+		        model.addAttribute("total_page", total_page);
+		        model.addAttribute("page", current_page);
+		        model.addAttribute("paging", paging);
+		        model.addAttribute("articleUrl", articleUrl);
+		        model.addAttribute("schType", schType);
+		        model.addAttribute("kwd", kwd);
 
-			String paging = paginateUtil.paging(current_page, total_page, listUrl);
-
-			model.addAttribute("list", list);
-			model.addAttribute("dataCount", dataCount);
-			model.addAttribute("size", size);
-			model.addAttribute("total_page", total_page);
-			model.addAttribute("page", current_page);
-
-			model.addAttribute("paging", paging);
-			model.addAttribute("articleUrl", articleUrl);
-
-			model.addAttribute("schType", schType);
-			model.addAttribute("kwd", kwd);
-
-		} catch (Exception e) {
-			log.info("projectgantt : ", e);
+		    } catch (Exception e) {
+		        log.info("projectgantt : ", e);
+		    }
+		    return "projects/gantt";
 		}
-		return "projects/gantt";
-	}
+	
 
 	@GetMapping("task")
 	public String projectask(@RequestParam(name = "page", defaultValue = "1") int current_page,
@@ -241,83 +237,82 @@ public class ProjectController {
 			@RequestParam(name = "kwd", defaultValue = "") String kwd, Model model) {
 
 		try {
-			int size = 30;
-			int total_page = 0;
+	        service.projectAutoStart();
+	        service.projectAutoDelay();
+	        taskService.taskAutoDelay();
 
-			kwd = myUtil.decodeUrl(kwd);
+	        int size = 30;
+	        int total_page = 0;
 
-			Map<String, Object> map = new HashMap<>();
-			map.put("projectId", projectId);
-			map.put("schType", schType);
-			map.put("kwd", kwd);
+	        kwd = myUtil.decodeUrl(kwd);
 
-			int taskDataCount = taskService.taskDataCount(map);
-			if (taskDataCount != 0) {
-				total_page = taskDataCount / size + (taskDataCount % size > 0 ? 1 : 0);
-			}
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("projectId", projectId);
+	        map.put("schType", schType);
+	        map.put("kwd", kwd);
 
-			current_page = Math.min(current_page, total_page);
+	        int taskDataCount = taskService.taskDataCount(map);
+	        if (taskDataCount != 0) {
+	            total_page = taskDataCount / size + (taskDataCount % size > 0 ? 1 : 0);
+	        }
 
-			int offset = (current_page - 1) * size;
-			if (offset < 0)
-				offset = 0;
-			map.put("offset", offset);
-			map.put("size", size);
+	        current_page = Math.min(current_page, total_page);
+	        int offset = (current_page - 1) * size;
+	        if (offset < 0) offset = 0;
+	        map.put("offset", offset);
+	        map.put("size", size);
 
-			List<ProjectsDto> members = service.projectMembers(projectId);
-			List<ProjectsDto> stages = taskService.findStagesByProjectId(projectId);
+	        List<ProjectsDto> members = service.projectMembers(projectId);
+	        List<ProjectsDto> stages = taskService.findStagesByProjectId(projectId);
 
-			SessionInfo info = LoginMemberUtil.getSessionInfo();
-			String loginEmpId = info.getEmpId();
+	        SessionInfo info = LoginMemberUtil.getSessionInfo();
+	        String loginEmpId = info.getEmpId();
 
-			boolean isManager = members.stream()
-					.anyMatch(m -> m.getEmpId().equals(loginEmpId) && "M".equals(m.getRole()));
+	        boolean isManager = members.stream()
+	                .anyMatch(m -> m.getEmpId().equals(loginEmpId) && "M".equals(m.getRole()));
 
-			model.addAttribute("isManager", isManager);
-			model.addAttribute("loginEmpId", loginEmpId);
+	        model.addAttribute("isManager", isManager);
+	        model.addAttribute("loginEmpId", loginEmpId);
 
-			String cp = RequestUtils.getContextPath();
-			String query = "";
-			String listUrl = cp + "/projects/task?projectId=" + projectId;
-			String articleUrl = cp + "/projects/task?projectId=" + projectId + "&page=" + current_page;
+	        String cp = RequestUtils.getContextPath();
+	        String query = "";
+	        String listUrl = cp + "/projects/task?projectId=" + projectId;
+	        String articleUrl = cp + "/projects/task?projectId=" + projectId + "&page=" + current_page;
 
-			if (!kwd.isBlank()) {
-				query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
+	        if (!kwd.isBlank()) {
+	            query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
+	            listUrl += "?" + query;
+	            articleUrl += "&" + query;
+	        }
 
-				listUrl += "?" + query;
-				articleUrl += "&" + query;
-			}
+	        String paging = paginateUtil.paging(current_page, total_page, listUrl);
 
-			String paging = paginateUtil.paging(current_page, total_page, listUrl);
+	        List<ProjectsDto> list = taskService.tasklist(map);
+	        model.addAttribute("list", list);
+	        model.addAttribute("taskDataCount", taskDataCount);
+	        model.addAttribute("size", size);
+	        model.addAttribute("total_page", total_page);
+	        model.addAttribute("page", current_page);
+	        model.addAttribute("paging", paging);
+	        model.addAttribute("articleUrl", articleUrl);
+	        model.addAttribute("projectId", projectId);
+	        model.addAttribute("schType", schType);
+	        model.addAttribute("kwd", kwd);
+	        model.addAttribute("stages", stages);
+	        model.addAttribute("members", members);
 
-			List<ProjectsDto> list = taskService.tasklist(map);
-			model.addAttribute("list", list);
-			model.addAttribute("taskDataCount", taskDataCount);
-			model.addAttribute("size", size);
-			model.addAttribute("total_page", total_page);
-			model.addAttribute("page", current_page);
+	        ProjectsDto dto = service.projectarticle(projectId);
+	        String projectStart = dto.getStartDate() != null ? dto.getStartDate().replace("/", "-") : "";
+	        String projectEnd = dto.getEndDate() != null ? dto.getEndDate().replace("/", "-") : "";
+	        model.addAttribute("projectStart", projectStart);
+	        model.addAttribute("projectEnd", projectEnd);
+	        model.addAttribute("projectTitle", dto.getTitle());
 
-			model.addAttribute("paging", paging);
-			model.addAttribute("articleUrl", articleUrl);
+	    } catch (Exception e) {
+	        log.info("projecttask : ", e);
+	    }
 
-			model.addAttribute("projectId", projectId);
-			model.addAttribute("schType", schType);
-			model.addAttribute("kwd", kwd);
-			model.addAttribute("stages", stages);
-			model.addAttribute("members", members);
-
-			ProjectsDto dto = service.projectarticle(projectId);
-			String projectStart = dto.getStartDate() != null ? dto.getStartDate().replace("/", "-") : "";
-			String projectEnd = dto.getEndDate() != null ? dto.getEndDate().replace("/", "-") : "";
-			model.addAttribute("projectStart", projectStart);
-			model.addAttribute("projectEnd", projectEnd);
-			model.addAttribute("projectTitle", dto.getTitle());
-
-		} catch (Exception e) {
-			log.info("projecttask : ", e);
-		}
-
-		return "projects/task";
+	    return "projects/task";
 	}
 
 	@PostMapping("task/insert")
@@ -393,84 +388,118 @@ public class ProjectController {
 			@RequestParam(name = "kwd", defaultValue = "") String kwd, Model model) throws Exception {
 
 		try {
-			int size = 10;
-			int total_page = 0;
+	        service.projectAutoStart();
+	        service.projectAutoDelay();
+	        taskService.taskAutoDelay();
 
-			kwd = myUtil.decodeUrl(kwd);
+	        int size = 10;
+	        int total_page = 0;
 
-			SessionInfo info = LoginMemberUtil.getSessionInfo();
+	        kwd = myUtil.decodeUrl(kwd);
+	        SessionInfo info = LoginMemberUtil.getSessionInfo();
 
-			Map<String, Object> map = new HashMap<>();
-			map.put("empId", info.getEmpId());
-			map.put("schType", schType);
-			map.put("kwd", kwd);
-			map.put("status", status);
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("empId", info.getEmpId());
+	        map.put("schType", schType);
+	        map.put("kwd", kwd);
+	        map.put("status", status);
 
-			// ✅ DB에서 총 프로젝트 수
-			int dataCount = service.myProjectsCount(map);
+	        int dataCount = service.myProjectsCount(map);
+	        if (dataCount != 0) {
+	            total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
+	        }
 
-			if (dataCount != 0) {
-				total_page = dataCount / size + (dataCount % size > 0 ? 1 : 0);
-			}
+	        current_page = Math.min(current_page, total_page);
+	        int offset = (current_page - 1) * size;
+	        if (offset < 0) offset = 0;
+	        map.put("offset", offset);
+	        map.put("size", size);
 
-			current_page = Math.min(current_page, total_page);
+	        List<ProjectsDto> list = service.myProjectsList(map);
+	        List<ProjectsDto> myList = service.myProjectstatusCount(info.getEmpId());
 
-			int offset = (current_page - 1) * size;
-			if (offset < 0)
-				offset = 0;
+	        long totalProjects = myList.size();
+	        long activeProjects = myList.stream().filter(p -> "2".equals(p.getStatus())).count();
+	        long finishedProjects = myList.stream().filter(p -> "4".equals(p.getStatus())).count();
+	        long delayedProjects = myList.stream().filter(p -> "5".equals(p.getStatus())).count();
 
-			map.put("offset", offset);
-			map.put("size", size);
+	        String cp = RequestUtils.getContextPath();
+	        String query = "";
+	        String listUrl = cp + "/projects/myProjectList";
+	        String articleUrl = cp + "/projects/article?page=" + current_page;
 
-			// ✅ 프로젝트 리스트 조회
-			List<ProjectsDto> list = service.myProjectsList(map);
+	        if (!kwd.isBlank() || !status.isBlank()) {
+	            query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
+	            if (!status.isBlank()) {
+	                query += "&status=" + status;
+	            }
+	            listUrl += "?" + query;
+	            articleUrl += "&" + query;
+	        }
 
-			List<ProjectsDto> myList = service.myProjectstatusCount(info.getEmpId());
+	        String paging = paginateUtil.paging(current_page, total_page, listUrl);
 
-			long totalProjects = myList.size();
-			long activeProjects = myList.stream().filter(p -> "2".equals(p.getStatus())).count();
-			long finishedProjects = myList.stream().filter(p -> "4".equals(p.getStatus())).count();
-			long delayedProjects = myList.stream().filter(p -> "5".equals(p.getStatus())).count();
+	        model.addAttribute("list", list);
+	        model.addAttribute("dataCount", dataCount);
+	        model.addAttribute("size", size);
+	        model.addAttribute("total_page", total_page);
+	        model.addAttribute("page", current_page);
+	        model.addAttribute("paging", paging);
+	        model.addAttribute("articleUrl", articleUrl);
+	        model.addAttribute("schType", schType);
+	        model.addAttribute("kwd", kwd);
+	        model.addAttribute("status", status);
+	        model.addAttribute("totalProjects", totalProjects);
+	        model.addAttribute("activeProjects", activeProjects);
+	        model.addAttribute("finishedProjects", finishedProjects);
+	        model.addAttribute("delayedProjects", delayedProjects);
 
-			String cp = RequestUtils.getContextPath();
-			String query = "";
-			String listUrl = cp + "/projects/myProjectList";
-			String articleUrl = cp + "/projects/article?page=" + current_page;
+	    } catch (Exception e) {
+	        log.info("myProjectList : ", e);
+	    }
 
-			if (!kwd.isBlank() || !status.isBlank()) { 
-			    query = "schType=" + schType + "&kwd=" + myUtil.encodeUrl(kwd);
-			    if (!status.isBlank()) {
-			        query += "&status=" + status;
-			    }
-			    listUrl += "?" + query;
-			    articleUrl += "&" + query;
-			}
-			String paging = paginateUtil.paging(current_page, total_page, listUrl);
+	    return "projects/myProjectList";
+	}
+	
+	
+	// 구성원 조회
+	@GetMapping("members")
+	@ResponseBody
+	public ResponseEntity<?> getProjectMembers(@RequestParam("projectId") long projectId) {
+	    try {
+	        List<ProjectsDto> members = service.projectMembers(projectId);
+	        return ResponseEntity.ok(members);
+	    } catch (Exception e) {
+	        log.info("getProjectMembers : ", e);
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
+	}
 
-			// ✅ 모델에 담기
-			model.addAttribute("list", list);
-			model.addAttribute("dataCount", dataCount);
-			model.addAttribute("size", size);
-			model.addAttribute("total_page", total_page);
-			model.addAttribute("page", current_page);
-			model.addAttribute("paging", paging);
-			model.addAttribute("articleUrl", articleUrl);
+	// 프로젝트 강제 중단
+	@PostMapping("forceStop")
+	@ResponseBody
+	public ResponseEntity<?> projectForceStop(@RequestParam("projectId") long projectId) {
+	    try {
+	        taskService.taskForceStopByProject(projectId);
+	        service.projectForceStop(projectId);
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        log.info("projectForceStop : ", e);
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
+	}
 
-			model.addAttribute("schType", schType);
-			model.addAttribute("kwd", kwd);
-			model.addAttribute("status", status);
-
-			// ✅ 통계 모델 추가
-			model.addAttribute("totalProjects", totalProjects);
-			model.addAttribute("activeProjects", activeProjects);
-			model.addAttribute("finishedProjects", finishedProjects);
-			model.addAttribute("delayedProjects", delayedProjects);
-
-		} catch (Exception e) {
-			log.info("myProjectList : ", e);
-		}
-
-		return "projects/myProjectList";
+	// 구성원 변경
+	@PostMapping("member/change")
+	@ResponseBody
+	public ResponseEntity<?> changeMember(@RequestBody Map<String, Object> map) {
+	    try {
+	        service.changeMember(map);
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        log.info("changeMember : ", e);
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
 	}
 
 }

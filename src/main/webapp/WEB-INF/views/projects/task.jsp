@@ -80,7 +80,8 @@
 						    <c:choose>
 						        <c:when test="${not empty list}">
 						            <c:forEach var="t" items="${list}" varStatus="status">
-						            <tr data-task-id="${t.taskId}" data-start="${t.taskStartDate}" data-end="${t.taskEndDate}" data-emp-task-id="${t.empTaskId}" data-emp-id="${t.empId}" data-stg-title="${t.stgTitle}">
+							            <tr data-task-id="${t.taskId}" data-start="${t.taskStartDate}" data-end="${t.taskEndDate}" data-emp-task-id="${t.empTaskId}" 
+							            	data-emp-id="${t.empId}" data-stg-title="${t.stgTitle}" data-progress="${t.taskProgress}">
 						                <td class="text-center">${status.count}</td>
 						                <td class="fw-bold task-name" style="cursor: default;">
 						                    <c:if test="${not empty t.stgTitle}">

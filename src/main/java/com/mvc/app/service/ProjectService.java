@@ -29,4 +29,11 @@ public interface ProjectService {
 	public List<ProjectsDto> myProjectsList(Map<String, Object> map);
 	public List<ProjectsDto> statusCount(Map<String, Object> map);
 	public List<ProjectsDto> myProjectstatusCount(String empId);
+	
+	public void projectAutoStart() throws Exception;
+	public void projectAutoDelay() throws Exception;
+	
+	public void projectForceStop(long projectId) throws Exception;
+	
+	public void changeMember(Map<String, Object> map) throws Exception;
 }

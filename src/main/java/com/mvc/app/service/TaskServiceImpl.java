@@ -38,12 +38,6 @@ public class TaskServiceImpl implements TaskService{
 			log.info("insertProjectTask : ", e);
 		}
 	}
-	
-	@Override
-	public void cancelProjectTask(String taskId) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public List<Map<String, Object>> findByEmpId(String empId) throws Exception {
@@ -130,7 +124,8 @@ public class TaskServiceImpl implements TaskService{
 			
 	        mapper.taskUpdateStatus(dto.getTaskId());
 	        mapper.projectUpdateProgress(dto.getProjectId());
-			
+	        mapper.projectAutoComplete(dto.getProjectId());
+	        
 		} catch (Exception e) {
 			log.info("insertTaskDailylog : ", e);
 			throw e;
@@ -177,6 +172,36 @@ public class TaskServiceImpl implements TaskService{
 		}
 		
 	    return result;
+	}
+
+	@Override
+	public void taskAutoDelay() throws Exception {
+	    try {
+	        mapper.taskAutoDelay();
+	    } catch (Exception e) {
+	        log.info("taskAutoDelay : ", e);
+	        throw e;
+	    }
+	}
+
+	@Override
+	public void projectAutoComplete(long projectId) throws Exception {
+	    try {
+	        mapper.projectAutoComplete(projectId);
+	    } catch (Exception e) {
+	        log.info("projectAutoComplete : ", e);
+	        throw e;
+	    }
+	}
+
+	@Override
+	public void taskForceStopByProject(long projectId) throws Exception {
+	    try {
+	        mapper.taskForceStopByProject(projectId);
+	    } catch (Exception e) {
+	        log.info("taskForceStopByProject : ", e);
+	        throw e;
+	    }
 	}
 
 }

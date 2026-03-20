@@ -12,8 +12,7 @@ public interface TaskService {
 	public void insertProjectTask(ProjectsDto dto) throws Exception;
 	
 	public void updateProjectTask(ProjectsDto dto) throws Exception;
-	public void cancelProjectTask(String taskId) throws Exception;
-	
+
 	List<ProjectsDto> findStagesByProjectId(long projectId) throws Exception;
 	
 	List<Map<String,Object>> findByEmpId(String empId) throws Exception;
@@ -26,4 +25,10 @@ public interface TaskService {
 
 	List<ProjectsDto> myProjectslist(Map<String, Object> map) throws Exception;
 	int myDataCount(Map<String, Object> map) throws Exception;
+	
+	public void taskAutoDelay() throws Exception;
+	public void projectAutoComplete(long projectId) throws Exception;
+	
+	public void taskForceStopByProject(long projectId) throws Exception;
+
 }

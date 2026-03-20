@@ -51,4 +51,9 @@ public interface TaskMapper {
 	// 간트
 	public List<ProjectsDto> myProjectslist(Map<String, Object> map) throws SQLException;
 	public int myDataCount(Map<String, Object> map) throws SQLException;
+	
+	public void taskAutoDelay() throws SQLException;
+	public void projectAutoComplete(long projectId) throws SQLException;
+	
+	public void taskForceStopByProject(long projectId) throws SQLException;
 }

@@ -66,6 +66,8 @@ public class ProjectsDto {
 	private String taskCreatedDate;
 	private String taskCreator;
 	
+	private int taskProgress; // 데일리 체크 시 쌓이는 진척률
+	
 	// 개인업무(emptask)
 	private String empTaskId;
 	private String empTaskStartDate;

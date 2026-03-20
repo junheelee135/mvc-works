@@ -218,4 +218,45 @@ public class ProjectServiceImpl implements ProjectService {
 		return list;
 	}
 
+	@Override
+	public void projectAutoStart() throws Exception {
+	    try {
+	        mapper.projectAutoStart();
+	    } catch (Exception e) {
+	        log.info("projectAutoStart : ", e);
+	        throw e;
+	    }
+	}
+
+	@Override
+	public void projectAutoDelay() throws Exception {
+	    try {
+	        mapper.projectAutoDelay();
+	    } catch (Exception e) {
+	        log.info("projectAutoDelay : ", e);
+	        throw e;
+	    }
+	}
+
+	@Override
+	public void projectForceStop(long projectId) throws Exception {
+	    try {
+	        mapper.projectForceStop(projectId);
+	    } catch (Exception e) {
+	        log.info("projectForceStop : ", e);
+	        throw e;
+	    }
+	}
+
+	@Override
+	public void changeMember(Map<String, Object> map) throws Exception {
+		try {
+	        mapper.changeEmpTask(map);
+	        mapper.updatePredecessor(map);
+	        mapper.updateNewEmpId(map);
+	    } catch (Exception e) {
+	        log.info("changeMember : ", e);
+	        throw e;
+	    }
+	}
 }

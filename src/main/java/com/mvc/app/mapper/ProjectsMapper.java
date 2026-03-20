@@ -37,4 +37,14 @@ public interface ProjectsMapper {
 	public List<ProjectsDto> statusCount(Map<String, Object> map);
 	public List<ProjectsDto> myProjectstatusCount(String empId);
 	
+	
+	public void projectAutoStart() throws SQLException;
+	public void projectAutoDelay() throws SQLException;
+	
+	public void projectForceStop(long projectId) throws SQLException;
+	
+	public void changeEmpTask(Map<String, Object> map) throws SQLException;
+	
+	public void updatePredecessor(Map<String, Object> map) throws SQLException;
+	public void updateNewEmpId(Map<String, Object> map) throws SQLException;
 }
