@@ -58,38 +58,47 @@ type="text/css">
                 <thead>
                     <tr>
                         <th style="width:50px;">No.</th>
-                        <th>제목</th>
-                        <th style="width:80px;">상태</th>
-                        <th style="width:80px;">익명</th>
-                        <th style="width:80px;">질문수</th>
-                        <th style="width:80px;">응답수</th>
-                        <th style="width:100px;">시작일</th>
-                        <th style="width:100px;">종료일</th>
-                        <th style="width:90px;">작성자</th>
-                        <th style="width:110px;">작성일</th>
-                        <th style="width:120px;">동작</th>
+                        <th style="width:250px;">제목</th>
+                        <th style="width:80px;text-align:center;">상태</th>
+                        <th style="width:60px;text-align:center;">익명</th>
+                        <th style="width:70px;text-align:right;">질문수</th>
+                        <th style="width:70px;text-align:right;">응답수</th>
+                        <th style="width:100px;text-align:center;">시작일</th>
+                        <th style="width:100px;text-align:center;">종료일</th>
+                        <th style="width:80px;">작성자</th>
+                        <th style="width:100px;text-align:center;">작성일</th>
+                        <th style="width:90px;text-align:center;">동작</th>
+                        <th style="width:80px;text-align:center;">결과</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="store.list.length === 0">
-                        <td colspan="11" style="text-align:center;padding:40px;color:#9aa0b4;">
+                        <td colspan="12" style="text-align:center;padding:40px;color:#9aa0b4;">
                             등록된 설문이 없습니다.
                         </td>
                     </tr>
                     <tr v-for="(item, index) in store.list" :key="item.surveyId">
                         <td>{{ store.totalCount - ((store.pageNo - 1) * store.pageSize) - index }}</td>
                         <td style="cursor:pointer;" @click="goDetail(item)">{{ item.title }}</td>
-                        <td><span class="survey-status" :class="item.status">{{ statusName(item.status) }}</span></td>
-                        <td>{{ item.anonymousYn === 'Y' ? '익명' : '실명' }}</td>
-                        <td>{{ item.questionCount }}</td>
-                        <td>{{ item.responseCount }}</td>
+                        <td style="text-align:center;"><span class="survey-status" :class="item.status">{{ statusName(item.status) }}</span></td>
+                        <td style="text-align:center;">{{ item.anonymousYn === 'Y' ? '익명' : '실명' }}</td>
+                        <td style="text-align:right;">{{ item.questionCount }}</td>
+                        <td style="text-align:right;">{{ item.responseCount }}</td>
                         <td style="text-align:center;">{{ item.startDate || '-' }}</td>
                         <td style="text-align:center;">{{ item.endDate || '-' }}</td>
                         <td>{{ item.writerName }}</td>
                         <td style="text-align:center;">{{ item.regDate }}</td>
                         <td style="text-align:center;" @click.stop>
-                            <button v-if="item.status === 'ACTIVE'" class="btn-action respond"
-                                    @click="goRespond(item.surveyId)">응답</button>
+                            <button v-if="item.status === 'ACTIVE' && isInPeriod(item) && item.respondedYn !== 'Y'"
+                                    class="btn-action respond" @click="goRespond(item.surveyId)">응답</button>
+                            <span v-if="item.respondedYn === 'Y' && item.status === 'ACTIVE'"
+                                  style="display:inline-block;padding:2px 10px;border-radius:12px;background:#d1fae5;color:#065f46;font-size:12px;font-weight:600;">완료</span>
+                            <span v-if="item.status === 'ACTIVE' && periodStatus(item) === 'before' && item.respondedYn !== 'Y'"
+                                  style="display:inline-block;padding:2px 10px;border-radius:12px;background:#e0e7ff;color:#3730a3;font-size:12px;font-weight:600;">시작전</span>
+                            <span v-if="item.status === 'ACTIVE' && periodStatus(item) === 'after' && item.respondedYn !== 'Y'"
+                                  style="display:inline-block;padding:2px 10px;border-radius:12px;background:#fee2e2;color:#991b1b;font-size:12px;font-weight:600;">기간종료</span>
+                        </td>
+                        <td style="text-align:center;" @click.stop>
                             <button v-if="isAdmin ? item.status !== 'DRAFT' : item.status === 'CLOSED'"
                                     class="btn-action result" @click="goResult(item.surveyId)">결과</button>
                         </td>
@@ -118,6 +127,8 @@ type="text/css">
                     <button class="btn-secondary" @click="goList">목록으로</button>
                     <button class="btn-danger" v-if="viewMode === 'edit'" @click="doDelete">삭제</button>
                     <button class="btn-success" v-if="viewMode === 'edit' && store.form.status === 'DRAFT'" @click="doPublish">배포하기</button>
+                    <button class="btn-warning" v-if="viewMode === 'edit' && store.form.status === 'ACTIVE'" @click="doClose"
+                            style="background:#f59e0b;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">마감하기</button>
                     <button class="btn-primary" @click="doSave">저장</button>
                 </div>
             </div>
@@ -175,6 +186,45 @@ type="text/css">
                         <span v-if="store.form.targets.length === 0" class="target-list-empty">
                             대상자 미지정 시 전체 직원이 응답할 수 있습니다.
                         </span>
+                    </div>
+                </div>
+
+                <!-- 첨부파일 -->
+                <div class="form-group">
+                    <label>첨부파일</label>
+                    <div>
+                        <input type="file" ref="fileInput" multiple style="display:none"
+                               @change="onFileSelect">
+                        <button type="button" class="btn-secondary" @click="$refs.fileInput.click()">
+                            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">attach_file</span>
+                            파일 선택
+                        </button>
+                    </div>
+                    <!-- 기존 파일 (수정 모드) -->
+                    <div v-if="store.existingFiles.length > 0" style="margin-top:8px;">
+                        <div class="file-item" v-for="(f, fi) in store.existingFiles" :key="'ex-'+fi">
+                            <span class="material-symbols-outlined" style="font-size:16px;color:#4b7bec;vertical-align:middle;">description</span>
+                            <span style="margin-left:4px;">{{ f.oriFilename }}</span>
+                            <span style="color:#9aa0b4;margin-left:6px;">({{ store.formatFileSize(f.fileSize) }})</span>
+                            <button class="btn-remove-opt" @click="store.removeExistingFile(fi)" title="삭제">
+                                <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 새 파일 -->
+                    <div v-if="store.attachedFiles.length > 0" style="margin-top:8px;">
+                        <div class="file-item" v-for="(f, fi) in store.attachedFiles" :key="'new-'+fi">
+                            <span class="material-symbols-outlined" style="font-size:16px;color:#1a9660;vertical-align:middle;">upload_file</span>
+                            <span style="margin-left:4px;">{{ f.name }}</span>
+                            <span style="color:#9aa0b4;margin-left:6px;">({{ store.formatFileSize(f.size) }})</span>
+                            <button class="btn-remove-opt" @click="store.removeFile(fi)" title="삭제">
+                                <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div v-if="store.existingFiles.length === 0 && store.attachedFiles.length === 0"
+                         style="color:#9aa0b4;font-size:13px;margin-top:6px;">
+                        첨부된 파일이 없습니다.
                     </div>
                 </div>
 
@@ -246,7 +296,7 @@ type="text/css">
 {
   "imports": {
     "http": "${pageContext.request.contextPath}/dist/util/http.js",
-    "surveyListStore": "${pageContext.request.contextPath}/dist/util/store/surveyListStore.js?v=3"
+    "surveyListStore": "${pageContext.request.contextPath}/dist/util/store/surveyListStore.js?v=5"
   }
 }
 </script>
@@ -347,6 +397,22 @@ const app = createApp({
             return map[code] || '';
         }
 
+        /* ── 기간 체크 함수 ── */
+        function isInPeriod(item) {
+            const today = new Date().toISOString().slice(0, 10);
+            if (item.startDate && today < item.startDate) return false;
+            if (item.endDate && today > item.endDate) return false;
+            return true;
+        }
+
+        // 'before' = 시작 전, 'after' = 기간 종료, null = 기간 내
+        function periodStatus(item) {
+            const today = new Date().toISOString().slice(0, 10);
+            if (item.startDate && today < item.startDate) return 'before';
+            if (item.endDate && today > item.endDate) return 'after';
+            return null;
+        }
+
         /* ── 질문유형 변경 시 옵션 초기화 ── */
         function onTypeChange(qIndex) {
             const q = store.form.questions[qIndex];
@@ -358,6 +424,14 @@ const app = createApp({
                 store.addOption(qIndex);
                 store.addOption(qIndex);
             }
+        }
+
+        /* ── 파일 선택 ── */
+        const fileInput = ref(null);
+
+        function onFileSelect(e) {
+            store.addFiles(e.target.files);
+            e.target.value = '';  // 같은 파일 재선택 가능하도록
         }
 
         /* ── 대상자 입력 상태 ── */
@@ -400,10 +474,11 @@ const app = createApp({
 
         return {
             store, viewMode, targetInput, isAdmin,
+            fileInput,
             goList, goCreate, goEdit, goDetail, goRespond, goResult,
             doSave, doDelete, doPublish, doClose,
-            statusName, statusClass,
-            onTypeChange, addTarget
+            statusName, statusClass, isInPeriod, periodStatus,
+            onTypeChange, addTarget, onFileSelect
         };
     }
 });

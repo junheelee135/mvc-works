@@ -44,6 +44,26 @@
             </button>
         </div>
 
+        <!-- 시작 전 -->
+        <div v-else-if="periodBlock === 'before'" class="respond-done">
+            <div class="done-icon" style="color:#6366f1;"><i class="fas fa-clock"></i></div>
+            <h3>아직 응답 기간이 아닙니다</h3>
+            <p>이 설문은 {{ store.survey.startDate }}부터 응답할 수 있습니다.</p>
+            <button class="btn-back" style="margin-top:20px;" @click="goList">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </button>
+        </div>
+
+        <!-- 기간 종료 -->
+        <div v-else-if="periodBlock === 'after'" class="respond-done">
+            <div class="done-icon" style="color:#ef4444;"><i class="fas fa-clock"></i></div>
+            <h3>응답 기간이 종료되었습니다</h3>
+            <p>이 설문의 응답 가능 기간이 지났습니다.</p>
+            <button class="btn-back" style="margin-top:20px;" @click="goList">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </button>
+        </div>
+
         <!-- 설문 응답 폼 -->
         <div v-else>
 
@@ -60,6 +80,19 @@
                     <span><i class="far fa-calendar"></i> {{ store.survey.startDate || '-' }} ~ {{ store.survey.endDate || '-' }}</span>
                     <span><i class="fas fa-user-secret"></i> {{ store.survey.anonymousYn === 'Y' ? '익명 설문' : '실명 설문' }}</span>
                     <span><i class="fas fa-list-ol"></i> 총 {{ store.questions.length }}개 질문</span>
+                </div>
+            </div>
+
+            <!-- 첨부파일 -->
+            <div v-if="store.files.length > 0" class="respond-files" style="background:#f8f9fb;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
+                <div style="font-weight:600;font-size:13px;color:#1d2939;margin-bottom:8px;">
+                    <i class="fas fa-paperclip"></i> 첨부파일 ({{ store.files.length }})
+                </div>
+                <div v-for="f in store.files" :key="f.fileId" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    <a :href="ctx + '/api/survey/file/' + f.fileId" style="color:#4b7bec;text-decoration:none;font-size:13px;">
+                        <i class="fas fa-download" style="margin-right:4px;"></i>{{ f.oriFilename }}
+                    </a>
+                    <span style="color:#9aa0b4;font-size:12px;">({{ formatFileSize(f.fileSize) }})</span>
                 </div>
             </div>
 
@@ -130,13 +163,13 @@
 {
     "imports": {
         "http": "${pageContext.request.contextPath}/dist/util/http.js",
-        "surveyRespondStore": "${pageContext.request.contextPath}/dist/util/store/surveyRespondStore.js?v=2"
+        "surveyRespondStore": "${pageContext.request.contextPath}/dist/util/store/surveyRespondStore.js?v=3"
     }
 }
 </script>
 
 <script type="module">
-import { createApp, ref, onMounted } from 'vue';
+import { createApp, ref, computed, onMounted } from 'vue';
 import { createPinia } from 'pinia';
 import { useSurveyRespondStore } from 'surveyRespondStore';
 
@@ -148,15 +181,34 @@ const app = createApp({
         const params = new URLSearchParams(location.search);
         const surveyId = Number(params.get('surveyId'));
 
+        const ctx = document.querySelector('meta[name="ctx"]').content;
+
+        // 기간 체크: 'before' | 'after' | null
+        const periodBlock = computed(() => {
+            const s = store.survey;
+            if (!s || !s.surveyId) return null;
+            const today = new Date().toISOString().slice(0, 10);
+            if (s.startDate && today < s.startDate) return 'before';
+            if (s.endDate && today > s.endDate) return 'after';
+            return null;
+        });
+
         // 질문유형 한글
         function typeName(code) {
             const map = { 'SINGLE': '단일선택', 'MULTI': '복수선택', 'TEXT': '서술형', 'SCORE': '점수형' };
             return map[code] || code;
         }
 
+        // 파일 크기 포맷
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
         // 목록으로
         function goList() {
-            location.href = document.querySelector('meta[name="ctx"]').content + '/survey/list';
+            location.href = ctx + '/survey/list';
         }
 
         // 응답 제출
@@ -174,7 +226,7 @@ const app = createApp({
             }
         });
 
-        return { store, typeName, goList, doSubmit };
+        return { store, ctx, periodBlock, typeName, formatFileSize, goList, doSubmit };
     }
 });
 

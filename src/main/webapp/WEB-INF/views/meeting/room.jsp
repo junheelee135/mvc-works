@@ -203,7 +203,7 @@
 {
     "imports": {
         "http": "/dist/util/http.js?v=2",
-        "meetingRoomStore": "/dist/js/meetingRoomStore.js?v=3",
+        "meetingRoomStore": "/dist/js/meetingRoomStore.js?v=4",
         "commonCodeStore": "/dist/util/store/commonCodeStore.js"
     }
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,16 +13,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mvc.app.common.StorageService;
 import com.mvc.app.domain.dto.SessionInfo;
 import com.mvc.app.domain.dto.SurveyDto;
+import com.mvc.app.domain.dto.SurveyFileDto;
 import com.mvc.app.domain.dto.SurveyOptionDto;
 import com.mvc.app.domain.dto.SurveyQuestionDto;
 import com.mvc.app.domain.dto.SurveyResponseDto;
 import com.mvc.app.domain.dto.SurveyTargetDto;
 import com.mvc.app.security.LoginMemberUtil;
 import com.mvc.app.service.SurveyService;
+
+import java.time.LocalDate;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +40,11 @@ import lombok.RequiredArgsConstructor;
 public class SurveyRestController {
 
     private final SurveyService service;
+    private final StorageService storageService;
+    private final ObjectMapper objectMapper;
+
+    @Value("${file.upload-root}/survey")
+    private String uploadPath;
 
     // 관리자 여부 확인
     private boolean isAdmin(SessionInfo info) {
@@ -45,11 +59,13 @@ public class SurveyRestController {
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize", defaultValue = "20") int pageSize) {
         try {
+            SessionInfo info = LoginMemberUtil.getSessionInfo();
             Map<String, Object> map = new HashMap<>();
             map.put("keyword", keyword);
             map.put("status", status);
             map.put("pageNo", pageNo);
             map.put("pageSize", pageSize);
+            map.put("empId", info.getEmpId());
             return ResponseEntity.ok(service.listSurvey(map));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
@@ -66,14 +82,18 @@ public class SurveyRestController {
         }
     }
 
-    // 설문 등록 (관리자만)
+    // 설문 등록 (관리자만) — 멀티파트
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> create(
+            @RequestPart("data") String dataJson,
+            @RequestPart(value = "files", required = false) MultipartFile[] files) {
         try {
             SessionInfo info = LoginMemberUtil.getSessionInfo();
             if (!isAdmin(info)) {
                 return ResponseEntity.status(403).body(Map.of("msg", "관리자만 등록할 수 있습니다."));
             }
+
+            Map<String, Object> body = objectMapper.readValue(dataJson, new TypeReference<>() {});
 
             SurveyDto dto = new SurveyDto();
             dto.setTitle((String) body.get("title"));
@@ -87,21 +107,26 @@ public class SurveyRestController {
             List<SurveyQuestionDto> questions = parseQuestions(body);
             List<SurveyTargetDto> targets = parseTargets(body);
 
-            service.createSurvey(dto, questions, targets);
+            service.createSurvey(dto, questions, targets, files);
             return ResponseEntity.ok(Map.of("surveyId", dto.getSurveyId()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 
-    // 설문 수정 (관리자만)
+    // 설문 수정 (관리자만) — 멀티파트
     @PostMapping("/{surveyId}")
-    public ResponseEntity<?> update(@PathVariable("surveyId") long surveyId, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> update(
+            @PathVariable("surveyId") long surveyId,
+            @RequestPart("data") String dataJson,
+            @RequestPart(value = "files", required = false) MultipartFile[] files) {
         try {
             SessionInfo info = LoginMemberUtil.getSessionInfo();
             if (!isAdmin(info)) {
                 return ResponseEntity.status(403).body(Map.of("msg", "관리자만 수정할 수 있습니다."));
             }
+
+            Map<String, Object> body = objectMapper.readValue(dataJson, new TypeReference<>() {});
 
             SurveyDto dto = new SurveyDto();
             dto.setSurveyId(surveyId);
@@ -114,7 +139,7 @@ public class SurveyRestController {
             List<SurveyQuestionDto> questions = parseQuestions(body);
             List<SurveyTargetDto> targets = parseTargets(body);
 
-            service.updateSurvey(dto, questions, targets);
+            service.updateSurvey(dto, questions, targets, files);
             return ResponseEntity.ok(Map.of("result", "ok"));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
@@ -184,6 +209,22 @@ public class SurveyRestController {
     public ResponseEntity<?> respond(@PathVariable("surveyId") long surveyId, @RequestBody SurveyResponseDto dto) {
         try {
             SessionInfo info = LoginMemberUtil.getSessionInfo();
+
+            // 날짜 검증
+            Map<String, Object> detail = service.findById(surveyId);
+            SurveyDto survey = (SurveyDto) detail.get("survey");
+            LocalDate today = LocalDate.now();
+            if (survey.getStartDate() != null && !survey.getStartDate().isEmpty()) {
+                if (today.isBefore(LocalDate.parse(survey.getStartDate()))) {
+                    return ResponseEntity.status(403).body(Map.of("msg", "응답 가능 기간이 아닙니다."));
+                }
+            }
+            if (survey.getEndDate() != null && !survey.getEndDate().isEmpty()) {
+                if (today.isAfter(LocalDate.parse(survey.getEndDate()))) {
+                    return ResponseEntity.status(403).body(Map.of("msg", "응답 가능 기간이 아닙니다."));
+                }
+            }
+
             dto.setSurveyId(surveyId);
             dto.setEmpId(info.getEmpId());
             service.submitResponse(dto);
@@ -200,6 +241,20 @@ public class SurveyRestController {
             return ResponseEntity.ok(service.getResult(surveyId));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // 첨부파일 다운로드
+    @GetMapping("/file/{fileId}")
+    public ResponseEntity<?> downloadFile(@PathVariable("fileId") long fileId) {
+        try {
+            SurveyFileDto file = service.findFileById(fileId);
+            if (file == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return storageService.downloadFile(uploadPath, file.getSaveFilename(), file.getOriFilename());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("msg", "파일 다운로드에 실패했습니다."));
         }
     }
 
@@ -246,5 +301,5 @@ public class SurveyRestController {
             targets.add(t);
         }
         return targets;
-    }    
+    }
 }

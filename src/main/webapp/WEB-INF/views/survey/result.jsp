@@ -45,6 +45,19 @@
                 </div>
             </div>
 
+            <!-- 첨부파일 -->
+            <div v-if="store.files.length > 0" style="background:#f8f9fb;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
+                <div style="font-weight:600;font-size:13px;color:#1d2939;margin-bottom:8px;">
+                    <i class="fas fa-paperclip"></i> 첨부파일 ({{ store.files.length }})
+                </div>
+                <div v-for="f in store.files" :key="f.fileId" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    <a :href="ctx + '/api/survey/file/' + f.fileId" style="color:#4b7bec;text-decoration:none;font-size:13px;">
+                        <i class="fas fa-download" style="margin-right:4px;"></i>{{ f.oriFilename }}
+                    </a>
+                    <span style="color:#9aa0b4;font-size:12px;">({{ formatFileSize(f.fileSize) }})</span>
+                </div>
+            </div>
+
             <!-- 응답 없음 -->
             <div v-if="store.responseCount === 0" class="no-response">
                 <i class="fas fa-chart-bar" style="font-size:36px;margin-bottom:12px;display:block;"></i>
@@ -104,7 +117,7 @@
 {
     "imports": {
         "http": "${pageContext.request.contextPath}/dist/util/http.js",
-        "surveyResultStore": "${pageContext.request.contextPath}/dist/util/store/surveyResultStore.js?v=2"
+        "surveyResultStore": "${pageContext.request.contextPath}/dist/util/store/surveyResultStore.js?v=3"
     }
 }
 </script>
@@ -122,15 +135,24 @@ const app = createApp({
         const params = new URLSearchParams(location.search);
         const surveyId = Number(params.get('surveyId'));
 
+        const ctx = document.querySelector('meta[name="ctx"]').content;
+
         // 질문유형 한글
         function typeName(code) {
             const map = { 'SINGLE': '단일선택', 'MULTI': '복수선택', 'TEXT': '서술형', 'SCORE': '점수형' };
             return map[code] || code;
         }
 
+        // 파일 크기 포맷
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
         // 목록으로
         function goList() {
-            location.href = document.querySelector('meta[name="ctx"]').content + '/survey/list';
+            location.href = ctx + '/survey/list';
         }
 
         onMounted(() => {
@@ -139,7 +161,7 @@ const app = createApp({
             }
         });
 
-        return { store, typeName, goList };
+        return { store, ctx, typeName, formatFileSize, goList };
     }
 });
 

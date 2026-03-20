@@ -16,7 +16,8 @@
                        TO_CHAR(s.regDate, 'YYYY-MM-DD') AS regDate,
                        e.name AS writerName,
                        (SELECT COUNT(*) FROM surveyQuestion q WHERE q.surveyId = s.surveyId) AS questionCount,
-                       (SELECT COUNT(*) FROM surveyResponse r WHERE r.surveyId = s.surveyId) AS responseCount
+                       (SELECT COUNT(*) FROM surveyResponse r WHERE r.surveyId = s.surveyId) AS responseCount,
+                       (SELECT CASE WHEN COUNT(*)>0 THEN 'Y' ELSE 'N' END FROM surveyResponse WHERE surveyId=s.surveyId AND empId=#{empId}) AS respondedYn
                 FROM survey s
                 LEFT JOIN employee2 e ON s.writerEmpId = e.empId
                 <where>
@@ -90,6 +91,15 @@
         SET status = #{status}, updateDate = SYSDATE
         WHERE surveyId = #{surveyId}
     </update>
+
+    <delete id="deleteAnswersBySurveyId" parameterType="long">
+        DELETE FROM surveyAnswer
+        WHERE responseId IN (SELECT responseId FROM surveyResponse WHERE surveyId = #{surveyId})
+    </delete>
+
+    <delete id="deleteResponsesBySurveyId" parameterType="long">
+        DELETE FROM surveyResponse WHERE surveyId = #{surveyId}
+    </delete>
 
     <delete id="deleteSurvey" parameterType="long">
         DELETE FROM survey WHERE surveyId = #{surveyId}
@@ -229,5 +239,33 @@
           WHERE questionId = #{questionId}
             AND scoreValue IS NOT NULL
       </select>
+
+    <!-- ── 첨부파일 ── -->
+    <insert id="insertFile" parameterType="com.mvc.app.domain.dto.SurveyFileDto">
+        <selectKey keyProperty="fileId" resultType="long" order="BEFORE">
+            SELECT surveyFile_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO surveyFile (fileId, surveyId, oriFilename, saveFilename, fileSize, regDate)
+        VALUES (#{fileId}, #{surveyId}, #{oriFilename}, #{saveFilename}, #{fileSize}, SYSDATE)
+    </insert>
+
+    <select id="listFiles" parameterType="long" resultType="com.mvc.app.domain.dto.SurveyFileDto">
+        SELECT fileId, surveyId, oriFilename, saveFilename, fileSize,
+               TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
+        FROM surveyFile
+        WHERE surveyId = #{surveyId}
+        ORDER BY fileId
+    </select>
+
+    <select id="getFileById" parameterType="long" resultType="com.mvc.app.domain.dto.SurveyFileDto">
+        SELECT fileId, surveyId, oriFilename, saveFilename, fileSize,
+               TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
+        FROM surveyFile
+        WHERE fileId = #{fileId}
+    </select>
+
+    <delete id="deleteFilesBySurveyId" parameterType="long">
+        DELETE FROM surveyFile WHERE surveyId = #{surveyId}
+    </delete>
 
 </mapper>

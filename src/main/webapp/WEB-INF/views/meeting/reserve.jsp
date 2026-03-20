@@ -291,7 +291,7 @@
 {
     "imports": {
         "http": "/dist/util/http.js?v=2",
-        "meetingReserveStore": "/dist/js/meetingReserveStore.js?v=2",
+        "meetingReserveStore": "/dist/js/meetingReserveStore.js?v=3",
         "commonCodeStore": "/dist/util/store/commonCodeStore.js"
     }
 }

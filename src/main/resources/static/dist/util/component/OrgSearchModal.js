@@ -1,8 +1,10 @@
 import { ref, reactive, computed, watch, provide, inject } from 'vue';
 import http from 'http';
 
-// 모듈 레벨 트리 캐시 (모든 인스턴스 공유)
+// 모듈 레벨 트리 캐시 (모든 인스턴스 공유, 5분 TTL)
 let cachedDeptTree = null;
+let cachedDeptTreeTime = 0;
+const CACHE_TTL = 5 * 60 * 1000;
 
 // ── 재귀 트리 노드 (내부 컴포넌트) ──
 const TreeNode = {
@@ -144,10 +146,14 @@ export const OrgSearchModal = {
 
         // 부서 트리 (캐시 공유)
         async function loadDeptTree() {
-            if (cachedDeptTree) { deptTree.value = cachedDeptTree; return; }
+            if (cachedDeptTree && (Date.now() - cachedDeptTreeTime < CACHE_TTL)) {
+                deptTree.value = cachedDeptTree;
+                return;
+            }
             try {
                 const res = await http.get('/approval/org/dept');
                 cachedDeptTree = res.data.tree || [];
+                cachedDeptTreeTime = Date.now();
                 deptTree.value = cachedDeptTree;
             } catch (e) {
                 console.error('조직도 로딩 실패:', e);

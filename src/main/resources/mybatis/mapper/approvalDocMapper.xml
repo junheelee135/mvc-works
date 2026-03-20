@@ -597,7 +597,7 @@
         UPDATE approvalLine
         SET lineStatusCode = 'REJECTED',
             apprDate = SYSDATE,
-            apprComment = #{comment},
+            apprComment = #{comment, jdbcType=VARCHAR},
             isDeputy = 'Y',
             deputyEmpId = #{empId},
             deputyName = #{empName}
@@ -669,7 +669,7 @@
         UPDATE approvalLine
         SET lineStatusCode = 'REJECTED',
             apprDate = SYSDATE,
-            apprComment = #{comment}
+            apprComment = #{comment, jdbcType=VARCHAR}
         WHERE docId = #{docId}
           AND apprEmpId = #{empId}
           AND (
@@ -720,7 +720,7 @@
     <!-- 참조자 코멘트 저장 -->
     <update id="updateRefComment" parameterType="map">
         UPDATE approvalReference
-        SET refComment = #{comment},
+        SET refComment = #{comment, jdbcType=VARCHAR},
             refCommentDate = SYSDATE
         WHERE docId = #{docId}
           AND refEmpId = #{empId}

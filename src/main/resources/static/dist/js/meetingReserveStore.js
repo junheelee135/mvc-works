@@ -23,27 +23,43 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
     actions: {
         // 날짜별 예약 목록
         async fetchByDate(date) {
-            this.selectedDate = date;
-            const res = await http.get('/meeting/reserve', { params: { date } });
-            this.reserveList = res.data.list || [];
+            try {
+                this.selectedDate = date;
+                const res = await http.get('/meeting/reserve', { params: { date } });
+                this.reserveList = res.data.list || [];
+            } catch (e) {
+                console.error('예약 목록 조회 실패:', e);
+            }
         },
 
         // 월별 캘린더 이벤트
         async fetchMonthEvents(yearMonth) {
-            const res = await http.get('/meeting/reserve/month', { params: { yearMonth } });
-            this.monthEvents = res.data.list || [];
+            try {
+                const res = await http.get('/meeting/reserve/month', { params: { yearMonth } });
+                this.monthEvents = res.data.list || [];
+            } catch (e) {
+                console.error('월별 이벤트 조회 실패:', e);
+            }
         },
 
         // 통계
         async fetchStats() {
-            const res = await http.get('/meeting/reserve/stats');
-            this.stats = res.data;
+            try {
+                const res = await http.get('/meeting/reserve/stats');
+                this.stats = res.data;
+            } catch (e) {
+                console.error('통계 조회 실패:', e);
+            }
         },
 
         // 사용중인 회의실 목록
         async fetchRooms() {
-            const res = await http.get('/meeting/reserve/rooms');
-            this.rooms = res.data.list || [];
+            try {
+                const res = await http.get('/meeting/reserve/rooms');
+                this.rooms = res.data.list || [];
+            } catch (e) {
+                console.error('회의실 목록 조회 실패:', e);
+            }
         },
 
         // 예약 등록

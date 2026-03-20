@@ -60,29 +60,34 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
 
         // 저장 (등록/수정 공용)
         async saveRoom(photoFiles) {
-            const formData = new FormData();
+            try {
+                const formData = new FormData();
 
-            // JSON 데이터
-            const blob = new Blob([JSON.stringify(this.form)], { type: 'application/json' });
-            formData.append('data', blob);
+                // JSON 데이터
+                const blob = new Blob([JSON.stringify(this.form)], { type: 'application/json' });
+                formData.append('data', blob);
 
-            // 사진 파일
-            if (photoFiles && photoFiles.length > 0) {
-                for (const file of photoFiles) {
-                    formData.append('photos', file);
+                // 사진 파일
+                if (photoFiles && photoFiles.length > 0) {
+                    for (const file of photoFiles) {
+                        formData.append('photos', file);
+                    }
                 }
+
+                const cfg = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+                if (this.formMode === 'ADD') {
+                    await http.post('/meeting/room', formData, cfg);
+                } else {
+                    await http.put('/meeting/room/' + this.currentRoom.roomId, formData, cfg);
+                }
+
+                this.formMode = '';
+                await this.fetchList();
+            } catch (e) {
+                console.error('회의실 저장 실패:', e);
+                alert('회의실 저장 중 오류가 발생했습니다.');
             }
-
-            const cfg = { headers: { 'Content-Type': 'multipart/form-data' } };
-
-            if (this.formMode === 'ADD') {
-                await http.post('/meeting/room', formData, cfg);
-            } else {
-                await http.put('/meeting/room/' + this.currentRoom.roomId, formData, cfg);
-            }
-
-            this.formMode = '';
-            await this.fetchList();
         },
 
         // 순서 일괄 저장

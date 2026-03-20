@@ -8,6 +8,7 @@ export const useSurveyResultStore = defineStore('surveyResult', () => {
     const survey = ref({});
     const responseCount = ref(0);
     const stats = ref([]);         // [ { question, options/textAnswers/avgScore }, ... ]
+    const files = ref([]);         // 첨부파일 목록
     const loading = ref(false);
 
     // ── 결과 조회 ──
@@ -18,6 +19,7 @@ export const useSurveyResultStore = defineStore('surveyResult', () => {
             survey.value = res.data.survey;
             responseCount.value = res.data.responseCount || 0;
             stats.value = res.data.stats || [];
+            files.value = res.data.files || [];
         } catch (e) {
             console.error('결과 조회 실패:', e);
         } finally {
@@ -49,7 +51,7 @@ export const useSurveyResultStore = defineStore('surveyResult', () => {
     }
 
     return {
-        survey, responseCount, stats, loading,
+        survey, responseCount, stats, files, loading,
         fetchResult, maxCount, percent, starArray
     };
 });

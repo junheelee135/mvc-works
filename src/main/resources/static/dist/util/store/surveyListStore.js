@@ -26,6 +26,10 @@ export const useSurveyListStore = defineStore('surveyList', () => {
         targets: []
     });
 
+    // 첨부파일 상태
+    const attachedFiles = ref([]);      // 새로 추가할 File 객체 배열
+    const existingFiles = ref([]);      // 수정 시 기존 파일 목록 (서버에서 받은)
+
     // ── 목록 조회 ──
     async function fetchList() {
         loading.value = true;
@@ -70,6 +74,10 @@ export const useSurveyListStore = defineStore('surveyList', () => {
                 questions: data.questions || [],
                 targets: data.targets || []
             };
+
+            // 기존 첨부파일 복원
+            existingFiles.value = data.files || [];
+            attachedFiles.value = [];
         } catch (e) {
             console.error('설문 상세 조회 실패:', e);
         }
@@ -88,6 +96,8 @@ export const useSurveyListStore = defineStore('surveyList', () => {
             questions: [],
             targets: []
         };
+        attachedFiles.value = [];
+        existingFiles.value = [];
     }
 
     // ── 질문 추가 ──
@@ -122,7 +132,31 @@ export const useSurveyListStore = defineStore('surveyList', () => {
         q.options.forEach((o, i) => o.sortOrder = i + 1);
     }
 
-    // ── 저장 (등록/수정) ──
+    // ── 첨부파일 추가 ──
+    function addFiles(fileList) {
+        for (let i = 0; i < fileList.length; i++) {
+            attachedFiles.value.push(fileList[i]);
+        }
+    }
+
+    // 새 파일 제거
+    function removeFile(index) {
+        attachedFiles.value.splice(index, 1);
+    }
+
+    // 기존 파일 제거
+    function removeExistingFile(index) {
+        existingFiles.value.splice(index, 1);
+    }
+
+    // 파일 크기 포맷
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // ── 저장 (등록/수정) — FormData 멀티파트 ──
     async function saveForm() {
         const body = {
             title: form.value.title,
@@ -135,11 +169,17 @@ export const useSurveyListStore = defineStore('surveyList', () => {
             targets: form.value.targets
         };
 
+        const fd = new FormData();
+        fd.append('data', new Blob([JSON.stringify(body)], { type: 'application/json' }));
+
+        // 새 첨부파일
+        attachedFiles.value.forEach(f => fd.append('files', f));
+
         try {
             if (form.value.surveyId) {
-                await http.post('/survey/' + form.value.surveyId, body);
+                await http.post('/survey/' + form.value.surveyId, fd);
             } else {
-                const res = await http.post('/survey', body);
+                const res = await http.post('/survey', fd);
                 form.value.surveyId = res.data.surveyId;
             }
             return true;
@@ -196,8 +236,10 @@ export const useSurveyListStore = defineStore('surveyList', () => {
     return {
         list, totalCount, pageNo, pageSize, keyword, statusFilter, loading,
         form, totalPages,
+        attachedFiles, existingFiles,
         fetchList, search, fetchDetail, resetForm,
         addQuestion, removeQuestion, addOption, removeOption,
+        addFiles, removeFile, removeExistingFile, formatFileSize,
         saveForm, deleteSurvey, publish, closeSurvey, goPage
     };
 });

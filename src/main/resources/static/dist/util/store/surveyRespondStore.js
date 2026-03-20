@@ -8,6 +8,7 @@ export const useSurveyRespondStore = defineStore('surveyRespond', () => {
     const survey = ref({});
     const questions = ref([]);
     const answers = ref({});       // { questionId: 값 } 형태
+    const files = ref([]);         // 첨부파일 목록
     const loading = ref(false);
     const responded = ref(false);  // 이미 응답했는지
     const isTarget = ref(false);   // 대상자인지
@@ -20,6 +21,7 @@ export const useSurveyRespondStore = defineStore('surveyRespond', () => {
             const detailRes = await http.get('/survey/' + surveyId);
             survey.value = detailRes.data.survey;
             questions.value = detailRes.data.questions || [];
+            files.value = detailRes.data.files || [];
 
             // 응답여부 + 대상자 확인
             const checkRes = await http.get('/survey/' + surveyId + '/check');
@@ -115,7 +117,7 @@ export const useSurveyRespondStore = defineStore('surveyRespond', () => {
     }
 
     return {
-        survey, questions, answers, loading, responded, isTarget,
+        survey, questions, answers, files, loading, responded, isTarget,
         fetchSurvey, toggleMulti, submitResponse
     };
 });

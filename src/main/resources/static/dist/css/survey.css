@@ -252,14 +252,16 @@
     outline: none;
 }
 
-.option-row .btn-remove-opt {
+.btn-remove-opt {
     background: none;
     border: none;
     color: #9aa0b4;
     cursor: pointer;
     font-size: 14px;
+    padding: 2px 4px;
+    vertical-align: middle;
 }
-.option-row .btn-remove-opt:hover { color: #e74c3c; }
+.btn-remove-opt:hover { color: #e74c3c; }
 
 .btn-add-option {
     background: none;

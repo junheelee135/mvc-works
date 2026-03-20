@@ -99,7 +99,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 }
             }         
         } catch (Exception e) {
-            log.info("saveDraft : ", e);
+            log.error("saveDraft : ", e);
             throw e;
         }
     }
@@ -338,7 +338,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 );
             }
         } catch (Exception e) {
-            log.info("대결자 알림 조회 실패: ", e);
+            log.error("대결자 알림 조회 실패: ", e);
         }
     } 
 }
