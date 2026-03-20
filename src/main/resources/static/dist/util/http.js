@@ -14,6 +14,11 @@ const http = axios.create({
 http.interceptors.request.use(
 	(config) => {
 		config.headers.AJAX = 'true';
+		
+		if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
+		}
+				
         return config;
     },
     (error) => Promise.reject(error)

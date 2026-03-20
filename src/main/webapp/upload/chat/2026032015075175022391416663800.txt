@@ -1,0 +1,29 @@
+※ AWS 가입 준비
+   1) 스마트 폰에 Google OTP(google Authenticator) 설치
+       멀티팩터 인증 (Multi-Factor Authentication) 추가 시 필요
+
+   2) 가입할 이메일
+       이전 가입 이력이 있는 이메일은 불가
+
+   3) 신용 카드
+
+   4) 영어 주소 및 영어 이름
+       https://www.jusoen.com
+
+   5) 사이트
+       - 가입 사이트
+          https://aws.amazon.com/ko/
+
+       - 콘솔에 로그인
+          https://aws.amazon.com/ko/console/
+
+   6) 최신 Putty 설치
+       https://www.chiark.greenend.org.uk/~sgtatham/putty/
+
+   7) 최신 Putty 설치
+       - 동일한 IP로 여러명이 동시에 가입하면 가입 실패가 될 수 있음.
+         핫 스팟등을 활용
+
+       - 카드는 100원 정도 결제 후 다시 입금 됨 
+
+

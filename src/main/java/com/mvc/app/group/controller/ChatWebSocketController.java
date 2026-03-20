@@ -55,7 +55,13 @@ public class ChatWebSocketController {
             dto.setSenderId(session.getEmpId());
             dto.setSenderName(session.getName());
             dto.setSenderAvatar(session.getAvatar());
-
+            
+            if ("FILE".equals(dto.getMsgType())) {
+                dto.setType("CHAT");
+                messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
+                return;
+            }
+            
             // DB 저장 (빈 메시지·200자 제한 검증 포함)
             ChatMessageDto saved = chatService.saveMessage(dto);
             saved.setType("CHAT");

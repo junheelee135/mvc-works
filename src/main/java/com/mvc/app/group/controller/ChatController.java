@@ -103,7 +103,7 @@ public class ChatController {
             @PathVariable(name = "roomId") Long roomId,
             @RequestParam(name = "offset", defaultValue = "0")  int offset,
             @RequestParam(name = "size",   defaultValue = "20") int size,
-            @SessionAttribute(name = "member") SessionInfo info) {
+            @SessionAttribute(name = "member") SessionInfo info) {	
         try {
             // 17-2: 채팅방 참여자 검증
             if (!chatService.isRoomMember(roomId, info.getEmpId())) {

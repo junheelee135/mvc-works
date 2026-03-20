@@ -163,6 +163,9 @@ public class ChatServiceImpl implements ChatService {
         msgDto.setSaveName(saveName);
         msgDto.setFileSize(file.getSize());
         msgDto.setFileExt(fileExt);
+        
+        msgDto.setSentAt(java.time.LocalDateTime.now()
+        .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
 
         return msgDto;
     }

@@ -271,6 +271,7 @@ export const useChatStore = defineStore('chat', {
                         originalName: saved.originalName,
                         fileSize:    saved.fileSize,
                         fileExt:     saved.fileExt,
+						sentAt:       saved.sentAt,
                     });
 
                 } catch (e) {
@@ -510,7 +511,8 @@ export const useChatStore = defineStore('chat', {
                     && prevMsg.senderId === msg.senderId
                     && prevMsg.sentAt?.substring(0, 10) === dateStr;
 
-                result.push({ type: 'message', ...msg, isMine, hiddenAvatar });
+                //result.push({ type: 'message', ...msg, isMine, hiddenAvatar });
+				result.push({ ...msg, isMine, hiddenAvatar, type: 'message' });
             });
 
             this.messageGroups = result;
