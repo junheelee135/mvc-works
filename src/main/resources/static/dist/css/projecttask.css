@@ -572,3 +572,38 @@ input:disabled, select:disabled {
     display: flex;
     align-items: center;
 }
+
+
+/* flatpickr 핵심 스타일 */
+.flatpickr-calendar{background:transparent;overflow:hidden;max-height:0;opacity:0;visibility:hidden;text-align:center;padding:0;animation:none;direction:ltr;border:0;font-size:14px;line-height:24px;border-radius:5px;position:absolute;width:307.875px;box-sizing:border-box;touch-action:manipulation;background:#fff;box-shadow:1px 0 0 #e6e6e6,-1px 0 0 #e6e6e6,0 1px 0 #e6e6e6,0 -1px 0 #e6e6e6,0 3px 13px rgba(0,0,0,.08)}
+.flatpickr-calendar.open,.flatpickr-calendar.inline{opacity:1;visibility:visible;max-height:640px}
+.flatpickr-calendar.open{display:inline-block;z-index:99999}
+.flatpickr-months{display:flex}
+.flatpickr-months .flatpickr-month{background:transparent;color:rgba(0,0,0,.9);fill:rgba(0,0,0,.9);height:34px;line-height:1;text-align:center;position:relative;user-select:none;overflow:hidden;flex:1}
+.flatpickr-months .flatpickr-prev-month,.flatpickr-months .flatpickr-next-month{text-decoration:none;cursor:pointer;position:absolute;top:0;height:34px;padding:10px;z-index:3;color:rgba(0,0,0,.9);fill:rgba(0,0,0,.9)}
+.flatpickr-months .flatpickr-prev-month{left:0}
+.flatpickr-months .flatpickr-next-month{right:0}
+.flatpickr-months .flatpickr-prev-month svg,.flatpickr-months .flatpickr-next-month svg{width:14px;height:14px}
+.flatpickr-months .flatpickr-prev-month svg path,.flatpickr-months .flatpickr-next-month svg path{transition:fill .1s;fill:inherit}
+.numInputWrapper{position:relative;height:auto}
+.numInputWrapper input,.numInputWrapper span{display:inline-block}
+.numInputWrapper input{width:100%}
+.flatpickr-current-month{font-size:135%;line-height:inherit;font-weight:300;color:inherit;position:absolute;width:75%;left:12.5%;padding:7.48px 0 0;line-height:1;height:34px;display:inline-block;text-align:center;transform:translateZ(0)}
+.flatpickr-current-month .numInputWrapper{width:6ch;display:inline-block}
+.flatpickr-current-month .flatpickr-monthDropdown-months{appearance:menulist;cursor:pointer;font-size:inherit;font-family:inherit;font-weight:300;line-height:inherit;border:none;outline:none;height:auto;padding:0 0 0 .5ch;color:inherit;background:transparent;box-shadow:none}
+.flatpickr-weekdays{background:transparent;text-align:center;overflow:hidden;display:flex;align-items:center}
+.flatpickr-weekdays .flatpickr-weekdaycontainer{display:flex;flex:1}
+span.flatpickr-weekday{cursor:default;font-size:90%;background:transparent;color:rgba(0,0,0,.54);line-height:1;margin:0;text-align:center;display:block;flex:1;font-weight:bolder}
+.dayContainer,.flatpickr-weeks{padding:1px 0 0}
+.dayContainer{padding:0;outline:0;text-align:left;width:307.875px;min-width:307.875px;max-width:307.875px;box-sizing:border-box;display:inline-block;display:flex;flex-wrap:wrap;justify-content:space-around;transform:translateZ(0);opacity:1}
+.flatpickr-day{background:none;border:1px solid transparent;border-radius:150px;box-sizing:border-box;color:#393939;cursor:pointer;font-weight:400;width:14.2857143%;flex-basis:14.2857143%;max-width:39px;height:39px;line-height:39px;margin:0;display:inline-block;position:relative;justify-content:center;text-align:center}
+.flatpickr-day:hover,.flatpickr-day:focus{cursor:pointer;outline:0;background:#e6e6e6;border-color:#e6e6e6}
+.flatpickr-day.today{border-color:#959ea9}
+.flatpickr-day.selected,.flatpickr-day.selected:hover{background:#569ff7;box-shadow:none;color:#fff;border-color:#569ff7}
+.flatpickr-day.flatpickr-disabled,.flatpickr-day.flatpickr-disabled:hover{background:transparent;border-color:transparent;color:rgba(57,57,57,.3);cursor:default}
+.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay{color:rgba(57,57,57,.3)}
+.flatpickr-innerContainer{display:block;display:flex;overflow:hidden}
+.flatpickr-rContainer{display:inline-block;padding:0;box-sizing:border-box}
+.flatpickr-time{text-align:center;outline:0;display:block;height:0;line-height:40px;max-height:40px;box-sizing:border-box;overflow:hidden;display:flex}
+.flatpickr-input{cursor:pointer}
+.flatpickr-input[readonly]{cursor:pointer}

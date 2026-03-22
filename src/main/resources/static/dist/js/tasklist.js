@@ -42,10 +42,12 @@ function renderGanttChart() {
     const projectStart = new Date(document.getElementById('hiddenProjectStart').value.replace(/\//g, '-'));
     const projectEnd = new Date(document.getElementById('hiddenProjectEnd').value.replace(/\//g, '-'));
     const totalDays = Math.round((projectEnd - projectStart) / (1000 * 60 * 60 * 24)) + 1;
+    const projectEndStr = toDateStr(projectEnd);
 
+    const displayDays = Math.max(31, totalDays);
     const allDates = [];
     const cur = new Date(projectStart);
-    while (cur <= projectEnd) {
+    for (let i = 0; i < displayDays; i++) {
         allDates.push(new Date(cur));
         cur.setDate(cur.getDate() + 1);
     }
@@ -54,10 +56,18 @@ function renderGanttChart() {
         const CELL_W = 35;
         const WEEKEND_W = 10;
 
+        // 헤더 렌더링
         allDates.forEach(d => {
             const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+            const isExtra = toDateStr(d) > projectEndStr;
             const cell = document.createElement('div');
-            cell.className = 'grid-header-cell' + (isWeekend ? ' is-weekend' : '');
+            if (isExtra) {
+                cell.className = 'grid-header-cell';
+                cell.style.background = '#fafafa';
+                cell.style.color = '#d0d0d0';
+            } else {
+                cell.className = 'grid-header-cell' + (isWeekend ? ' is-weekend' : '');
+            }
             if (!isWeekend) {
                 cell.textContent = (d.getMonth() + 1) + '/' + d.getDate();
             }
@@ -67,12 +77,19 @@ function renderGanttChart() {
         if (rows.length === 0) {
             allDates.forEach(d => {
                 const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                const isExtra = toDateStr(d) > projectEndStr;
                 const cell = document.createElement('div');
-                cell.className = 'grid-cell' + (isWeekend ? ' is-weekend-cell' : '');
+                if (isExtra) {
+                    cell.className = 'grid-cell';
+                    cell.style.background = '#fafafa';
+                    cell.style.pointerEvents = 'none';
+                } else {
+                    cell.className = 'grid-cell' + (isWeekend ? ' is-weekend-cell' : '');
+                }
                 grid.appendChild(cell);
             });
         } else {
-            rows.forEach(function (row, idx) {
+            rows.forEach(function (row) {
                 const taskStartStr = row.dataset.start || null;
                 const taskEndStr = row.dataset.end || null;
                 const badge = row.querySelector('.stage-badge');
@@ -81,35 +98,47 @@ function renderGanttChart() {
 
                 allDates.forEach((cellDate, colIdx) => {
                     const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+                    const isExtra = toDateStr(cellDate) > projectEndStr;
                     const cell = document.createElement('div');
-                    cell.className = 'grid-cell' + (isWeekend ? ' is-weekend-cell' : '');
+                    if (isExtra) {
+                        cell.className = 'grid-cell';
+                        cell.style.background = '#fafafa';
+                        cell.style.pointerEvents = 'none';
+                    } else {
+                        cell.className = 'grid-cell' + (isWeekend ? ' is-weekend-cell' : '');
+                    }
 
-                    if (taskStartStr && taskEndStr && toDateStr(cellDate) === taskStartStr) {
+                    if (!isExtra && taskStartStr && taskEndStr && toDateStr(cellDate) === taskStartStr) {
                         let barWidth = 0;
                         for (let i = colIdx; i < allDates.length; i++) {
-                            if (toDateStr(allDates[i]) <= taskEndStr) {
-                                const isWe = allDates[i].getDay() === 0 || allDates[i].getDay() === 6;
+                            const d = allDates[i];
+                            if (toDateStr(d) <= taskEndStr && toDateStr(d) <= projectEndStr) {
+                                const isWe = d.getDay() === 0 || d.getDay() === 6;
                                 barWidth += isWe ? WEEKEND_W : CELL_W;
                             } else break;
                         }
-						const bar = document.createElement('div');
-						bar.className = 'task-bar';
-						bar.style.width = (barWidth - 4) + 'px';
-						bar.style.left = '2px';
-						bar.style.background = barColor;
-						bar.style.borderRadius = '4px';
-						bar.style.cursor = 'pointer';
-						bar.addEventListener('click', () => {
-						    const taskId = row.dataset.taskId;
-						    const taskTitle = row.querySelector('.task-name').textContent.trim();
-						    const startStr = row.dataset.start;
-						    const endStr = row.dataset.end;
-						    const empTaskId = row.dataset.empTaskId || '';
-						    const empId = row.dataset.empId || '';
-						    const stgTitle = row.dataset.stgTitle || '';
-						    openTaskDailyModal(taskId, taskTitle, startStr, endStr, empId, stgTitle, projectTitle, empTaskId);
-						});
-						cell.appendChild(bar);
+                        const bar = document.createElement('div');
+                        bar.className = 'task-bar';
+                        bar.style.width = (barWidth - 4) + 'px';
+                        bar.style.left = '2px';
+						
+						const progress = parseFloat(row.dataset.progress) || 0;
+						const progressWidth = Math.round(progress) + '%';
+						bar.style.background = `linear-gradient(to right, ${barColor} ${progressWidth}, ${barColor}88 ${progressWidth})`;
+						
+                        bar.style.borderRadius = '4px';
+                        bar.style.cursor = 'pointer';
+                        bar.addEventListener('click', () => {
+                            const taskId = row.dataset.taskId;
+                            const taskTitle = row.querySelector('.task-name').textContent.trim();
+                            const startStr = row.dataset.start;
+                            const endStr = row.dataset.end;
+                            const empTaskId = row.dataset.empTaskId || '';
+                            const empId = row.dataset.empId || '';
+                            const stgTitle = row.dataset.stgTitle || '';
+                            openTaskDailyModal(taskId, taskTitle, startStr, endStr, empId, stgTitle, projectTitle, empTaskId);
+                        });
+                        cell.appendChild(bar);
                     }
                     grid.appendChild(cell);
                 });
@@ -122,8 +151,8 @@ function renderGanttChart() {
         }).join(' ');
 
     } else {
-        const CELL_W = 60;
-        const WEEKEND_W = 15;
+        const CELL_W = 80;
+        const WEEKEND_W = 20;
 
         const columns = [];
         let i = 0;
@@ -160,10 +189,18 @@ function renderGanttChart() {
             }
         }
 
+        // 헤더 렌더링
         columns.forEach(col => {
+            const isExtra = col.dates.length > 0 && toDateStr(col.dates[0]) > projectEndStr;
             const cell = document.createElement('div');
-            cell.className = 'grid-header-cell' + (col.type === 'weekend' ? ' is-weekend' : '');
-            if (col.type === 'weekday') {
+            if (isExtra) {
+                cell.className = 'grid-header-cell';
+                cell.style.background = '#fafafa';
+                cell.style.color = '#d0d0d0';
+            } else {
+                cell.className = 'grid-header-cell' + (col.type === 'weekend' ? ' is-weekend' : '');
+            }
+            if (!isExtra && col.type === 'weekday') {
                 cell.style.whiteSpace = 'pre-line';
                 cell.style.fontSize = '10px';
                 cell.style.lineHeight = '1.2';
@@ -175,12 +212,19 @@ function renderGanttChart() {
 
         if (rows.length === 0) {
             columns.forEach(col => {
+                const isExtra = col.dates.length > 0 && toDateStr(col.dates[0]) > projectEndStr;
                 const cell = document.createElement('div');
-                cell.className = 'grid-cell' + (col.type === 'weekend' ? ' is-weekend-cell' : '');
+                if (isExtra) {
+                    cell.className = 'grid-cell';
+                    cell.style.background = '#fafafa';
+                    cell.style.pointerEvents = 'none';
+                } else {
+                    cell.className = 'grid-cell' + (col.type === 'weekend' ? ' is-weekend-cell' : '');
+                }
                 grid.appendChild(cell);
             });
         } else {
-            rows.forEach(function (row, idx) {
+            rows.forEach(function (row) {
                 const taskStartStr = row.dataset.start || null;
                 const taskEndStr = row.dataset.end || null;
                 const badge = row.querySelector('.stage-badge');
@@ -197,32 +241,62 @@ function renderGanttChart() {
                             }
                         }
                         if (startColIdx !== -1) break;
+                        if (columns[ci].type === 'weekday') {
+                            const first = columns[ci].dates[0];
+                            const last = columns[ci].dates[columns[ci].dates.length - 1];
+                            if (taskStartStr >= toDateStr(first) && taskStartStr <= toDateStr(last)) {
+                                startColIdx = ci;
+                                break;
+                            }
+                        }
                     }
                 }
 
                 columns.forEach((col, colIdx) => {
+                    const isExtra = col.dates.length > 0 && toDateStr(col.dates[0]) > projectEndStr;
                     const cell = document.createElement('div');
-                    cell.className = 'grid-cell' + (col.type === 'weekend' ? ' is-weekend-cell' : '');
+                    if (isExtra) {
+                        cell.className = 'grid-cell';
+                        cell.style.background = '#fafafa';
+                        cell.style.pointerEvents = 'none';
+                    } else {
+                        cell.className = 'grid-cell' + (col.type === 'weekend' ? ' is-weekend-cell' : '');
+                    }
 
-                    if (taskStartStr && taskEndStr && colIdx === startColIdx) {
+                    if (!isExtra && taskStartStr && taskEndStr && colIdx === startColIdx) {
                         let barWidth = 0;
                         for (let ci = startColIdx; ci < columns.length; ci++) {
                             const c = columns[ci];
-                            if (toDateStr(c.dates[0]) <= taskEndStr) {
-                                barWidth += c.type === 'weekend' ? WEEKEND_W : CELL_W;
-                            } else break;
+                            if (c.dates.length === 0) break;
+                            const colFirstDate = toDateStr(c.dates[0]);
+                            if (colFirstDate > taskEndStr) break;
+                            if (colFirstDate > projectEndStr) break;
+                            barWidth += c.type === 'weekend' ? WEEKEND_W : CELL_W;
                         }
-						bar.addEventListener('click', () => {
-						    const taskId = row.dataset.taskId;
-						    const taskTitle = row.querySelector('.task-name').textContent.trim();
-						    const startStr = row.dataset.start;
-						    const endStr = row.dataset.end;
-						    const empTaskId = row.dataset.empTaskId || '';
-						    const empId = row.dataset.empId || '';
-						    const stgTitle = row.dataset.stgTitle || '';
-						    openTaskDailyModal(taskId, taskTitle, startStr, endStr, empId, stgTitle, projectTitle, empTaskId);
-						});
-						cell.appendChild(bar);
+                        if (barWidth > 0) {
+                            const bar = document.createElement('div');
+                            bar.className = 'task-bar';
+                            bar.style.width = (barWidth - 4) + 'px';
+                            bar.style.left = '2px';
+							
+							const progress = parseFloat(row.dataset.progress) || 0;
+							const progressWidth = Math.round(progress) + '%';
+							bar.style.background = `linear-gradient(to right, ${barColor} ${progressWidth}, ${barColor}88 ${progressWidth})`;
+							
+                            bar.style.borderRadius = '4px';
+                            bar.style.cursor = 'pointer';
+                            bar.addEventListener('click', () => {
+                                const taskId = row.dataset.taskId;
+                                const taskTitle = row.querySelector('.task-name').textContent.trim();
+                                const startStr = row.dataset.start;
+                                const endStr = row.dataset.end;
+                                const empTaskId = row.dataset.empTaskId || '';
+                                const empId = row.dataset.empId || '';
+                                const stgTitle = row.dataset.stgTitle || '';
+                                openTaskDailyModal(taskId, taskTitle, startStr, endStr, empId, stgTitle, projectTitle, empTaskId);
+                            });
+                            cell.appendChild(bar);
+                        }
                     }
                     grid.appendChild(cell);
                 });
@@ -313,6 +387,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // 태스크 등록
 function submitTask() {
+	const projectStatus = document.getElementById('hiddenProjectStatus').value;
+	if (projectStatus === '6') {
+	    toast('중단된 프로젝트는 task를 추가할 수 없습니다.');
+	    return;
+	}
+	
     let stageId = document.getElementById('modalStageId').value;
     const directStage = document.getElementById('modalDirectStage').value.trim();
     const taskTitle = document.getElementById('modalTaskTitle').value.trim();
@@ -327,11 +407,11 @@ function submitTask() {
 
     if (!stageId) { toast('단계를 선택해주세요.'); return; }
     if (stageId === 'direct' && !directStage) { toast('단계명을 입력해주세요.'); return; }
-    if (!empId) { toast('담당자를 선택해주세요.'); return; }
+	const members = document.querySelectorAll('#modalMember option:not([value=""])');
+	if (members.length > 0 && !empId) { toast('담당자를 선택해주세요.'); return; }
     if (!taskTitle) { toast('Task명을 입력해주세요.'); return; }
     if (!startDate) { toast('시작일을 입력해주세요.'); return; }
     if (!endDate) { toast('종료일을 입력해주세요.'); return; }
-    if (endDate < startDate) { toast('종료일은 시작일보다 빠를 수 없습니다.'); return; }
     if (startDate < projectStart) { toast('시작일은 프로젝트 시작일(' + projectStart + ') 이후여야 합니다.'); return; }
     if (endDate > projectEnd) { toast('종료일은 프로젝트 종료일(' + projectEnd + ') 이전이어야 합니다.'); return; }
 
@@ -376,6 +456,13 @@ let currentLogMap = {};
 let projectTitle = '';
 
 function toggleEditMode() {
+	
+	const projectStatus = document.getElementById('hiddenProjectStatus').value;
+	if (projectStatus === '6') {
+	    toast('중단된 프로젝트는 편집할 수 없습니다.');
+	    return;
+	}
+	
     const isManager = document.getElementById('hiddenIsManager').value === 'true';
     if (!isManager) {
         toast('매니저만 편집할 수 있습니다.');
@@ -397,6 +484,12 @@ function toggleEditMode() {
 }
 
 function updateTask(taskId, type) {
+    const projectStatus = document.getElementById('hiddenProjectStatus').value;
+    if (projectStatus === '6') {
+        toast('중단된 프로젝트는 수정할 수 없습니다.');
+        return;
+    }
+	
     if (!editMode) {
         toast('편집 모드를 활성화해주세요.');
 
@@ -416,9 +509,13 @@ function updateTask(taskId, type) {
     }
 
     const row = document.querySelector(`tr[data-task-id="${taskId}"]`);
-    const dates = row.querySelectorAll('.cell-date');
-    const startDate = dates[0].value;
-    const endDate = dates[1].value;
+	const dates = row.querySelectorAll('.cell-date');
+	const startDate = dates[0]._flatpickr && dates[0]._flatpickr.selectedDates[0]
+	    ? dates[0]._flatpickr.formatDate(dates[0]._flatpickr.selectedDates[0], 'Y-m-d')
+	    : dates[0].value;
+	const endDate = dates[1]._flatpickr && dates[1]._flatpickr.selectedDates[0]
+	    ? dates[1]._flatpickr.formatDate(dates[1]._flatpickr.selectedDates[0], 'Y-m-d')
+	    : dates[1].value;
     const empId = row.querySelector('.cell-assignee').value;
     const statusSelect = row.querySelector('.status-cell');
     const today = new Date().toISOString().split('T')[0];
@@ -435,12 +532,6 @@ function updateTask(taskId, type) {
         if (endDate > projectEnd) {
             toast('종료일은 프로젝트 종료일(' + projectEnd + ') 이전이어야 합니다.');
             dates[1].value = row.dataset.end;
-            return;
-        }
-        if (endDate && startDate && endDate < startDate) {
-            toast('종료일은 시작일보다 빠를 수 없습니다.');
-            if (type === 'startDate') dates[0].value = row.dataset.start;
-            else dates[1].value = row.dataset.end;
             return;
         }
     }
@@ -476,27 +567,24 @@ function updateTask(taskId, type) {
         if (!res.ok) {
             toast('저장 실패.');
         } else {
-            row.dataset.start = startDate;
-            row.dataset.end = endDate;
 			
-			if (currentTaskId === taskId) {
-			    currentTaskEmpId = empId;
-			}
+			if (startDate) row.dataset.start = startDate;
+			if (endDate) row.dataset.end = endDate;
 
 			const taskNameTd = row.querySelector('.task-name');
 			if (taskNameTd) {
 			    const onclick = taskNameTd.getAttribute('onclick');
-			    // 날짜(3,4번째) 업데이트
-			    let updated = onclick.replace(
-			        /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
-			        `openTaskDailyModal('$1', '$2', '${startDate}', '${endDate}'`
-			    );
-			    // 담당자(5번째) 업데이트
-			    updated = updated.replace(
-			        /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
-			        `openTaskDailyModal('$1', '$2', '$3', '$4', '${empId}'`
-			    );
-			    taskNameTd.setAttribute('onclick', updated);
+			    if (onclick) {  // ← null 체크 추가
+			        let updated = onclick.replace(
+			            /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
+			            `openTaskDailyModal('$1', '$2', '${startDate}', '${endDate}'`
+			        );
+			        updated = updated.replace(
+			            /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
+			            `openTaskDailyModal('$1', '$2', '$3', '$4', '${empId}'`
+			        );
+			        taskNameTd.setAttribute('onclick', updated);
+			    }
 			}
 
             applyStageColors();
@@ -565,13 +653,11 @@ function openTaskDailyModal(taskId, title, startStr, endStr, assigneeEmpId, stgT
         cur.setDate(cur.getDate() + 1);
     }
 
-    // grid 컬럼 너비 설정
     grid.style.gridTemplateColumns = allDates.map(d => {
         const isWe = d.getDay() === 0 || d.getDay() === 6;
         return (isWe ? WEEKEND_W : CELL_W) + 'px';
     }).join(' ');
 
-    // 헤더 먼저 렌더링
     allDates.forEach(d => {
         const isWe = d.getDay() === 0 || d.getDay() === 6;
         const cell = document.createElement('div');
@@ -588,23 +674,21 @@ function openTaskDailyModal(taskId, title, startStr, endStr, assigneeEmpId, stgT
     });
 
 	const statusStyle = {
-	    'F': { bg: '#f0fdf4', color: '#22c55e', text: '완료' }, 
-	    'I': { bg: '#eff6ff', color: '#3b82f6', text: '진행' }, 
-	    'S': { bg: '#fef2f2', color: '#f87171', text: '중단' }  
+	    'F': { bg: '#f0fdf4', color: '#22c55e', text: '완료' },
+	    'I': { bg: '#eff6ff', color: '#3b82f6', text: '진행' },
+	    'S': { bg: '#fef2f2', color: '#f87171', text: '중단' }
 	};
 
-
-	// daily log 조회 후 체크칸 렌더링
 	fetch(contextPath + '/projects/task/dailylist?empTaskId=' + empTaskId)
 	    .then(res => res.json())
 	    .then(logs => {
 	        const logMap = {};
-	        logs.forEach(log => { 
+	        logs.forEach(log => {
 	            logMap[log.logDate] = { status: log.logStatus, reason: log.logReason };
 	        });
 
 			currentLogMap = logMap;
-			
+
 	        const tooltipEl = document.getElementById('dailyTooltipText');
 
 	        allDates.forEach(d => {
@@ -673,22 +757,6 @@ function openTaskDailyModal(taskId, title, startStr, endStr, assigneeEmpId, stgT
 	            if (!isWe) cell.addEventListener('click', () => openDailyCheckModal(toStr(d)));
 	            grid.appendChild(cell);
 	        });
-	    })
-	    .catch(err => {
-	        console.error('dailylist 조회 실패:', err);
-	        // API 실패 시에도 높이를 60px로 맞춰서 렌더링
-	        allDates.forEach(d => {
-	            const isWe = d.getDay() === 0 || d.getDay() === 6;
-	            const cell = document.createElement('div');
-	            cell.style.cssText = `
-	                border:1px solid #eaecf0; height:60px; /* 여기도 60px로 수정 */
-	                background:${isWe ? '#f0f0f0' : '#fff'};
-	                display:flex; align-items:center; justify-content:center;
-	                cursor:${isWe ? 'default' : 'pointer'};
-	            `;
-	            if (!isWe) cell.addEventListener('click', () => openDailyCheckModal(toStr(d)));
-	            grid.appendChild(cell);
-	        });
 	    });
 
     document.getElementById('taskDailyModal').style.display = 'flex';
@@ -701,22 +769,25 @@ function closeTaskDailyModal() {
 let selectedDailyType = null;
 
 function openDailyCheckModal(dateStr) {
-	console.log('loginEmpId:', document.getElementById('hiddenLoginEmpId').value);
-	console.log('currentTaskEmpId:', currentTaskEmpId);
-	
+
+	const projectStatus = document.getElementById('hiddenProjectStatus').value;
+	if (projectStatus === '6') {
+	    toast('중단된 프로젝트는 데일리 체크를 할 수 없습니다.');
+	    return;
+	}
+
     const loginEmpId = document.getElementById('hiddenLoginEmpId').value;
     if (loginEmpId !== currentTaskEmpId) {
         toast('담당자만 체크할 수 있습니다.');
         return;
     }
-	
+
 	const logData = currentLogMap ? currentLogMap[dateStr] : null;
 	    if (logData) {
 	        if (logData.status === 'F' || logData.status === 'S') {
 	            toast('완료 또는 중단된 날짜는 수정할 수 없습니다.');
 	            return;
 	        }
-	        // 진행(I)인 경우 확인 팝업
 	        if (logData.status === 'I') {
 	            Swal.fire({
 	                text: '진행에서 완료로 수정하게 되면 수정이 불가합니다. 수정하시겠습니까?',
@@ -773,8 +844,6 @@ function selectDailyType(type, btn) {
 }
 
 function submitDailyCheck() {
-	console.log('empTaskId:', currentEmpTaskId);
-	
     if (!selectedDailyType) {
         toast('오늘 Task 진행 상태와 사유 선택해주세요.');
         return;

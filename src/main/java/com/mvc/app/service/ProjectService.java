@@ -36,4 +36,6 @@ public interface ProjectService {
 	public void projectForceStop(long projectId) throws Exception;
 	
 	public void changeMember(Map<String, Object> map) throws Exception;
+	
+	public void projectAutoCompleteAll() throws Exception;
 }

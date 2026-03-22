@@ -47,4 +47,7 @@ public interface ProjectsMapper {
 	
 	public void updatePredecessor(Map<String, Object> map) throws SQLException;
 	public void updateNewEmpId(Map<String, Object> map) throws SQLException;
+	
+	public void projectAutoCompleteAll() throws SQLException;
+
 }

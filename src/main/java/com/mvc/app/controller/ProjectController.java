@@ -48,6 +48,7 @@ public class ProjectController {
 			@RequestParam(name = "kwd", defaultValue = "") String kwd, Model model) throws Exception {
 
 	    try {
+	    	service.projectAutoCompleteAll();
 	        service.projectAutoStart();
 	        service.projectAutoDelay();
 	        taskService.taskAutoDelay();
@@ -74,8 +75,8 @@ public class ProjectController {
 	        map.put("offset", offset);
 	        map.put("size", size);
 
-	        List<ProjectsDto> list = service.projectslist(map);
-
+	        List<ProjectsDto> list = service.projectslist(map);	        
+	        
 	        Map<String, Object> emptyMap = new HashMap<>();
 	        List<ProjectsDto> allList = service.statusCount(emptyMap);
 
@@ -110,6 +111,7 @@ public class ProjectController {
 	        model.addAttribute("schType", schType);
 	        model.addAttribute("kwd", kwd);
 	        model.addAttribute("status", status);
+	        
 	        model.addAttribute("totalProjects", totalProjects);
 	        model.addAttribute("activeProjects", activeProjects);
 	        model.addAttribute("finishedProjects", finishedProjects);
@@ -307,6 +309,7 @@ public class ProjectController {
 	        model.addAttribute("projectStart", projectStart);
 	        model.addAttribute("projectEnd", projectEnd);
 	        model.addAttribute("projectTitle", dto.getTitle());
+	        model.addAttribute("projectStatus", dto.getStatus());
 
 	    } catch (Exception e) {
 	        log.info("projecttask : ", e);

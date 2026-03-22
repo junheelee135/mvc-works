@@ -185,6 +185,7 @@
 	</select>
 
 
+
 	<select id="dataCount" parameterType="map" resultType="Integer">
 		SELECT NVL(COUNT(*), 0)
 		FROM (
@@ -252,31 +253,22 @@
 	</select>
 
 	<select id="findById" parameterType="long"
-		resultType="com.mvc.app.domain.dto.ProjectsDto">
-		SELECT
-		p.PROJECTID,
-		p.TITLE,
-		p.DESCRIPTION,
-		TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
-		TO_CHAR(p.ENDDATE,
-		'YYYY/MM/DD') AS endDate,
-		p.PROGRESS,
-		LISTAGG(e.NAME, ', ') WITHIN GROUP
-		(ORDER BY e.NAME) AS managerName
-		FROM PROJECT p
-		JOIN EMPPROJECT ep ON
-		p.PROJECTID = ep.PROJECTID
-		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-		WHERE
-		p.PROJECTID = #{projectId}
-		AND ep.ROLE = 'M'
-		GROUP BY
-		p.PROJECTID,
-		p.TITLE,
-		p.DESCRIPTION,
-		p.STARTDATE,
-		p.ENDDATE,
-		p.PROGRESS
+	    resultType="com.mvc.app.domain.dto.ProjectsDto">
+	    SELECT
+	    p.PROJECTID,
+	    p.TITLE,
+	    p.DESCRIPTION,
+	    p.STATUS,
+	    TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
+	    TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
+	    p.PROGRESS,
+	    LISTAGG(e.NAME, ', ') WITHIN GROUP (ORDER BY e.NAME) AS managerName
+	    FROM PROJECT p
+	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
+	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+	    WHERE p.PROJECTID = #{projectId}
+	    AND ep.ROLE = 'M'
+	    GROUP BY p.PROJECTID, p.TITLE, p.DESCRIPTION, p.STARTDATE, p.ENDDATE, p.PROGRESS, p.STATUS
 	</select>
 
 	<select id="findProjectsByEmpId" parameterType="string"
@@ -359,19 +351,12 @@
 		)
 	</select>
 
-	<select id="statusCount" parameterType="map"
-		resultType="com.mvc.app.domain.dto.ProjectsDto">
-		SELECT
-		CASE
-		WHEN p.ENDDATE &lt;= TRUNC(SYSDATE) THEN '4'
-		WHEN p.STARTDATE &lt;= TRUNC(SYSDATE) AND p.ENDDATE &gt;= TRUNC(SYSDATE)
-		THEN '2'
-		ELSE p.STATUS
-		END AS status
-		FROM PROJECT p
-		JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
-		WHERE ep.ROLE = 'M'
-		GROUP BY p.PROJECTID, p.STARTDATE, p.ENDDATE, p.STATUS
+	<select id="statusCount" parameterType="map" resultType="com.mvc.app.domain.dto.ProjectsDto">
+	    SELECT p.STATUS AS status
+	    FROM PROJECT p
+	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
+	    WHERE ep.ROLE = 'M'
+	    GROUP BY p.PROJECTID, p.STATUS
 	</select>
 
 
@@ -390,6 +375,13 @@
 		GROUP BY p.PROJECTID, p.STARTDATE, p.ENDDATE, p.STATUS
 	</select>
 
+	<select id="myProjectstatusCount" parameterType="string" resultType="com.mvc.app.domain.dto.ProjectsDto">
+	    SELECT p.STATUS AS status
+	    FROM PROJECT p
+	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
+	    WHERE ep.EMPID = #{empId}
+	    GROUP BY p.PROJECTID, p.STATUS
+	</select>
 
 	<!-- 1. 프로젝트 시작일 됐으면 자동 진행중 -->
 	<update id="projectAutoStart" parameterType="string">
@@ -401,10 +393,11 @@
 
 	<!-- 2. 프로젝트 종료일 지났으면 자동 지연 -->
 	<update id="projectAutoDelay" parameterType="string">
-		UPDATE PROJECT
-		SET status = '5'
-		WHERE TRUNC(SYSDATE) &gt; TRUNC(endDate)
-		AND status NOT IN ('4', '6')
+	    UPDATE PROJECT
+	    SET status = '5'
+	    WHERE TRUNC(SYSDATE) &gt; TRUNC(endDate)
+	    AND status NOT IN ('4', '6')
+	    AND progress &lt; 100
 	</update>
 
 	<!-- 프로젝트 강제 중단 시 → project status 6 -->
@@ -445,5 +438,12 @@
 		SET empId = #{newEmpId}
 		WHERE projectId = #{projectId}
 		AND empId = #{oldEmpId}
+	</update>
+	
+	<update id="projectAutoCompleteAll">
+	    UPDATE PROJECT
+	    SET status = '4'
+	    WHERE progress = 100
+	    AND status NOT IN ('4', '6')
 	</update>
 </mapper>

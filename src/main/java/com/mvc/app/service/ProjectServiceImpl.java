@@ -259,4 +259,14 @@ public class ProjectServiceImpl implements ProjectService {
 	        throw e;
 	    }
 	}
+
+	@Override
+	public void projectAutoCompleteAll() throws Exception {
+	    try {
+	        mapper.projectAutoCompleteAll();
+	    } catch (Exception e) {
+	        log.info("projectAutoCompleteAll : ", e);
+	        throw e;
+	    }
+	}
 }
