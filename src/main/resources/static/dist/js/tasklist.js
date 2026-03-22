@@ -407,8 +407,7 @@ function submitTask() {
 
     if (!stageId) { toast('단계를 선택해주세요.'); return; }
     if (stageId === 'direct' && !directStage) { toast('단계명을 입력해주세요.'); return; }
-	const members = document.querySelectorAll('#modalMember option:not([value=""])');
-	if (members.length > 0 && !empId) { toast('담당자를 선택해주세요.'); return; }
+	if (!empId) { toast('담당자를 선택해주세요.'); return; }
     if (!taskTitle) { toast('Task명을 입력해주세요.'); return; }
     if (!startDate) { toast('시작일을 입력해주세요.'); return; }
     if (!endDate) { toast('종료일을 입력해주세요.'); return; }

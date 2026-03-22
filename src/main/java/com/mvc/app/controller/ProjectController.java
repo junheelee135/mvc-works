@@ -324,7 +324,11 @@ public class ProjectController {
 		try {
 			SessionInfo info = LoginMemberUtil.getSessionInfo();
 			dto.setTaskCreator(info.getEmpId());
-
+			
+	        if (dto.getEmpId() == null || dto.getEmpId().isEmpty()) {
+	            dto.setEmpId(info.getEmpId());
+	        }
+	        
 			taskService.insertProjectTask(dto);
 			return ResponseEntity.ok().build();
 

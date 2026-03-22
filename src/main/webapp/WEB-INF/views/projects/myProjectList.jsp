@@ -104,6 +104,10 @@
                             <li><a class="dropdown-item"><span class="status-badge badge-ready"><span class="status-dot"></span>시작전</span></a></li>
                         </ul>
                     </div>
+                    
+                    <button type="button" class="btn-icon btn-edit" id="editModeBtn" onclick="toggleEditMode()">
+                    <i class="fas fa-pen"></i>
+                </button>
 
                     <button type="button" class="btn btn-create"
                         onclick="location.href='${pageContext.request.contextPath}/projects/create';">+</button>
@@ -111,7 +115,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0" id="myProjectTable">
                     <thead>
                         <tr>
                             <th width="40">No</th>
@@ -126,40 +130,45 @@
                     </thead>
                     <tbody>
                         <c:forEach var="p" items="${list}" varStatus="status">
-                        <tr>
-							<td>${dataCount - ((page-1) * size) - status.index}</td>
-						        <td class="fw-medium">
-						            <a href="${pageContext.request.contextPath}/projects/task?projectId=${p.projectId}" class="project-title-link">
-						                ${p.title}
-						            </a>
-                            	</td>
-                            <td><span class="member-badge">${p.managerName}</span></td>
-                            <td>${p.startDate}</td>
-                            <td>${p.endDate}</td>
-                            <td>${p.remainDays}</td>
-	                        <td>
-							    <div class="d-flex align-items-center gap-2">
-							        <div class="progress-container flex-grow-1" style="min-width: 100px;">
-							            <c:set var="progressClass" value="range-low"/>
-							            <c:if test="${p.progress == 0}"><c:set var="progressClass" value=""/></c:if>
-							            <c:if test="${p.progress > 30}"><c:set var="progressClass" value="range-mid"/></c:if>
-							            <c:if test="${p.progress > 70}"><c:set var="progressClass" value="range-high"/></c:if>
-							            <c:if test="${p.progress == 100}"><c:set var="progressClass" value="range-complete"/></c:if>
-							            <div class="progress-bar ${progressClass}" style="width: ${p.progress}%;"></div>
-							        </div>
-							        <span class="progress-text">${p.progress}%</span>
-							    </div>
-							</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${p.status == '1'}"><span class="status-badge badge-ready"><span class="status-dot"></span>시작전</span></c:when>
-                                    <c:when test="${p.status == '2'}"><span class="status-badge badge-inprogress"><span class="status-dot"></span>진행중</span></c:when>
-                                    <c:when test="${p.status == '3'}"><span class="status-badge badge-pending"><span class="status-dot"></span>승인대기</span></c:when>
-                                    <c:when test="${p.status == '4'}"><span class="status-badge badge-finished"><span class="status-dot"></span>종료</span></c:when>
-                                    <c:when test="${p.status == '5'}"><span class="status-badge badge-delayed"><span class="status-dot"></span>지연</span></c:when>
-                                    <c:when test="${p.status == '6'}"><span class="status-badge badge-stop"><span class="status-dot"></span>중단</span></c:when>
-                                </c:choose>
-                            </td>
+                        <tr class="project-row"
+                        data-project-id="${p.projectId}"
+                        data-project-title="${p.title}"
+                        data-project-status="${p.status}"
+                        data-role="${p.role}">
+                        <td>${dataCount - ((page-1) * size) - status.index}</td>
+                        <td class="fw-medium">
+
+                            <a href="${pageContext.request.contextPath}/projects/task?projectId=${p.projectId}"
+                               class="project-title-link">${p.title}</a>
+                        </td>
+                        <td><span class="member-badge">${p.managerName}</span></td>
+                        <td>${p.startDate}</td>
+                        <td>${p.endDate}</td>
+                        <td>${p.remainDays}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress-container flex-grow-1" style="min-width: 100px;">
+                                    <c:set var="progressClass" value="range-low"/>
+                                    <c:if test="${p.progress == 0}"><c:set var="progressClass" value=""/></c:if>
+                                    <c:if test="${p.progress > 30}"><c:set var="progressClass" value="range-mid"/></c:if>
+                                    <c:if test="${p.progress > 70}"><c:set var="progressClass" value="range-high"/></c:if>
+                                    <c:if test="${p.progress == 100}"><c:set var="progressClass" value="range-complete"/></c:if>
+                                    <div class="progress-bar ${progressClass}" style="width: ${p.progress}%;"></div>
+                                </div>
+									<span class="progress-text">${p.progress}%</span>
+							</div>
+                        </td>
+                        
+						<td onclick="editMode && openEditModal(this.closest('tr'))">
+						    <c:choose>
+						        <c:when test="${p.status == '1'}"><span class="status-badge badge-ready" style="${p.role == 'M' ? 'cursor:pointer' : ''}"><span class="status-dot"></span>시작전</span></c:when>
+						        <c:when test="${p.status == '2'}"><span class="status-badge badge-inprogress" style="${p.role == 'M' ? 'cursor:pointer' : ''}"><span class="status-dot"></span>진행중</span></c:when>
+						        <c:when test="${p.status == '3'}"><span class="status-badge badge-pending" style="${p.role == 'M' ? 'cursor:pointer' : ''}"><span class="status-dot"></span>승인대기</span></c:when>
+						        <c:when test="${p.status == '4'}"><span class="status-badge badge-finished" style="${p.role == 'M' ? 'cursor:pointer' : ''}"><span class="status-dot"></span>종료</span></c:when>
+						        <c:when test="${p.status == '5'}"><span class="status-badge badge-delayed" style="${p.role == 'M' ? 'cursor:pointer' : ''}"><span class="status-dot"></span>지연</span></c:when>
+						        <c:when test="${p.status == '6'}"><span class="status-badge badge-stop" style="${p.role == 'M' ? 'cursor:pointer' : ''}"><span class="status-dot"></span>중단</span></c:when>
+						    </c:choose>
+						</td>
                         </tr>
                         </c:forEach>
                         <c:if test="${empty list}">
@@ -179,7 +188,95 @@
     </main>
 
 
-<script src="${pageContext.request.contextPath}/dist/js/projectlist.js"></script>
+	<div class="modal fade" id="projectEditModal" tabindex="-1" aria-hidden="true">
+	    <div class="modal-dialog modal-lg modal-dialog-centered">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title fw-bold" id="editModalTitle">프로젝트 수정</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	            </div>
+	            <div class="modal-body">
+	                <input type="hidden" id="editProjectId">
+	
+	                
+	                <div class="mb-4 p-3 border rounded bg-light">
+	                    <div class="d-flex justify-content-between align-items-center">
+	                        <div>
+	                            <div class="fw-bold mb-1">프로젝트 강제 중단</div>
+	                            <div class="text-muted small">프로젝트와 모든 task가 중단 처리됩니다.</div>
+	                        </div>
+	                        <button type="button" class="btn btn-danger" id="forceStopBtn" onclick="forceStopProject()">
+	                            강제 중단
+	                        </button>
+	                    </div>
+	                </div>
+	
+	                
+	                <div class="mb-3">
+	                    <div class="d-flex justify-content-between align-items-center mb-3">
+	                        <div class="fw-bold">구성원 변경</div>
+	                    </div>
+	                    <div class="mb-3">
+	                        <div class="text-muted small mb-2">현재 구성원 (교체할 구성원의 <i class="fas fa-exchange-alt"></i> 클릭)</div>
+	                        <div id="currentMemberBadges" class="d-flex flex-wrap gap-2"></div>
+	                    </div>
+	                    <div id="newMemberArea" style="display:none;">
+	                        <div class="text-muted small mb-2">새 구성원</div>
+	                        <div id="selectedMemberList" class="d-flex flex-wrap gap-2 p-3 border rounded bg-light">
+	                            <p class="text-muted mb-0" id="noMemberText">선택된 멤버가 없습니다.</p>
+	                        </div>
+	                        <div id="hiddenInputContainer"></div>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	                <button type="button" class="btn btn-primary" onclick="saveMemberChange()">저장</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	
+	<%-- ✅ 구성원 검색 모달 --%>
+	<div class="modal fade" id="editMemberSearchModal" tabindex="-1" aria-hidden="true">
+	    <div class="modal-dialog modal-xl modal-dialog-centered">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title fw-bold">구성원 선택</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	            </div>
+	            <div class="modal-body p-0">
+	                <div class="p-3 border-bottom bg-light">
+	                    <div class="input-group">
+	                        <input type="text" id="editMemberSearchKeyword" class="form-control" placeholder="이름, 부서, 직급으로 검색...">
+	                        <button class="btn btn-primary" type="button" onclick="editSearchMembers()">
+	                            <i class="fas fa-search"></i> 검색
+	                        </button>
+	                    </div>
+	                </div>
+	                <div class="d-flex" style="height: 450px;">
+	                    <div class="border-end p-3" style="width: 35%; min-width: 220px; overflow-y: auto;">
+	                        <h6 class="fw-bold mb-3">조직도</h6>
+	                        <ul class="list-unstyled shadow-none mb-0" id="editDeptTree"></ul>
+	                    </div>
+	                    <div class="p-3 flex-grow-1" style="overflow-y: auto;">
+	                        <h6 class="fw-bold mb-3" id="editSelectedDeptName">부서를 선택하세요</h6>
+	                        <div id="editModalMemberList" class="row row-cols-2 row-cols-md-3 g-2"></div>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	                <button type="button" class="btn btn-primary" onclick="editConfirmSelection()">선택 완료</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="${pageContext.request.contextPath}/dist/js/myprojectlist.js"></script>
 
 </body>
 </html>
