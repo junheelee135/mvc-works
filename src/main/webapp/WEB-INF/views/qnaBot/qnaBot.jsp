@@ -1,120 +1,142 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QnA Bot</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
+<jsp:include page="/WEB-INF/views/layout/sidebarResources.jsp" />
+
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/dist/css/qnabot.css">
+
 </head>
+
 <body>
-<main>
-	<div class="container py-5">
-	    <div class="row justify-content-center">
-	        <div class="col-md-8 col-lg-6">
-	            <div class="card border-0 shadow-lg" style="border-radius: 7px; overflow: hidden;">
-	                <div class="card-header text-center">
-	                    <h5>RAG기반 호텔 AI 챗봇 서비스</h5>
-	                </div>
-	                
-	                <div class="card-body chat-box" id="chatBox">
-	                    <div class="message assistant">
-	                        <div class="message-content">
-	                            호텔 챗봇은 고객의 질문에 답변하거나 필요한 정보를 제공하는 AI 기반 서비스입니다.
-	                        </div>
-	                    </div>
-	                </div>
-	
-	                <div class="card-footer">
-	                    <form id="chatForm" class="input-group">
-	                        <input type="text" id="messageInput" class="form-control me-2" 
-	                               placeholder="문의사항을 입력하세요..." autocomplete="off">
-	                        <button class="btn btn-send" type="submit" id="sendButton">전송</button>
-	                    </form>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
+
+	<jsp:include page="/WEB-INF/views/layout/sidebar.jsp" />
+
+	<div class="emp-content">
+
+		<header>
+			<jsp:include page="/WEB-INF/views/layout/header.jsp" />
+		</header>
+
+		<div class="card m-3">
+
+			<div class="card-header">
+				<h5>QnA Bot</h5>
+			</div>
+
+			<div class="chat-box" id="chatBox">
+				<div class="message assistant">
+					<div class="message-content">${sessionScope.member.name} ${sessionScope.member.gradeName}님 무엇을 도와드릴까요?</div>
+				</div>
+			</div>
+
+			<div class="card-footer">
+				<form id="chatForm" class="d-flex gap-2">
+					<input type="text" id="messageInput" class="form-control"
+						placeholder="문의사항을 입력하세요..." autocomplete="off">
+
+					<button class="btn-send" type="submit" id="sendButton">전송
+					</button>
+				</form>
+			</div>
+
+		</div>
 	</div>
-</main>
-  
-<script type="text/javascript">
+
+	<script>
 const chatBox = document.getElementById('chatBox');
 const chatForm = document.getElementById('chatForm');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
 
-// 메시지 추가 함수
 function addMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
-    
-    messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
-    
+
+    const content = document.createElement('div');
+    content.classList.add('message-content');
+    content.innerHTML = escapeHtml(text);
+
+    messageDiv.appendChild(content);
     chatBox.appendChild(messageDiv);
 
+    smoothScroll();
+    return content;
+}
+
+function smoothScroll(){
     chatBox.scrollTo({
         top: chatBox.scrollHeight,
         behavior: 'smooth'
     });
-    
-    return messageDiv;
 }
 
 function escapeHtml(text) {
-	const div = document.createElement('div');
-	div.textContent = text;
-	return div.innerHTML;
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-// 전송 이벤트 핸들러
-chatForm.addEventListener('submit', (e) => {
+chatForm.addEventListener('submit', e => {
     e.preventDefault();
     sendMessage();
 });
 
+messageInput.addEventListener("keydown", e => {
+    if(e.key === "Enter"){
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
 async function sendMessage() {
-	const question = messageInput.value.trim();
-    
-    if (question) {
-    	addMessage(question, 'user');
-        messageInput.value = '';
-        sendButton.disabled = true;
-        
-        try {
-			const response = await fetch('${pageContext.request.contextPath}/api/question?question=' 
-				+ encodeURIComponent(question));
-			
-			const reader = response.body.getReader();
-			const decoder = new TextDecoder();
-			
-			const botMessageElement = addMessage('', 'assistant');
-			const contentElement = botMessageElement.querySelector('.message-content');
-			
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-				
-				const targetText = decoder.decode(value, { stream: true });
-				contentElement.innerHTML += targetText;
-						
-				chatBox.scrollTo({
-					top: chatBox.scrollHeight,
-					behavior: 'smooth'
-				});	
-			}
-    	} catch(error) {
-        	addMessage('오류가 발생했습니다. 다시 시도해주세요.', 'assistant');
-			console.error('Error:', error);
-        }  finally {
-        	sendButton.disabled = false;
+
+    const question = messageInput.value.trim();
+    if (!question) return;
+
+    addMessage(question, 'user');
+
+    messageInput.value = '';
+    sendButton.disabled = true;
+
+    const botContent = addMessage('', 'assistant');
+
+    try {
+        const response = await fetch(
+            '${pageContext.request.contextPath}/api/question?question=' 
+            + encodeURIComponent(question)
+        );
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            botContent.innerHTML += decoder.decode(value);
+            smoothScroll();
         }
+
+    } catch (e) {
+        botContent.innerHTML = "오류가 발생했습니다.";
+    } finally {
+        sendButton.disabled = false;
+        messageInput.focus();
     }
 }
 </script>
-  
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-	
+
+	<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
+
 </body>
 </html>

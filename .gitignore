@@ -8,6 +8,9 @@ build/
 ### application.yml ###
 **/application.yml
 
+### qnaBot ###
+EmbeddingConfig
+
 ### api ###
 **/WEB-INF/views/api/**
 footer.jsp

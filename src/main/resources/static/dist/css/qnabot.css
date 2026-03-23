@@ -1,0 +1,178 @@
+/* ==============================
+   채팅 공통 변수
+============================== */
+:root {
+  --chat-bg: #f4f7fe;
+  --chat-primary: #0061ff;
+  --chat-primary-dark: #0052d6;
+  --chat-border: #e2e8f0;
+  --chat-text: #334155;
+  --chat-scroll: #e2e8f0;
+}
+
+
+/* ==============================
+   카드 헤더
+============================== */
+.card-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--chat-border);
+  padding: 14px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.card-header h5 {
+  font-weight: 700;
+  color: var(--chat-text);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+
+/* ==============================
+   채팅 영역
+============================== */
+.chat-box {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  background: var(--chat-bg);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 스크롤 */
+.chat-box::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: var(--chat-scroll);
+  border-radius: 6px;
+}
+
+
+/* ==============================
+   메시지 애니메이션
+============================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  display: flex;
+  margin-bottom: 8px;
+  animation: fadeInUp 0.18s ease;
+}
+
+
+/* ==============================
+   사용자 메시지
+============================== */
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.user .message-content {
+  background: var(--chat-primary);
+  color: #ffffff;
+  border-radius: 16px 4px 16px 16px;
+}
+
+
+/* ==============================
+   봇 메시지
+============================== */
+.message.assistant {
+  justify-content: flex-start;
+}
+
+.message.assistant .message-content {
+  background: #ffffff;
+  color: var(--chat-text);
+  border-radius: 4px 16px 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+
+/* ==============================
+   메시지 공통
+============================== */
+.message-content {
+  max-width: 62%;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+
+/* ==============================
+   입력 영역
+============================== */
+.card-footer {
+  background: #ffffff;
+  border-top: 1px solid var(--chat-border);
+  padding: 14px 20px;
+}
+
+
+/* 입력창 */
+.form-control {
+  border-radius: 12px;
+  background: var(--chat-bg);
+  border: 1.5px solid var(--chat-border);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--chat-primary);
+  box-shadow: 0 0 0 3px rgba(0,97,255,0.08);
+  background: #ffffff;
+}
+
+
+/* ==============================
+   버튼 영역
+============================== */
+.btn-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: var(--chat-primary);
+  color: #ffffff;
+  transition: all 0.15s ease;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-send:hover {
+  background: var(--chat-primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-send:active {
+  transform: scale(0.96);
+}
+
+.btn-send:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
