@@ -1,36 +1,40 @@
 .nav-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
 }
 
 .toggle-icon {
-    margin-left: auto;
-    transition: transform 0.3s ease;
-    font-size: 12px;
+	margin-left: auto;
+	transition: transform 0.3s ease;
+	font-size: 12px;
 }
 
 .toggle-icon.open {
-    transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 
 #hrmSubMenu {
-    display: none;
+	display: none;
 }
 
 #groupSubMenu {
-    display: none;
+	display: none;
 }
 
 #approvalSubMenu {
-    display: none;
+	display: none;
 }
 
 #projectSubMenu {
-    display: none;
+	display: none;
 }
 
 #meetingSubMenu {
-    display: none;
+	display: none;
+}
+
+#surveySubMenu {
+	display: none;
 }

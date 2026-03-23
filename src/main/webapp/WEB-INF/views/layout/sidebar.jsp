@@ -110,7 +110,9 @@
 
 	<a href="${pageContext.request.contextPath}/qnaBot" class="nav-link">
 		<i class="fa-solid fa-question"></i> 질문봇
-	</a> <a href="${pageContext.request.contextPath}/layout/lunchLadder"
+	</a> 
+	
+	<a href="${pageContext.request.contextPath}/layout/lunchLadder"
 		class="nav-link"> <i class="fa-solid fa-gamepad"></i> 쉬어가기
 	</a>
 
