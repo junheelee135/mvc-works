@@ -30,5 +30,7 @@ public interface TaskService {
 	public void projectAutoComplete(long projectId) throws Exception;
 	
 	public void taskForceStopByProject(long projectId) throws Exception;
+	
+	public String findEmpTaskId(String taskId) throws Exception;
 
 }

@@ -56,4 +56,6 @@ public interface TaskMapper {
 	public void projectAutoComplete(long projectId) throws SQLException;
 	
 	public void taskForceStopByProject(long projectId) throws SQLException;
+	
+	public String findEmpTaskId(String taskId);
 }

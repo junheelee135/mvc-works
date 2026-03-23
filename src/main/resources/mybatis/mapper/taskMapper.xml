@@ -215,10 +215,18 @@
 	<update id="projectUpdateProgress" parameterType="long">
 	    UPDATE PROJECT
 	    SET progress = (
-	        SELECT ROUND(
-	            COUNT(CASE WHEN t.taskStatus = '4' THEN 1 END) * 100.0
-	            / NULLIF(COUNT(t.taskId), 0)
-	        )
+	        SELECT NVL(ROUND(
+	            AVG(
+	                ROUND(
+	                    (SELECT COUNT(*) 
+	                     FROM TASKDAILYLOG dl
+	                     JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
+	                     WHERE et.taskId = t.taskId 
+	                     AND dl.logStatus = 'F') * 100.0
+	                    / NULLIF(t.taskEndDate - t.taskStartDate + 1, 0)
+	                )
+	            )
+	        ), 0)
 	        FROM task t
 	        JOIN stage s ON t.stageId = s.stageId
 	        WHERE s.projectId = #{projectId}
@@ -233,8 +241,8 @@
 	    SET taskStatus = (
 	        SELECT CASE
 	            WHEN latestStatus = 'S' THEN '6'
-	            WHEN completedDays &gt;= totalDays THEN '4'
-	            WHEN latestStatus = 'I' THEN '2'
+	            WHEN completedDays >= totalDays THEN '4'
+	            WHEN completedDays > 0 THEN '2'
 	            ELSE taskStatus
 	        END
 	        FROM (

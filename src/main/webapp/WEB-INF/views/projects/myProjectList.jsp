@@ -66,7 +66,7 @@
 
         <div class="project-container">
             <div class="table-header">
-                <h5 class="mb-0 fw-bold">Project List</h5>
+                <h5 class="mb-0 fw-bold">My Project List</h5>
                 <div class="d-flex gap-2 align-items-center">
 
                     <%-- 검색폼 --%>

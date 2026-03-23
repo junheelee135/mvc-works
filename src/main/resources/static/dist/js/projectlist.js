@@ -4,60 +4,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterMenu = document.getElementById('myFilterMenu');
     const filterItems = filterMenu.querySelectorAll('.dropdown-item');
 
-    let currentStatus = "";
+    // ── 실시간 검색 → 서버 요청 (디바운스 400ms) ──────────────────────────
+    let searchTimer = null;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            const kwd = searchInput.value.trim();
+            const schType = document.querySelector('select[name="schType"]').value;
+            const form = document.querySelector('.search-box').closest('form');
+            const statusInput = form.querySelector('input[name="status"]');
+            const status = statusInput ? statusInput.value : '';
 
+            const url = new URL(form.action || window.location.href);
+            url.searchParams.set('kwd', kwd);
+            url.searchParams.set('schType', schType);
+            url.searchParams.set('status', status);
+            url.searchParams.set('page', '1');
 
-	function applyFilters() {
-	    const searchTerm = searchInput.value.toLowerCase().trim();
-	    const schType = document.querySelector('select[name="schType"]').value;
-	    const rows = document.querySelectorAll('tbody tr');
+            window.location.href = url.toString();
+        }, 400);
+    });
 
-	    rows.forEach(row => {
-	        if (row.cells.length < 8) return;
-
-	        const projectName = row.cells[1].textContent.toLowerCase();
-	        const managerName = row.cells[2].textContent.toLowerCase();
-	        const startDate = row.cells[3].textContent.toLowerCase();
-	        const endDate = row.cells[4].textContent.toLowerCase();
-	        const rowStatusClean = row.cells[7].textContent.replace(/\s/g, "").trim();
-	        const selectedStatusClean = currentStatus.replace(/\s/g, "").trim();
-
-	        let matchesSearch = false;
-			if (searchTerm === '') {
-			    matchesSearch = true;
-			} else if (schType === 'all') {
-			    const normalizedStart = startDate.replace(/[-\/]/g, '');
-			    const normalizedEnd = endDate.replace(/[-\/]/g, '');
-			    const normalizedTerm = searchTerm.replace(/[-\/]/g, '');
-			    matchesSearch = projectName.includes(searchTerm) ||
-			                    managerName.includes(searchTerm) ||
-			                    normalizedStart.includes(normalizedTerm) ||
-			                    normalizedEnd.includes(normalizedTerm);
-			} else if (schType === 'title') {
-			    matchesSearch = projectName.includes(searchTerm);
-			} else if (schType === 'manager') {
-			    matchesSearch = managerName.includes(searchTerm);
-			} else if (schType === 'startDate') {
-			    const normalizedStart = startDate.replace(/[-\/]/g, '');
-			    const normalizedTerm = searchTerm.replace(/[-\/]/g, '');
-			    matchesSearch = normalizedStart.includes(normalizedTerm);
-			} else if (schType === 'endDate') {
-			    const normalizedEnd = endDate.replace(/[-\/]/g, '');
-			    const normalizedTerm = searchTerm.replace(/[-\/]/g, '');
-			    matchesSearch = normalizedEnd.includes(normalizedTerm);
-			} else if (schType === 'status') {
-			    matchesSearch = rowStatusClean.includes(searchTerm);
-			}
-
-	        const matchesStatus = (currentStatus === "") || rowStatusClean.includes(selectedStatusClean);
-
-	        row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
-	    });
-	}
-
-
-    searchInput.addEventListener('input', applyFilters);
-
+    // ── 필터 드롭다운 열기/닫기 ──────────────────────────────────────────
     if (filterBtn && filterMenu) {
         filterBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -72,45 +40,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-	filterItems.forEach(item => {
-	    item.addEventListener('click', function(e) {
-	        e.preventDefault();
+    // ── 필터 클릭 → form submit ──────────────────────────────────────────
+    filterItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
 
-	        const statusText = this.querySelector('.status-badge').innerText.trim();
+            const statusText = this.querySelector('.status-badge').innerText.trim();
 
-	        const statusMap = {
-	            '진행중': '2',
-	            '승인대기': '3',
-	            '중단': '6',
-	            '종료': '4',
-	            '지연': '5',
-	            '시작전': '1'
-	        };
+            const statusMap = {
+                '진행중': '2',
+                '승인대기': '3',
+                '중단': '6',
+                '종료': '4',
+                '지연': '5',
+                '시작전': '1'
+            };
 
-	        const statusCode = statusMap[statusText] || '';
-	        const form = document.querySelector('.search-box').closest('form');
+            const statusCode = statusMap[statusText] || '';
+            const form = document.querySelector('.search-box').closest('form');
 
-	        let statusInput = form.querySelector('input[name="status"]');
-	        if (!statusInput) {
-	            statusInput = document.createElement('input');
-	            statusInput.type = 'hidden';
-	            statusInput.name = 'status';
-	            form.appendChild(statusInput);
-	        }
+            let statusInput = form.querySelector('input[name="status"]');
+            if (!statusInput) {
+                statusInput = document.createElement('input');
+                statusInput.type = 'hidden';
+                statusInput.name = 'status';
+                form.appendChild(statusInput);
+            }
 
-	        // 같은 거 누르면 해제 (토글)
-	        const currentStatus = form.querySelector('input[name="status"]')?.value || '';
-	        if (currentStatus === statusCode) {
-	            statusInput.value = '';
-	            filterBtn.classList.remove('active');
-	        } else {
-	            statusInput.value = statusCode;
-	            filterBtn.classList.add('active');
-	        }
+            // 같은 거 누르면 해제 (토글)
+            const currentStatus = form.querySelector('input[name="status"]')?.value || '';
+            if (currentStatus === statusCode) {
+                statusInput.value = '';
+                filterBtn.classList.remove('active');
+            } else {
+                statusInput.value = statusCode;
+                filterBtn.classList.add('active');
+            }
 
-	        filterMenu.classList.remove('show');
-	        form.submit();
-	    });
-	});
+            filterMenu.classList.remove('show');
+            form.submit();
+        });
+    });
 
 });

@@ -3,6 +3,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterMenu  = document.getElementById('myFilterMenu');
     const filterItems = filterMenu.querySelectorAll('.dropdown-item');
 
+    // ── 실시간 검색 → 서버 요청 (디바운스 400ms) ──────────────────────────
+    const searchInput = document.querySelector('.search-box input');
+    let searchTimer = null;
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                const kwd = searchInput.value.trim();
+                const schType = document.querySelector('select[name="schType"]').value;
+                const form = document.querySelector('.search-box').closest('form');
+                const statusInput = form.querySelector('input[name="status"]');
+                const status = statusInput ? statusInput.value : '';
+
+                const url = new URL(form.action || window.location.href);
+                url.searchParams.set('kwd', kwd);
+                url.searchParams.set('schType', schType);
+                url.searchParams.set('status', status);
+                url.searchParams.set('page', '1');
+
+                window.location.href = url.toString();
+            }, 400);
+        });
+    }
+
     // ── 필터 드롭다운 열기/닫기 ──────────────────────────────────────────
     if (filterBtn && filterMenu) {
         filterBtn.addEventListener('click', function(e) {
@@ -68,10 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ══════════════════════════════════════════════════════════════════════════
-// 전역 함수
+// 전역 함수 (아래는 기존 코드 유지)
 // ══════════════════════════════════════════════════════════════════════════
 
-// ── 편집 모드 토글 ────────────────────────────────────────────────────────
 let editMode = false;
 
 function toggleEditMode() {
@@ -91,7 +114,6 @@ function toggleEditMode() {
     }
 }
 
-// ── 수정 모달 열기 ────────────────────────────────────────────────────────
 function openEditModal(row) {
     if (row.dataset.role !== 'M') {
         toast('매니저만 수정할 수 있습니다.');
@@ -124,7 +146,6 @@ function openEditModal(row) {
     bootstrap.Modal.getOrCreateInstance(document.getElementById('projectEditModal')).show();
 }
 
-// ── 현재 구성원 로드 ──────────────────────────────────────────────────────
 function loadCurrentMembers(projectId) {
     fetch(`/projects/members?projectId=${projectId}`)
         .then(res => res.json())
@@ -146,7 +167,6 @@ function loadCurrentMembers(projectId) {
         });
 }
 
-// ── 교체 대상 선택 ────────────────────────────────────────────────────────
 let replaceTargetEmpId = null;
 let replaceTargetRole  = null;
 
@@ -164,14 +184,9 @@ function selectReplaceTarget(empId, name, role) {
     bootstrap.Modal.getOrCreateInstance(document.getElementById('editMemberSearchModal')).show();
 }
 
-// ── 강제 중단 ────────────────────────────────────────────────────────────
 function forceStopProject() {
     const projectId = document.getElementById('editProjectId').value;
-    
-    // ✅ 수정 모달 먼저 닫기
     bootstrap.Modal.getInstance(document.getElementById('projectEditModal')).hide();
-    
-    // ✅ 모달 닫힌 후 확인 팝업
     setTimeout(() => {
         Swal.fire({
             title: '강제 중단',
@@ -196,7 +211,6 @@ function forceStopProject() {
     }, 400);
 }
 
-// ── 구성원 변경 저장 ──────────────────────────────────────────────────────
 function saveMemberChange() {
     const projectId = document.getElementById('editProjectId').value;
     const newEmpId  = document.querySelector('#hiddenInputContainer input[name="memberIds"]')?.value;
@@ -230,7 +244,6 @@ function saveMemberChange() {
     });
 }
 
-// ── 토스트 알림 ───────────────────────────────────────────────────────────
 function toast(msg, icon = 'warning') {
     Swal.fire({
         title: '알림',
@@ -245,7 +258,6 @@ function toast(msg, icon = 'warning') {
     });
 }
 
-// ── 조직도 렌더링 ─────────────────────────────────────────────────────────
 function editRenderDeptTree(nodes, parentEl, depth) {
     nodes.forEach(dept => {
         const hasChildren = dept.children && dept.children.length > 0;
@@ -365,7 +377,6 @@ function editRenderMemberList(list) {
             '<div class="emp-meta"><span>' + dept + '</span><span class="sep">|</span><span>' + grade + '</span></div>';
 
         card.addEventListener('click', function() {
-            // 단일 선택
             document.querySelectorAll('#editModalMemberList .member-card').forEach(c => c.classList.remove('added'));
             this.classList.add('added');
 

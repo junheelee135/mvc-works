@@ -570,6 +570,11 @@ function updateTask(taskId, type) {
 			if (startDate) row.dataset.start = startDate;
 			if (endDate) row.dataset.end = endDate;
 
+			row.dataset.empId = empId;
+			if (currentTaskId === taskId) {
+				currentTaskEmpId = empId;
+			}
+
 			const taskNameTd = row.querySelector('.task-name');
 			if (taskNameTd) {
 			    const onclick = taskNameTd.getAttribute('onclick');

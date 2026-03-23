@@ -120,6 +120,10 @@ public class TaskServiceImpl implements TaskService{
 	@Override
 	public void insertTaskDailylog(ProjectsDto dto) throws Exception {
 		try {
+			
+	        log.info("taskId 확인: {}", dto.getTaskId());      // 여기 추가
+	        log.info("projectId 확인: {}", dto.getProjectId());
+	        
 			mapper.insertTaskDailylog(dto);
 			
 	        mapper.taskUpdateStatus(dto.getTaskId());
@@ -202,6 +206,19 @@ public class TaskServiceImpl implements TaskService{
 	        log.info("taskForceStopByProject : ", e);
 	        throw e;
 	    }
+	}
+	
+	@Override
+	public String findEmpTaskId(String taskId) throws Exception {
+		String empTaskId = null;
+		
+	    try {
+	        empTaskId = mapper.findEmpTaskId(taskId);
+	    } catch (Exception e) {
+	        log.info("findEmpTaskId : ", e);
+	        throw e;
+	    }
+	    return empTaskId;
 	}
 
 }

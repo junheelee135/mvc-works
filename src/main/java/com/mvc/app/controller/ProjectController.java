@@ -341,17 +341,23 @@ public class ProjectController {
 	@PostMapping("task/update")
 	@ResponseBody
 	public ResponseEntity<?> updateTask(@RequestBody List<ProjectsDto> list, HttpServletRequest req) throws Exception {
-		try {
+	    try {
+	        for (ProjectsDto dto : list) {
+	            taskService.updateProjectTask(dto);
+	        }
+	        
+	        // 첫 번째 task의 empTaskId 조회해서 반환
+	        Map<String, Object> result = new HashMap<>();
+	        if (!list.isEmpty()) {
+	            String empTaskId = taskService.findEmpTaskId(list.get(0).getTaskId());
+	            result.put("empTaskId", empTaskId);
+	        }
+	        return ResponseEntity.ok(result);
 
-			for (ProjectsDto dto : list) {
-				taskService.updateProjectTask(dto);
-			}
-			return ResponseEntity.ok().build();
-
-		} catch (Exception e) {
-			log.info("updateTask : ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		}
+	    } catch (Exception e) {
+	        log.info("updateTask : ", e);
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
 	}
 
 	@PostMapping("task/dailyinsert")
