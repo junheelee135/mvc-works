@@ -110,10 +110,6 @@ body.sidebar-collapsed .navbar-custom {
 	object-fit: contain;
 }
 
-.sidebar-logo:hover {
-	transform: scale(1.05);
-}
-
 .nav-section {
 	padding: 12px 24px;
 	font-size: 0.75rem;
