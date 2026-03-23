@@ -509,12 +509,12 @@ function updateTask(taskId, type) {
 
     const row = document.querySelector(`tr[data-task-id="${taskId}"]`);
 	const dates = row.querySelectorAll('.cell-date');
-	const startDate = dates[0]._flatpickr && dates[0]._flatpickr.selectedDates[0]
+	const startDate = (dates[0]._flatpickr && dates[0]._flatpickr.selectedDates[0])
 	    ? dates[0]._flatpickr.formatDate(dates[0]._flatpickr.selectedDates[0], 'Y-m-d')
-	    : dates[0].value;
-	const endDate = dates[1]._flatpickr && dates[1]._flatpickr.selectedDates[0]
+	    : (dates[0].value || row.dataset.start || null);
+	const endDate = (dates[1]._flatpickr && dates[1]._flatpickr.selectedDates[0])
 	    ? dates[1]._flatpickr.formatDate(dates[1]._flatpickr.selectedDates[0], 'Y-m-d')
-	    : dates[1].value;
+	    : (dates[1].value || row.dataset.end || null);
     const empId = row.querySelector('.cell-assignee').value;
     const statusSelect = row.querySelector('.status-cell');
     const today = new Date().toISOString().split('T')[0];
@@ -798,7 +798,7 @@ function openDailyCheckModal(dateStr) {
 	                icon: 'question',
 	                showCancelButton: true,
 					confirmButtonColor: '#4e73df',
-					cancelButtonColor: '#fff',
+					cancelButtonColor: '#6c757d',
 	                confirmButtonText: '수정',
 	                cancelButtonText: '취소',
 	                width: '320px',
@@ -870,7 +870,7 @@ function submitDailyCheck() {
 	            icon: 'warning',
 	            showCancelButton: true,
 	            confirmButtonColor: '#4e73df',
-	            cancelButtonColor: '#fff',
+	            cancelButtonColor: '#6c757d',
 	            confirmButtonText: '저장',
 	            cancelButtonText: '취소',
 	            width: '320px',

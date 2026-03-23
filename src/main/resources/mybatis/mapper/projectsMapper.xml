@@ -244,12 +244,18 @@
 	</select>
 
 	<select id="projectMembers" parameterType="long"
-		resultType="com.mvc.app.domain.dto.ProjectsDto">
-		SELECT ep.EMPID AS empId, e.NAME AS name, ep.ROLE AS role
-		FROM EMPPROJECT ep
-		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-		WHERE
-		ep.PROJECTID = #{projectId}
+	    resultType="com.mvc.app.domain.dto.ProjectsDto">
+	    SELECT 
+	        ep.EMPID AS empId, 
+	        e.NAME AS name, 
+	        ep.ROLE AS role,
+	        prev_ep.EMPID AS predecessorEmpId,
+	        prev_e.NAME AS predecessorName
+	    FROM EMPPROJECT ep
+	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+	    LEFT JOIN EMPPROJECT prev_ep ON ep.PREDECESSOR = prev_ep.EMPPROJID
+	    LEFT JOIN EMPLOYEE2 prev_e ON prev_ep.EMPID = prev_e.EMPID
+	    WHERE ep.PROJECTID = #{projectId}
 	</select>
 
 	<select id="findById" parameterType="long"
@@ -406,15 +412,15 @@
 	</update>
 
 	<update id="updatePredecessor" parameterType="map">
-		UPDATE EMPPROJECT
-		SET predecessor = (
-		SELECT empprojId
-		FROM EMPPROJECT
-		WHERE projectId = #{projectId}
-		AND empId = #{oldEmpId}
-		)
-		WHERE projectId = #{projectId}
-		AND empId = #{oldEmpId}
+	    UPDATE EMPPROJECT
+	    SET predecessor = (
+	        SELECT empprojId
+	        FROM EMPPROJECT
+	        WHERE projectId = #{projectId}
+	        AND empId = #{oldEmpId}
+	    )
+	    WHERE projectId = #{projectId}
+	    AND empId = #{newEmpId}
 	</update>
 
 	<update id="updateNewEmpId" parameterType="map">

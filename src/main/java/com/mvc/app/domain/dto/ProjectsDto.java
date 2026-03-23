@@ -55,6 +55,9 @@ public class ProjectsDto {
 	private String empStartDate;
 	private String empEndDate;
 	private String role; // 매니저 - M, 디자이너 - D, 개발자 - P
+
+	private String predecessorEmpId;
+	private String predecessorName;
 	
 	// 업무(task)
 	private String taskId;

@@ -58,9 +58,10 @@
 	</update> 
 	
 	<update id="updateProjectEmp" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-		UPDATE EMPTASK SET 
-			EMPID = #{empId}
-		WHERE TASKID = #{taskId}
+	    UPDATE EMPTASK SET 
+	        PREDECESSOR = EMPID, 
+	        EMPID = #{empId}
+	    WHERE TASKID = #{taskId}
 	</update>
 	
 	
@@ -389,5 +390,9 @@
 	        AND t.taskStatus NOT IN ('4')
 	    )
 	</update>
+	
+	<select id="findEmpTaskId" parameterType="string" resultType="string">
+	    SELECT EMPTASKID FROM EMPTASK WHERE TASKID = #{taskId}
+	</select>
 	
 </mapper>

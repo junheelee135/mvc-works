@@ -134,6 +134,7 @@
                         data-project-id="${p.projectId}"
                         data-project-title="${p.title}"
                         data-project-status="${p.status}"
+                        data-project-type="${p.projectType}"
                         data-role="${p.role}">
                         <td>${dataCount - ((page-1) * size) - status.index}</td>
                         <td class="fw-medium">
@@ -212,7 +213,7 @@
 	                </div>
 	
 	                
-	                <div class="mb-3">
+	                <div class="mb-3" id="memberChangeArea">
 	                    <div class="d-flex justify-content-between align-items-center mb-3">
 	                        <div class="fw-bold">구성원 변경</div>
 	                    </div>
@@ -249,26 +250,35 @@
 	            <div class="modal-body p-0">
 	                <div class="p-3 border-bottom bg-light">
 	                    <div class="input-group">
-	                        <input type="text" id="editMemberSearchKeyword" class="form-control" placeholder="이름, 부서, 직급으로 검색...">
-	                        <button class="btn btn-primary" type="button" onclick="editSearchMembers()">
+	                        <input type="text" id="editMemberSearchKeyword" 
+	                               class="form-control" 
+	                               placeholder="이름, 부서, 직급으로 검색...">
+	                        <button class="btn btn-primary" type="button" 
+	                                onclick="editSearchMembers()">
 	                            <i class="fas fa-search"></i> 검색
 	                        </button>
 	                    </div>
 	                </div>
 	                <div class="d-flex" style="height: 450px;">
-	                    <div class="border-end p-3" style="width: 35%; min-width: 220px; overflow-y: auto;">
+	                    <div class="border-end p-3" 
+	                         style="width: 35%; min-width: 220px; overflow-y: auto;">
 	                        <h6 class="fw-bold mb-3">조직도</h6>
 	                        <ul class="list-unstyled shadow-none mb-0" id="editDeptTree"></ul>
 	                    </div>
 	                    <div class="p-3 flex-grow-1" style="overflow-y: auto;">
-	                        <h6 class="fw-bold mb-3" id="editSelectedDeptName">부서를 선택하세요</h6>
-	                        <div id="editModalMemberList" class="row row-cols-2 row-cols-md-3 g-2"></div>
+	                        <h6 class="fw-bold mb-3" id="editSelectedDeptName">
+	                            부서를 선택하세요
+	                        </h6>
+	                        <div id="editModalMemberList" 
+	                             class="row row-cols-2 row-cols-md-3 g-2"></div>
 	                    </div>
 	                </div>
 	            </div>
 	            <div class="modal-footer">
-	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-	                <button type="button" class="btn btn-primary" onclick="editConfirmSelection()">선택 완료</button>
+	                <button type="button" class="btn btn-secondary" 
+	                        data-bs-dismiss="modal">닫기</button>
+	                <button type="button" class="btn btn-primary" 
+	                        onclick="editConfirmSelection()">선택 완료</button>
 	            </div>
 	        </div>
 	    </div>

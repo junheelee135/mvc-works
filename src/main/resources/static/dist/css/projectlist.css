@@ -347,66 +347,48 @@ body {
 
 .btn-edit { background-color: var(--primary-amber); }
 
-/* 편집 모드 */
-.project-row.editable {
+/* 조직도 트리 */
+.dept-item {
     cursor: pointer;
-    background-color: rgba(78, 115, 223, 0.05);
+    padding: 6px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    transition: background 0.15s;
+    user-select: none;
 }
+.dept-item:hover { background-color: #e9f0fb; }
+.dept-item.active { background-color: #dbeafe; font-weight: 600; color: #1d4ed8; }
 
-.project-row.editable:hover {
-    background-color: rgba(78, 115, 223, 0.1);
+.dept-toggle {
+    width: 16px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #6c757d;
+    transition: transform 0.2s;
+    display: inline-block;
 }
+.dept-toggle.open { transform: rotate(90deg); }
 
-.project-row.editable .project-title-link {
-    color: #4e73df;
-    text-decoration: underline;
+.dept-children {
+    display: none;
+    padding-left: 16px;
 }
+.dept-children.open { display: block; }
 
-.project-row.edit-blocked {
-    opacity: 0.4;
-    pointer-events: none;
-}
-
-#editModeBtn.active {
-    background-color: #4e73df;
-    color: white;
-}
-
-
-/* 구성원 카드 */
+/* 사원 카드 */
 .member-card {
-    padding: 10px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 10px 12px;
+    transition: background 0.15s, border-color 0.15s;
     background: #fff;
 }
-.member-card:hover {
-    background: #f0f4ff;
-    border-color: #4e73df;
-}
-.member-card.added {
-    background: #4e73df;
-    border-color: #4e73df;
-    color: #fff;
-}
-.member-card.added .emp-meta {
-    color: rgba(255,255,255,0.8);
-}
-.emp-name {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-.emp-meta {
-    font-size: 0.75rem;
-    color: #888;
-    margin-top: 2px;
-}
-.sep {
-    margin: 0 4px;
-}
-
-.swal-over-modal {
-    z-index: 99999 !important;
-}
+.member-card:hover { background: #f8f9fa; border-color: #0d6efd; }
+.member-card.added { background: #e8f4fd; border-color: #0d6efd; opacity: 0.7; }
+.member-card .emp-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+.member-card .emp-meta { font-size: 0.78rem; color: #6c757d; }
+.member-card .emp-meta .sep { margin: 0 4px; color: #ced4da; }

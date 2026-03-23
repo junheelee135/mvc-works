@@ -123,6 +123,7 @@ function openEditModal(row) {
     const projectId     = row.dataset.projectId;
     const projectTitle  = row.dataset.projectTitle;
     const projectStatus = row.dataset.projectStatus;
+	const projectType   = row.dataset.projectType;
 
     document.getElementById('editProjectId').value        = projectId;
     document.getElementById('editModalTitle').textContent = projectTitle + ' 수정';
@@ -136,7 +137,18 @@ function openEditModal(row) {
         forceStopBtn.textContent = '강제 중단';
     }
 
-    loadCurrentMembers(projectId);
+	const memberChangeArea = document.getElementById('memberChangeArea'); // JSP에 id 추가 필요
+	    
+	    if (projectStatus === '6') {
+	        // 1) 강제 중단 프로젝트 - 구성원 변경 X
+	        memberChangeArea.style.display = 'none';
+	    } else if (projectType === 'I') {
+	        // 2) 개인 프로젝트 - 구성원 변경 X
+	        memberChangeArea.style.display = 'none';
+	    } else {
+	        memberChangeArea.style.display = '';
+	        loadCurrentMembers(projectId);
+	    }
 
     document.getElementById('selectedMemberList').innerHTML =
         '<p class="text-muted mb-0" id="noMemberText">선택된 멤버가 없습니다.</p>';
@@ -152,11 +164,17 @@ function loadCurrentMembers(projectId) {
         .then(list => {
             const container = document.getElementById('currentMemberBadges');
             container.innerHTML = '';
+
+            // 현재 구성원 empId 목록 저장 (전역)
+            window.__currentMemberIds = list.map(m => m.empId);
+
             list.forEach(member => {
-                const badge           = document.createElement('span');
-                badge.className       = 'badge bg-secondary d-flex align-items-center gap-1 p-2';
-                badge.dataset.empId   = member.empId;
-                badge.dataset.role    = member.role;
+                // task 담당 여부 - 일단 서버에서 못 받으면 true로 처리
+                const badge = document.createElement('span');
+                badge.className     = 'badge bg-secondary d-flex align-items-center gap-1 p-2';
+                badge.dataset.empId  = member.empId;
+                badge.dataset.role   = member.role;
+                badge.dataset.hasTask = 'true'; // 기본값, 나중에 API 붙이면 갱신
                 badge.innerHTML =
                     `<span>${member.name}</span>
                      <span class="fw-normal opacity-75" style="font-size:0.75rem">${member.role}</span>
@@ -224,6 +242,30 @@ function saveMemberChange() {
         return;
     }
 
+    // 1) 담당 업무 없는 구성원인지 체크
+    const targetBadge = document.querySelector(`#currentMemberBadges .badge[data-emp-id="${replaceTargetEmpId}"]`);
+    const hasNoTask = targetBadge?.dataset.hasTask === 'false';
+
+    if (hasNoTask) {
+        Swal.fire({
+            text: '담당 업무가 지정되지 않은 구성원입니다. 그래도 변경하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '변경',
+            cancelButtonText: '취소',
+            width: '320px',
+        }).then(result => {
+            if (result.isConfirmed) doSaveMemberChange(projectId, newEmpId);
+        });
+        return;
+    }
+
+    doSaveMemberChange(projectId, newEmpId);
+}
+
+function doSaveMemberChange(projectId, newEmpId) {
     fetch('/projects/member/change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -377,6 +419,12 @@ function editRenderMemberList(list) {
             '<div class="emp-meta"><span>' + dept + '</span><span class="sep">|</span><span>' + grade + '</span></div>';
 
         card.addEventListener('click', function() {
+			
+			if (window.__currentMemberIds && window.__currentMemberIds.includes(empId)) {
+			    toast('이미 프로젝트 구성원입니다.');
+			    return;
+			}
+			
             document.querySelectorAll('#editModalMemberList .member-card').forEach(c => c.classList.remove('added'));
             this.classList.add('added');
 
