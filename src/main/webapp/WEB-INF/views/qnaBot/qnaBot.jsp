@@ -34,8 +34,13 @@
 			</div>
 
 			<div class="chat-box" id="chatBox">
+
 				<div class="message assistant">
-					<div class="message-content">${sessionScope.member.name} ${sessionScope.member.gradeName}님 무엇을 도와드릴까요?</div>
+					<div class="avatar">🤖</div>
+
+					<div class="bubble">
+						<div class="message-content">${sessionScope.member.name} ${sessionScope.member.gradeName}님<br>무엇을 도와드릴까요?</div>
+					</div>
 				</div>
 			</div>
 
@@ -44,8 +49,7 @@
 					<input type="text" id="messageInput" class="form-control"
 						placeholder="문의사항을 입력하세요..." autocomplete="off">
 
-					<button class="btn-send" type="submit" id="sendButton">전송
-					</button>
+					<button class="btn-send" type="submit" id="sendButton">➤</button>
 				</form>
 			</div>
 
@@ -62,14 +66,32 @@ function addMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
 
+    let bubble;
+
+    if(sender === 'assistant'){
+        const avatar = document.createElement('div');
+        avatar.classList.add('avatar');
+        avatar.textContent = '🤖';
+        messageDiv.appendChild(avatar);
+
+        bubble = document.createElement('div');
+        bubble.classList.add('bubble');
+        messageDiv.appendChild(bubble);
+    }
+
     const content = document.createElement('div');
     content.classList.add('message-content');
     content.innerHTML = escapeHtml(text);
 
-    messageDiv.appendChild(content);
-    chatBox.appendChild(messageDiv);
+    if(sender === 'assistant'){
+        bubble.appendChild(content);
+    } else {
+        messageDiv.appendChild(content);
+    }
 
+    chatBox.appendChild(messageDiv);
     smoothScroll();
+
     return content;
 }
 
