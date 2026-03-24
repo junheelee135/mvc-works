@@ -17,17 +17,9 @@
 		href="${pageContext.request.contextPath}/projects/list"
 		class="nav-link"><i class="bi bi-folder"></i> 전사 프로젝트</a>
 
-	<%-- 예약 관리 토글 메뉴 --%>
-	<a href="#" class="nav-link nav-toggle" id="meetingToggle"> <i
-		class="fas fa-door-open"></i> 예약관리 <i
-		class="fas fa-chevron-down toggle-icon" id="meetingArrow"></i>
+	<a href="${pageContext.request.contextPath}/groupware/notice"
+		class="nav-link"> <i class="fas fa-bullhorn"></i> 공지사항
 	</a>
-	<ul class="sub-menu" id="meetingSubMenu">
-		<li><a href="${pageContext.request.contextPath}/meeting/room">회의실
-				관리</a></li>
-		<li><a href="${pageContext.request.contextPath}/meeting/reserve">예약
-				현황</a></li>
-	</ul>
 
 	<hr />
 
@@ -41,21 +33,22 @@
 		<li><a href="${pageContext.request.contextPath}/chat">채팅</a></li>
 	</ul>
 
-	<%-- 인사관리 토글 메뉴 --%>
-	<a href="#" class="nav-link nav-toggle" id="hrmToggle"> <i
-		class="fas fa-file-signature"></i> 인사관리 <i
-		class="fas fa-chevron-down toggle-icon" id="hrmArrow"></i>
-	</a>
-	<ul class="sub-menu" id="hrmSubMenu">
-		<li><a href="${pageContext.request.contextPath}/hrm">직원 정보통합
-				관리</a></li>
-		<li><a href="${pageContext.request.contextPath}/hrm/performance">직원
-				성과 관리</a></li>
-		<li><a href="${pageContext.request.contextPath}/activity-log">인사관리
-				기록</a></li>
+	<%-- 프로젝트관리 토글 메뉴 --%>
+	<a href="#" class="nav-link nav-toggle" id="projectToggle"><i
+		class="fa-solid fa-chart-gantt"></i>내 프로젝트 <i
+		class="fas fa-chevron-down toggle-icon" id="projectArrow"></i></a>
+	<ul class="sub-menu" id="projectSubMenu">
+		<li><a href="${pageContext.request.contextPath}/projects/create">프로젝트
+				생성</a></li>
+		<li><a
+			href="${pageContext.request.contextPath}/projects/projectNotice">프로젝트
+				공지사항</a></li>
+		<li><a
+			href="${pageContext.request.contextPath}/projects/myProjectList">프로젝트
+				리스트</a></li>
 	</ul>
-
-	<%-- 결재관리 토글 메뉴 --%>
+	
+		<%-- 결재관리 토글 메뉴 --%>
 	<a href="#" class="nav-link nav-toggle" id="approvalToggle"> <i
 		class="fa-solid fa-clipboard"></i> 결재관리 <i
 		class="fas fa-chevron-down toggle-icon" id="approvalArrow"></i>
@@ -73,26 +66,35 @@
 		<li><a href="${pageContext.request.contextPath}/approval/absence">부재
 				등록</a></li>
 	</ul>
-
-	<%-- 프로젝트관리 토글 메뉴 --%>
-	<a href="#" class="nav-link nav-toggle" id="projectToggle"><i
-		class="fa-solid fa-chart-gantt"></i>프로젝트관리 <i
-		class="fas fa-chevron-down toggle-icon" id="projectArrow"></i></a>
-	<ul class="sub-menu" id="projectSubMenu">
-		<li><a href="${pageContext.request.contextPath}/projects/create">프로젝트
-				생성</a></li>
-		<li><a
-			href="${pageContext.request.contextPath}/projects/projectNotice">프로젝트
-				공지사항</a></li>
-		<li><a
-			href="${pageContext.request.contextPath}/projects/myProjectList">프로젝트
-				리스트</a></li>
+	
+		<%-- 인사관리 토글 메뉴 --%>
+	<a href="#" class="nav-link nav-toggle" id="hrmToggle"> <i
+		class="fas fa-file-signature"></i> 인사관리 <i
+		class="fas fa-chevron-down toggle-icon" id="hrmArrow"></i>
+	</a>
+	<ul class="sub-menu" id="hrmSubMenu">
+		<li><a href="${pageContext.request.contextPath}/hrm">직원 정보통합
+				관리</a></li>
+		<li><a href="${pageContext.request.contextPath}/hrm/performance">직원
+				성과 관리</a></li>
+		<li><a href="${pageContext.request.contextPath}/activity-log">인사관리
+				기록</a></li>
 	</ul>
 
 	<hr />
-	<a href="${pageContext.request.contextPath}/groupware/notice"
-		class="nav-link"> <i class="fas fa-bullhorn"></i> 공지사항
+
+
+	<%-- 예약 관리 토글 메뉴 --%>
+	<a href="#" class="nav-link nav-toggle" id="meetingToggle"> <i
+		class="fas fa-door-open"></i> 예약관리 <i
+		class="fas fa-chevron-down toggle-icon" id="meetingArrow"></i>
 	</a>
+	<ul class="sub-menu" id="meetingSubMenu">
+		<li><a href="${pageContext.request.contextPath}/meeting/room">회의실
+				관리</a></li>
+		<li><a href="${pageContext.request.contextPath}/meeting/reserve">예약
+				현황</a></li>
+	</ul>
 
 	<%-- 설문관리 토글 메뉴 --%>
 	<a href="#" class="nav-link nav-toggle" id="surveyToggle">
@@ -102,6 +104,8 @@
 	<ul class="sub-menu" id="surveySubMenu">
 		<li><a href="${pageContext.request.contextPath}/survey/list">설문 목록</a></li>
 	</ul>
+	
+	<hr>
 
 	<a href="${pageContext.request.contextPath}/qnaBot" class="nav-link">
 		<i class="fa-solid fa-question"></i> 질문봇

@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="<c:url value='/dist/css/main.css' />">
 </head>
 
-<body>
+<body class="dashboard-page">
 
 	<jsp:include page="/WEB-INF/views/layout/header.jsp" />
 	<jsp:include page="/WEB-INF/views/layout/sidebar.jsp" />

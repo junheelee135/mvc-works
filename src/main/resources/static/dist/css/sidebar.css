@@ -51,7 +51,7 @@
 }
 
 /* 대시보드에서는 사이드바 엣지 버튼 숨김 */
-.dashboard .sidebar-edge-btn {
+.dashboard-page .sidebar-edge-btn {
     display: none;
 }
 
