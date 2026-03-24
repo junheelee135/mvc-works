@@ -549,7 +549,7 @@ function updateTask(taskId, type) {
             updateStatusStyle(statusSelect);
         }
     }
-
+	
     fetch(contextPath + '/projects/task/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -559,6 +559,7 @@ function updateTask(taskId, type) {
             taskEndDate: endDate,
             taskStatus: taskStatus,
             empId: empId,
+			oldEmpId: row.dataset.empId,
             projectId: document.getElementById('hiddenProjectId').value
         }])
     })

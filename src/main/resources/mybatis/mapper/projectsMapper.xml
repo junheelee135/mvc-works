@@ -245,17 +245,16 @@
 
 	<select id="projectMembers" parameterType="long"
 	    resultType="com.mvc.app.domain.dto.ProjectsDto">
-	    SELECT 
-	        ep.EMPID AS empId, 
-	        e.NAME AS name, 
-	        ep.ROLE AS role,
-	        prev_ep.EMPID AS predecessorEmpId,
-	        prev_e.NAME AS predecessorName
-	    FROM EMPPROJECT ep
-	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-	    LEFT JOIN EMPPROJECT prev_ep ON ep.PREDECESSOR = prev_ep.EMPPROJID
-	    LEFT JOIN EMPLOYEE2 prev_e ON prev_ep.EMPID = prev_e.EMPID
-	    WHERE ep.PROJECTID = #{projectId}
+		SELECT 
+		    ep.EMPID AS empId, 
+		    e.NAME AS name, 
+		    ep.ROLE AS role,
+		    ep.PREDECESSOR AS predecessorEmpId,
+		    prev_e.NAME AS predecessorName
+		FROM EMPPROJECT ep
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		LEFT JOIN EMPLOYEE2 prev_e ON ep.PREDECESSOR = prev_e.EMPID
+		WHERE ep.PROJECTID = #{projectId}
 	</select>
 
 	<select id="findById" parameterType="long"
@@ -400,27 +399,21 @@
 
 	<!-- 해당 구성원 EMPTASK 전부 새 구성원으로 교체 -->
 	<update id="changeEmpTask" parameterType="map">
-		UPDATE EMPTASK
-		SET empId = #{newEmpId}
-		WHERE empId = #{oldEmpId}
-		AND taskId IN (
-		SELECT t.taskId
-		FROM task t
-		JOIN stage s ON t.stageId = s.stageId
-		WHERE s.projectId = #{projectId}
-		)
+	    UPDATE EMPTASK
+	    SET EMPID = #{newEmpId}
+	    WHERE EMPID = #{oldEmpId}
+	    AND TASKID IN (
+	        SELECT t.TASKID FROM TASK t
+	        JOIN STAGE s ON t.STAGEID = s.STAGEID
+	        WHERE s.PROJECTID = #{projectId}
+	    )
 	</update>
 
 	<update id="updatePredecessor" parameterType="map">
 	    UPDATE EMPPROJECT
-	    SET predecessor = (
-	        SELECT empprojId
-	        FROM EMPPROJECT
-	        WHERE projectId = #{projectId}
-	        AND empId = #{oldEmpId}
-	    )
+	    SET predecessor = #{oldEmpId}
 	    WHERE projectId = #{projectId}
-	    AND empId = #{newEmpId}
+	    AND empId = #{oldEmpId}
 	</update>
 
 	<update id="updateNewEmpId" parameterType="map">
