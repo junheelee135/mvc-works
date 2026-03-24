@@ -59,9 +59,9 @@
 	
 	<update id="updateProjectEmp" parameterType="com.mvc.app.domain.dto.ProjectsDto">
 	    UPDATE EMPTASK SET 
-	        PREDECESSOR = EMPID, 
 	        EMPID = #{empId}
 	    WHERE TASKID = #{taskId}
+	    AND EMPID != #{empId}
 	</update>
 	
 	
