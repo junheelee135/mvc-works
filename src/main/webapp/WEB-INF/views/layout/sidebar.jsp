@@ -87,8 +87,6 @@
 		<li><a
 			href="${pageContext.request.contextPath}/projects/myProjectList">프로젝트
 				리스트</a></li>
-		<li><a href="${pageContext.request.contextPath}/projects/gantt">프로젝트
-				태스크 관리</a></li>
 	</ul>
 
 	<hr />

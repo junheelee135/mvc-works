@@ -11,14 +11,33 @@
 }
 
 /* 클릭 가능한 요소 커서 */
-.notice-item,
-.todo-item,
-.project-item,
-.project-nav,
-.todo-card,
-.approval-box,
-.project-card {
+.notice-item, .project-item, .project-nav, .notice-card,
+	.approval-box, .project-card {
 	cursor: pointer;
+}
+
+/* ===== hover 영역 정확히 맞추기 (공통 보정) ===== */
+.notice-item {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+}
+
+/* 내부 텍스트 영역 */
+.notice-subject, .todo-left {
+	flex: 1;
+	min-width: 0;
+}
+
+/* padding */
+.notice-item {
+	padding: 10px 12px;
+}
+
+/* hover */
+.notice-item:hover, .project-item:hover {
+	background: #f5f7ff;
 }
 
 /* 1행: 프로필(1/3) + 할일(2/3) */
@@ -186,9 +205,6 @@
 	white-space: nowrap;
 }
 
-.todo-item:hover {
-	background: #f5f7ff;
-}
 
 /* -------------------- 프로젝트 -------------------- */
 .project-header {
@@ -319,16 +335,16 @@
 }
 
 .notice-subject {
-    max-width: 80%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+	max-width: 80%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .notice-date {
-    flex-shrink: 0;
-    color: #888;
-    font-size: 13px;
+	flex-shrink: 0;
+	color: #888;
+	font-size: 13px;
 }
 
 .notice-item {
@@ -340,7 +356,7 @@
 	cursor: pointer;
 	transition: background 0.15s ease;
 	border-radius: 8px;
-	
+	justify-content: space-between;
 }
 
 .notice-item:hover {
@@ -357,21 +373,21 @@
 }
 
 .notice-slider {
-    overflow: hidden;
-    width: 100%;
+	overflow: hidden;
+	width: 100%;
 }
 
 .notice-track {
-    display: flex;
-    transition: transform 0.35s ease;
-    width: 100%;
+	display: flex;
+	transition: transform 0.35s ease;
+	width: 100%;
 }
 
 .notice-slide {
-    min-width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+	min-width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }
 
 /* -------------------- 캘린더 -------------------- */
@@ -379,10 +395,8 @@
 	width: 100% !important;
 }
 
-.calendar-card .fc-view-harness,
-.calendar-card .fc-scrollgrid,
-.fc-scrollgrid-sync-table,
-.fc-daygrid-body {
+.calendar-card .fc-view-harness, .calendar-card .fc-scrollgrid,
+	.fc-scrollgrid-sync-table, .fc-daygrid-body {
 	width: 100% !important;
 }
 
@@ -469,7 +483,7 @@
 /* -------------------- 반응형 -------------------- */
 
 /* 992px 이하: 태블릿 */
-@media (max-width: 992px) {
+@media ( max-width : 992px) {
 	.top-row {
 		flex-direction: column !important;
 	}
@@ -479,7 +493,7 @@
 	.middle-row {
 		flex-wrap: wrap;
 	}
-	.middle-row > .card {
+	.middle-row>.card {
 		flex: 1 1 48% !important;
 		margin-bottom: 15px;
 	}
@@ -493,7 +507,7 @@
 }
 
 /* 768px 이하: 모바일 */
-@media (max-width: 768px) {
+@media ( max-width : 768px) {
 	.dashboard {
 		margin-left: 0 !important;
 		width: 100% !important;
@@ -502,7 +516,7 @@
 	.top-row, .middle-row {
 		flex-direction: column !important;
 	}
-	.profile-card, .todo-card, .middle-row > .card {
+	.profile-card, .todo-card, .middle-row>.card {
 		flex: 1 1 100% !important;
 		margin-bottom: 15px;
 	}
@@ -528,7 +542,7 @@
 }
 
 /* 480px 이하: 작은 모바일 */
-@media (max-width: 480px) {
+@media ( max-width : 480px) {
 	.dashboard {
 		padding: 10px !important;
 	}

@@ -62,7 +62,9 @@
 			<!-- 할일 -->
 			<div class="card todo-card">
 				<div class="project-header">
-					<div class="card-title">내 할일</div>
+					<div class="card-title"
+						onclick="location.href='<c:url value="projects/myProjectList"/>'">내
+						할일</div>
 					<div class="project-nav-wrap">
 						<button class="project-nav" onclick="todoPrev()">‹</button>
 						<button class="project-nav" onclick="todoNext()">›</button>
@@ -78,8 +80,7 @@
 									<div class="todo-grid">
 							</c:if>
 
-							<div class="todo-item"
-								onclick="location.href='<c:url value='/projects/task?projectId=${t.projectId}' />'">
+							<div class="todo-item">
 								<div class="todo-left">
 									<span class="todo-project">[${t.PROJECTNAME}]</span> <span
 										class="todo-title">${t.TITLE}</span>
@@ -136,7 +137,9 @@
 		<!-- 프로젝트 -->
 		<div class="card project-card">
 			<div class="project-header">
-				<div class="card-title">프로젝트 진행률</div>
+				<div class="card-title"
+					onclick="location.href='<c:url value="/projects/myProjectList"/>'">내
+					프로젝트 진행률</div>
 				<div class="project-nav-wrap">
 					<button class="project-nav" onclick="slidePrev()">‹</button>
 					<button class="project-nav" onclick="slideNext()">›</button>
@@ -169,10 +172,11 @@
 	</div>
 
 	<!-- 공지 -->
-	<!-- 공지 -->
 	<div class="card notice-card">
 		<div class="project-header">
-			<div class="card-title">프로젝트 공지사항</div>
+			<div class="card-title"
+				onclick="location.href='<c:url value="/projects/projectNotice"/>'">
+				프로젝트 공지사항</div>
 			<div class="project-nav-wrap">
 				<button class="project-nav" onclick="noticePrev()">‹</button>
 				<button class="project-nav" onclick="noticeNext()">›</button>

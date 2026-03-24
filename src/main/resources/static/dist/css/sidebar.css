@@ -49,6 +49,12 @@
 	background: #f0f3ff;
 	color: #4e73df;
 }
+
+/* 대시보드에서는 사이드바 엣지 버튼 숨김 */
+.dashboard .sidebar-edge-btn {
+    display: none;
+}
+
 /* 접혔을 때: 왼쪽 끝으로 이동 + 아이콘 방향 전환 */
 body.sidebar-collapsed .sidebar-edge-btn {
 	left: 0;
