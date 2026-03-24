@@ -172,6 +172,12 @@
 
   <!-- 받은 결재함 목록 (내 차례 WAIT + 내가 승인한 APPROVED + 대결) -->
   <select id="listInbox" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
+      WITH firstWait AS (
+          SELECT docId, MIN(stepOrder) AS minOrder
+          FROM approvalLine
+          WHERE lineStatusCode = 'WAIT'
+          GROUP BY docId
+      )
       SELECT d.docId, d.title, d.docStatus,
              d.writerEmpName, d.writerGradeName,
              d.regDate, t.typeName,
@@ -181,12 +187,11 @@
       FROM approvalDoc d
       LEFT JOIN approvalDocType t ON d.docTypeId = t.docTypeId
       INNER JOIN approvalLine l ON d.docId = l.docId
+      LEFT JOIN firstWait fw ON l.docId = fw.docId
       WHERE (l.apprEmpId = #{empId} OR l.deputyEmpId = #{empId})
         AND (
             (d.docStatus = 'PENDING' AND l.lineStatusCode = 'WAIT'
-             AND l.stepOrder = (
-                 SELECT MIN(stepOrder) FROM approvalLine
-                 WHERE docId = d.docId AND lineStatusCode = 'WAIT'))
+             AND l.stepOrder = fw.minOrder)
             OR
             (l.lineStatusCode = 'APPROVED')
         )
@@ -205,15 +210,20 @@
   </select>
 
   <select id="countInbox" parameterType="map" resultType="int">
+      WITH firstWait AS (
+          SELECT docId, MIN(stepOrder) AS minOrder
+          FROM approvalLine
+          WHERE lineStatusCode = 'WAIT'
+          GROUP BY docId
+      )
       SELECT COUNT(*)
       FROM approvalDoc d
       INNER JOIN approvalLine l ON d.docId = l.docId
+      LEFT JOIN firstWait fw ON l.docId = fw.docId
       WHERE (l.apprEmpId = #{empId} OR l.deputyEmpId = #{empId})
         AND (
             (d.docStatus = 'PENDING' AND l.lineStatusCode = 'WAIT'
-             AND l.stepOrder = (
-                 SELECT MIN(stepOrder) FROM approvalLine
-                 WHERE docId = d.docId AND lineStatusCode = 'WAIT'))
+             AND l.stepOrder = fw.minOrder)
             OR
             (l.lineStatusCode = 'APPROVED')
         )
@@ -231,26 +241,31 @@
 
   <!-- 미결재 문서 (내 차례 WAIT + 대결 대상 WAIT) -->
   <select id="listPendingInbox" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
+      WITH firstWait AS (
+          SELECT docId, apprEmpId
+          FROM (
+              SELECT docId, apprEmpId,
+                     ROW_NUMBER() OVER (PARTITION BY docId ORDER BY stepOrder) AS rn
+              FROM approvalLine
+              WHERE lineStatusCode = 'WAIT'
+          )
+          WHERE rn = 1
+      )
       SELECT d.docId, d.title, d.docStatus,
              d.writerEmpName, d.writerGradeName,
              d.regDate, t.typeName
       FROM approvalDoc d
       LEFT JOIN approvalDocType t ON d.docTypeId = t.docTypeId
-      INNER JOIN approvalLine l ON d.docId = l.docId
-      WHERE (
-              l.apprEmpId = #{empId}
-              OR l.apprEmpId IN (
-                  SELECT delegatorEmpId FROM approvalDeputyReg
-                  WHERE deputyEmpId = #{empId}
-                    AND isActive = 'Y'
-                    AND TRUNC(SYSDATE) BETWEEN startDate AND endDate
-              )
+      INNER JOIN firstWait fw ON d.docId = fw.docId
+      WHERE d.docStatus = 'PENDING'
+        AND (
+            fw.apprEmpId = #{empId}
+            OR fw.apprEmpId IN (
+                SELECT delegatorEmpId FROM approvalDeputyReg
+                WHERE deputyEmpId = #{empId}
+                  AND isActive = 'Y'
+                  AND TRUNC(SYSDATE) BETWEEN startDate AND endDate
             )
-        AND d.docStatus = 'PENDING'
-        AND l.lineStatusCode = 'WAIT'
-        AND l.stepOrder = (
-            SELECT MIN(stepOrder) FROM approvalLine
-            WHERE docId = d.docId AND lineStatusCode = 'WAIT'
         )
       <if test="keyword != null and keyword != ''">
           AND d.title LIKE '%' || #{keyword} || '%'
@@ -266,23 +281,28 @@
   </select>
 
   <select id="countPendingInbox" parameterType="map" resultType="int">
+      WITH firstWait AS (
+          SELECT docId, apprEmpId
+          FROM (
+              SELECT docId, apprEmpId,
+                     ROW_NUMBER() OVER (PARTITION BY docId ORDER BY stepOrder) AS rn
+              FROM approvalLine
+              WHERE lineStatusCode = 'WAIT'
+          )
+          WHERE rn = 1
+      )
       SELECT COUNT(*)
       FROM approvalDoc d
-      INNER JOIN approvalLine l ON d.docId = l.docId
-      WHERE (
-              l.apprEmpId = #{empId}
-              OR l.apprEmpId IN (
-                  SELECT delegatorEmpId FROM approvalDeputyReg
-                  WHERE deputyEmpId = #{empId}
-                    AND isActive = 'Y'
-                    AND TRUNC(SYSDATE) BETWEEN startDate AND endDate
-              )
+      INNER JOIN firstWait fw ON d.docId = fw.docId
+      WHERE d.docStatus = 'PENDING'
+        AND (
+            fw.apprEmpId = #{empId}
+            OR fw.apprEmpId IN (
+                SELECT delegatorEmpId FROM approvalDeputyReg
+                WHERE deputyEmpId = #{empId}
+                  AND isActive = 'Y'
+                  AND TRUNC(SYSDATE) BETWEEN startDate AND endDate
             )
-        AND d.docStatus = 'PENDING'
-        AND l.lineStatusCode = 'WAIT'
-        AND l.stepOrder = (
-            SELECT MIN(stepOrder) FROM approvalLine
-            WHERE docId = d.docId AND lineStatusCode = 'WAIT'
         )
       <if test="keyword != null and keyword != ''">
           AND d.title LIKE '%' || #{keyword} || '%'
