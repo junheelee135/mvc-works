@@ -27,17 +27,24 @@ public interface ProjectService {
 	public int myProjectsCount(Map<String, Object> map);
 
 	public List<ProjectsDto> myProjectsList(Map<String, Object> map);
+
 	public List<ProjectsDto> statusCount(Map<String, Object> map);
+
 	public List<ProjectsDto> myProjectstatusCount(String empId);
-	
+
 	public void projectAutoStart() throws Exception;
+
 	public void projectAutoDelay() throws Exception;
-	
+
 	public void projectForceStop(long projectId) throws Exception;
-	
+
 	public void changeMember(Map<String, Object> map) throws Exception;
-	
+
 	public void projectAutoCompleteAll() throws Exception;
-	
+
 	public void updateProjectDate(Map<String, Object> map) throws Exception;
+
+	public List<Map<String, Object>> ManagerProjects(String empId);
+
+	public boolean isProjectManager(long projectId, String empId);
 }

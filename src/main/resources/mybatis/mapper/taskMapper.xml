@@ -1,76 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mvc.app.mapper.TaskMapper">
-	<!-- task 생성 -->
-	<insert id="insertProjectTask" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-	<selectKey keyProperty="taskId" resultType="string" order="BEFORE">
-		SELECT 'TSK' || TASK_SEQ.NEXTVAL FROM DUAL
-	</selectKey>
+	<insert id="insertProjectTask"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		<selectKey keyProperty="taskId" resultType="string"
+			order="BEFORE">
+			SELECT 'TSK' || TASK_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
 		INSERT INTO TASK (
-			TASKID, STAGEID, TASKTITLE, TASKDESCRIPTION, TASKSTARTDATE,
-			TASKENDDATE, TASKSTATUS, TASKCREATEDDATE, TASKCREATOR
-		) VALUES (
-			#{taskId}, #{stageId}, #{taskTitle}, #{taskDescription, jdbcType=VARCHAR},
-			TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
-			TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
-			CASE
-			 	WHEN TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt; TRUNC(SYSDATE) THEN 4
-	            WHEN TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;= TRUNC(SYSDATE)
-	            AND TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &gt;= TRUNC(SYSDATE) THEN 2
-	            ELSE 1
-			END,
-			SYSDATE,
-			#{taskCreator, jdbcType=VARCHAR}
+		TASKID, STAGEID, TASKTITLE, TASKDESCRIPTION,
+		TASKSTARTDATE,
+		TASKENDDATE, TASKSTATUS, TASKCREATEDDATE, TASKCREATOR
+		)
+		VALUES (
+		#{taskId}, #{stageId}, #{taskTitle}, #{taskDescription,
+		jdbcType=VARCHAR},
+		TO_DATE(#{taskStartDate, jdbcType=VARCHAR},
+		'YYYY-MM-DD'),
+		TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		CASE
+		WHEN TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;
+		TRUNC(SYSDATE) THEN 4
+		WHEN TO_DATE(#{taskStartDate,
+		jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;=
+		TRUNC(SYSDATE)
+		AND TO_DATE(#{taskEndDate,
+		jdbcType=VARCHAR}, 'YYYY-MM-DD') &gt;=
+		TRUNC(SYSDATE) THEN 2
+		ELSE 1
+		END,
+		SYSDATE,
+		#{taskCreator, jdbcType=VARCHAR}
 		)
 	</insert>
-	
-	<insert id="insertEmpTask" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-	    INSERT INTO EMPTASK (
-	        EMPTASKID,
-	        EMPID,
-	        TASKID,
-	        EMPTASKSTARTDATE,
-	        EMPTASKENDDATE,
-	        EMPTASKSTATUS
-	    ) VALUES (
-	        'ET' || LPAD(EMPTASK_SEQ.NEXTVAL, 9, '0'),
-	        #{empId, jdbcType=VARCHAR},
-	        #{taskId},
-	        TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
-			TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
-	        CASE
-	            WHEN TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt; TRUNC(SYSDATE) THEN '4'
-	            WHEN TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;= TRUNC(SYSDATE)
-	            AND TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &gt;= TRUNC(SYSDATE) THEN '2'
-	            ELSE '1'
-	        END
-	    )
+
+	<insert id="insertEmpTask"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		INSERT INTO EMPTASK (
+		EMPTASKID,
+		EMPID,
+		TASKID,
+		EMPTASKSTARTDATE,
+		EMPTASKENDDATE,
+		EMPTASKSTATUS
+		) VALUES (
+		'ET' ||
+		LPAD(EMPTASK_SEQ.NEXTVAL, 9, '0'),
+		#{empId, jdbcType=VARCHAR},
+		#{taskId},
+		TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		CASE
+		WHEN
+		TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;
+		TRUNC(SYSDATE) THEN '4'
+		WHEN TO_DATE(#{taskStartDate,
+		jdbcType=VARCHAR}, 'YYYY-MM-DD') &lt;=
+		TRUNC(SYSDATE)
+		AND
+		TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') &gt;=
+		TRUNC(SYSDATE) THEN '2'
+		ELSE '1'
+		END
+		)
 	</insert>
-	
-	<!-- 업데이트 task -->
-	<update id="updateProjectTask" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-		UPDATE TASK SET 
-			TASKSTARTDATE = TO_DATE(#{taskStartDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
-			TASKENDDATE = TO_DATE(#{taskEndDate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
-			TASKSTATUS = #{taskStatus}
-		WHERE TASKID = #{taskId}
-	</update> 
-	
-	<update id="updateProjectEmp" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-	    UPDATE EMPTASK SET 
-	        EMPID = #{empId}
-	    WHERE TASKID = #{taskId}
-	    AND EMPID != #{empId}
+
+	<update id="updateProjectTask"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		UPDATE TASK SET
+		TASKSTARTDATE = TO_DATE(#{taskStartDate,
+		jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		TASKENDDATE = TO_DATE(#{taskEndDate,
+		jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		TASKSTATUS = #{taskStatus}
+		WHERE
+		TASKID = #{taskId}
 	</update>
-	
-	
-	<select id="countEmpTask" parameterType="String" resultType="int">
-	    SELECT COUNT(*) 
-	    FROM EMPTASK 
-	    WHERE TASKID = #{taskId}
+
+	<update id="updateProjectEmp"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		UPDATE EMPTASK SET
+		EMPID = #{empId}
+		WHERE TASKID =
+		#{taskId}
+		AND EMPID != #{empId}
+	</update>
+
+
+	<select id="countEmpTask" parameterType="String"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM EMPTASK
+		WHERE TASKID = #{taskId}
 	</select>
-	
+
 
 	<sql id="where-task">
 		<choose>
@@ -102,198 +125,235 @@
 
 	<select id="findByEmpId" resultType="map">
 		SELECT
-			p.TITLE AS projectName,
-			t.TASKTITLE AS title,
-			TO_CHAR(e.EMPTASKSTARTDATE,'YYYY-MM-DD') AS deadline
+		p.TITLE AS
+		projectName,
+		t.TASKTITLE AS title,
+		TO_CHAR(e.EMPTASKSTARTDATE,'YYYY-MM-DD') AS deadline
 		FROM EMPTASK e
-			JOIN TASK t ON e.TASKID = t.TASKID
-			JOIN STAGE s ON t.STAGEID = s.STAGEID
-			JOIN PROJECT p ON s.PROJECTID = p.PROJECTID
-		WHERE e.EMPID = #{empId}
-			AND e.EMPTASKSTATUS = '1'
+		JOIN TASK t ON e.TASKID = t.TASKID
+		JOIN STAGE s ON t.STAGEID =
+		s.STAGEID
+		JOIN PROJECT p ON s.PROJECTID = p.PROJECTID
+		WHERE e.EMPID =
+		#{empId}
+		AND e.EMPTASKSTATUS = '1'
 		ORDER BY e.EMPTASKSTARTDATE DESC
 	</select>
 
-	<!-- task 리스트 -->
-	<select id="tasklist" parameterType="map" resultType="com.mvc.app.domain.dto.ProjectsDto">
+	<select id="tasklist" parameterType="map"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
 		SELECT
-			t.taskId,
-			t.stageId,
-			s.projectId,
-			t.taskTitle,
-			t.taskDescription,
-			TO_CHAR(t.taskStartDate, 'YYYY-MM-DD') AS taskStartDate,
-			TO_CHAR(t.taskEndDate, 'YYYY-MM-DD') AS taskEndDate,
-			t.taskStatus,
-			t.taskcreator,
-			TO_CHAR(t.taskCreatedDate, 'YYYY-MM-DD') AS taskCreatedDate,
-			s.stgTitle,
-			s.sequence,
-			e1.NAME AS taskCreaterName,
-			ep.EMPTASKID AS empTaskId,
-			e2.NAME AS name,
-			e2.empId AS empId,
-			ROUND(
-				(SELECT COUNT(*) FROM TASKDAILYLOG dl
-				 JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
-				 WHERE et.taskId = t.taskId AND dl.logStatus = 'F') * 100.0 /
-			NULLIF(
-				(SELECT taskEndDate - taskStartDate + 1 FROM TASK WHERE taskId = t.taskId), 0)
-			) AS taskProgress
+		t.taskId,
+		t.stageId,
+		s.projectId,
+		t.taskTitle,
+		t.taskDescription,
+		TO_CHAR(t.taskStartDate, 'YYYY-MM-DD') AS taskStartDate,
+		TO_CHAR(t.taskEndDate, 'YYYY-MM-DD') AS taskEndDate,
+		t.taskStatus,
+		t.taskcreator,
+		TO_CHAR(t.taskCreatedDate, 'YYYY-MM-DD') AS
+		taskCreatedDate,
+		s.stgTitle,
+		s.sequence,
+		e1.NAME AS taskCreaterName,
+		ep.EMPTASKID AS empTaskId,
+		e2.NAME AS name,
+		e2.empId AS empId,
+		ROUND(
+		(SELECT COUNT(*) FROM TASKDAILYLOG dl
+		JOIN EMPTASK et ON dl.empTaskId =
+		et.empTaskId
+		WHERE et.taskId = t.taskId AND dl.logStatus = 'F') * 100.0
+		/
+		NULLIF(
+		(SELECT taskEndDate - taskStartDate + 1 FROM TASK WHERE taskId
+		= t.taskId),
+		0)
+		) AS taskProgress
 		FROM TASK t
-			LEFT JOIN STAGE s ON t.stageId = s.stageId
-			LEFT JOIN EMPLOYEE2 e1 ON t.taskcreator = e1.empId
-			LEFT JOIN EMPTASK ep ON t.taskId = ep.taskId
-			LEFT JOIN EMPLOYEE2 e2 ON ep.empId = e2.empId
-		WHERE s.PROJECTID = #{projectId}
+		LEFT JOIN STAGE s ON
+		t.stageId = s.stageId
+		LEFT JOIN EMPLOYEE2 e1 ON t.taskcreator =
+		e1.empId
+		LEFT JOIN EMPTASK ep ON t.taskId = ep.taskId
+		LEFT JOIN
+		EMPLOYEE2 e2 ON ep.empId = e2.empId
+		WHERE s.PROJECTID =
+		#{projectId}
 		<if test="kwd != null and kwd != ''">
 			AND
 			<include refid="where-task" />
 		</if>
-			ORDER BY s.sequence ASC, t.taskStartDate ASC
-			OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+		ORDER BY s.sequence ASC, t.taskStartDate ASC
+		OFFSET #{offset} ROWS
+		FETCH FIRST #{size} ROWS ONLY
 	</select>
 
-	<!-- 프로젝트 개발 단계 찾기 -->
-	<select id="findStagesByProjectId" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectsDto">
-	    SELECT stageId, stgTitle, sequence
-	    FROM STAGE
-	    WHERE projectId = #{projectId}
-	    ORDER BY sequence
+	<select id="findStagesByProjectId" parameterType="long"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT stageId, stgTitle, sequence
+		FROM STAGE
+		WHERE projectId
+		= #{projectId}
+		ORDER BY sequence
 	</select>
 
-	<insert id="insertNewStage" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-		<selectKey keyProperty="stageId" resultType="string" order="BEFORE">
+	<insert id="insertNewStage"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		<selectKey keyProperty="stageId" resultType="string"
+			order="BEFORE">
 			SELECT 'STG' || LPAD(STAGE_SEQ.NEXTVAL, 8, '0') FROM DUAL
 		</selectKey>
-		    INSERT INTO STAGE 
-		    	(stageId, 
-		    	projectId, 
-		    	stgTitle, 
-		    	sequence, 
-		    	stgStatus, 
-		    	stgProgress, 
-		    	stgCreatedDate)
-			VALUES 
-				(#{stageId},
-				#{projectId},
-				#{stgTitle},
-				(SELECT NVL(MAX(sequence), 0) + 1 FROM STAGE WHERE projectId = #{projectId}),
-				'1', 0, SYSDATE)
+		INSERT INTO STAGE
+		(stageId,
+		projectId,
+		stgTitle,
+		sequence,
+		stgStatus,
+		stgProgress,
+		stgCreatedDate)
+		VALUES
+		(#{stageId},
+		#{projectId},
+		#{stgTitle},
+		(SELECT NVL(MAX(sequence), 0) + 1 FROM STAGE WHERE
+		projectId = #{projectId}),
+		'1', 0, SYSDATE)
 	</insert>
-	
-		<select id="taskDataCount" parameterType="map" resultType="Integer">
-			SELECT NVL(COUNT(*), 0)
-			FROM TASK t
-			LEFT JOIN STAGE s ON t.stageId = s.stageId
-			WHERE s.projectId = #{projectId}
+
+	<select id="taskDataCount" parameterType="map"
+		resultType="Integer">
+		SELECT NVL(COUNT(*), 0)
+		FROM TASK t
+		LEFT JOIN STAGE s ON t.stageId =
+		s.stageId
+		WHERE s.projectId = #{projectId}
 		<if test="kwd != null and kwd != ''">
 			AND
 			<include refid="where-task" />
 		</if>
 	</select>
-	
-	<insert id="insertTaskDailylog" parameterType="com.mvc.app.domain.dto.ProjectsDto">
-		<selectKey keyProperty="logId" resultType="string" order="BEFORE">
-		 	SELECT 'TDL' || LPAD(TASKDAILY_SEQ.NEXTVAL, 12, '0') FROM DUAL
-		</selectKey>
-			INSERT INTO TASKDAILYLOG (logId, empTaskId, logDate, logStatus, logReason)
-				VALUES(#{logId}, #{empTaskId}, TO_DATE(#{logDate}, 'YYYY-MM-DD'), #{logStatus}, #{logReason, jdbcType=VARCHAR})
-	</insert>
-	
 
-	<select id="taskDailylist" parameterType="String" resultType="com.mvc.app.domain.dto.ProjectsDto">
-	    SELECT 
-	        TO_CHAR(logDate, 'YYYY-MM-DD') AS logDate,
-	        logStatus,
-	        logReason
-	    FROM TASKDAILYLOG
-	    WHERE empTaskId = #{empTaskId}
-	    ORDER BY logDate ASC
+	<insert id="insertTaskDailylog"
+		parameterType="com.mvc.app.domain.dto.ProjectsDto">
+		<selectKey keyProperty="logId" resultType="string"
+			order="BEFORE">
+			SELECT 'TDL' || LPAD(TASKDAILY_SEQ.NEXTVAL, 12, '0') FROM DUAL
+		</selectKey>
+		INSERT INTO TASKDAILYLOG (logId, empTaskId, logDate, logStatus,
+		logReason)
+		VALUES(#{logId}, #{empTaskId}, TO_DATE(#{logDate},
+		'YYYY-MM-DD'), #{logStatus},
+		#{logReason, jdbcType=VARCHAR})
+	</insert>
+
+
+	<select id="taskDailylist" parameterType="String"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+		TO_CHAR(logDate, 'YYYY-MM-DD') AS logDate,
+		logStatus,
+		logReason
+		FROM TASKDAILYLOG
+		WHERE empTaskId = #{empTaskId}
+		ORDER BY
+		logDate ASC
 	</select>
-	
-	<!-- 프로젝트 진척도 업데이트 -->
+
 	<update id="projectUpdateProgress" parameterType="long">
-	    UPDATE PROJECT
-	    SET progress = (
-	        SELECT NVL(ROUND(
-	            AVG(
-	                ROUND(
-	                    (SELECT COUNT(*) 
-	                     FROM TASKDAILYLOG dl
-	                     JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
-	                     WHERE et.taskId = t.taskId 
-	                     AND dl.logStatus = 'F') * 100.0
-	                    / NULLIF(t.taskEndDate - t.taskStartDate + 1, 0)
-	                )
-	            )
-	        ), 0)
-	        FROM task t
-	        JOIN stage s ON t.stageId = s.stageId
-	        WHERE s.projectId = #{projectId}
-	    )
-	    WHERE projectId = #{projectId}
+		UPDATE PROJECT
+		SET progress = (
+		SELECT NVL(ROUND(
+		AVG(
+		ROUND(
+		(SELECT COUNT(*)
+		FROM
+		TASKDAILYLOG dl
+		JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
+		WHERE
+		et.taskId = t.taskId
+		AND dl.logStatus = 'F') * 100.0
+		/
+		NULLIF(t.taskEndDate - t.taskStartDate + 1, 0)
+		)
+		)
+		), 0)
+		FROM task t
+		JOIN
+		stage s ON t.stageId = s.stageId
+		WHERE s.projectId = #{projectId}
+		)
+		WHERE projectId = #{projectId}
 	</update>
-	
-	
-	<!-- task 상태 자동 업데이트 -->
+
+
 	<update id="taskUpdateStatus" parameterType="String">
-	    UPDATE task
-	    SET taskStatus = (
-	        SELECT CASE
-	            WHEN latestStatus = 'S' THEN '6'
-	            WHEN completedDays >= totalDays THEN '4'
-	            WHEN completedDays > 0 THEN '2'
-	            ELSE taskStatus
-	        END
-	        FROM (
-	            SELECT
-	                (SELECT dl.logStatus
-	                 FROM TASKDAILYLOG dl
-	                 JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
-	                 WHERE et.taskId = #{taskId}
-	                 ORDER BY dl.logDate DESC
-	                 FETCH FIRST 1 ROW ONLY) AS latestStatus,
-	                (SELECT COUNT(*)
-	                 FROM TASKDAILYLOG dl
-	                 JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
-	                 WHERE et.taskId = #{taskId}
-	                 AND dl.logStatus = 'F') AS completedDays,
-	                (SELECT taskEndDate - taskStartDate + 1
-	                 FROM task
-	                 WHERE taskId = #{taskId}) AS totalDays
-	            FROM DUAL
-	        )
-	    )
-	    WHERE taskId = #{taskId}
+		UPDATE task
+		SET
+		taskStatus = (
+		SELECT CASE
+		WHEN latestStatus = 'S' THEN '6'
+		WHEN
+		completedDays >= totalDays THEN '4'
+		WHEN completedDays > 0 THEN '2'
+		ELSE taskStatus
+		END
+		FROM (
+		SELECT
+		(SELECT dl.logStatus
+		FROM TASKDAILYLOG dl
+		JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
+		WHERE et.taskId =
+		#{taskId}
+		ORDER BY dl.logDate DESC
+		FETCH FIRST 1 ROW ONLY) AS
+		latestStatus,
+		(SELECT COUNT(*)
+		FROM TASKDAILYLOG dl
+		JOIN EMPTASK et ON
+		dl.empTaskId = et.empTaskId
+		WHERE et.taskId = #{taskId}
+		AND dl.logStatus
+		= 'F') AS completedDays,
+		(SELECT taskEndDate - taskStartDate + 1
+		FROM
+		task
+		WHERE taskId = #{taskId}) AS totalDays
+		FROM DUAL
+		)
+		)
+		WHERE taskId =
+		#{taskId}
 	</update>
-	
-	<!-- task 종료일 지났으면 자동 지연 -->
+
 	<update id="taskAutoDelay">
-	    UPDATE task
-	    SET taskStatus = '5'
-	    WHERE TRUNC(SYSDATE) &gt; taskEndDate
-	    AND taskStatus NOT IN ('4', '6')
+		UPDATE task
+		SET taskStatus = '5'
+		WHERE TRUNC(SYSDATE)
+		&gt; taskEndDate
+		AND taskStatus NOT IN ('4', '6')
 	</update>
-	
-	<!-- 모든 task 종료 시 프로젝트 자동 완료 -->
+
 	<update id="projectAutoComplete" parameterType="long">
-	    UPDATE PROJECT
-	    SET status = '4'
-	    WHERE projectId = #{projectId}
-	    AND (
-	        SELECT COUNT(*)
-	        FROM task t
-	        JOIN stage s ON t.stageId = s.stageId
-	        WHERE s.projectId = #{projectId}
-	        AND t.taskStatus != '4'
-	    ) = 0
-	    AND (
-	        SELECT COUNT(*)
-	        FROM task t
-	        JOIN stage s ON t.stageId = s.stageId
-	        WHERE s.projectId = #{projectId}
-	    ) &gt; 0
+		UPDATE PROJECT
+		SET status = '4'
+		WHERE projectId = #{projectId}
+		AND (
+		SELECT COUNT(*)
+		FROM task t
+		JOIN stage s ON t.stageId = s.stageId
+		WHERE s.projectId =
+		#{projectId}
+		AND t.taskStatus != '4'
+		) = 0
+		AND (
+		SELECT COUNT(*)
+		FROM task
+		t
+		JOIN stage s ON t.stageId = s.stageId
+		WHERE s.projectId = #{projectId}
+		) &gt; 0
 	</update>
 
 	<sql id="where-project">
@@ -323,76 +383,174 @@
 			</otherwise>
 		</choose>
 	</sql>
-	
-	<select id="myProjectslist" parameterType="map" resultType="com.mvc.app.domain.dto.ProjectsDto">
-	    SELECT
-	    p.PROJECTID,
-	    p.TITLE,
-	    p.PROJECTTYPE,
-	    CASE
-	    WHEN COUNT(e.NAME) > 1
-	    THEN MIN(e.NAME) || ' 외 ' || (COUNT(e.NAME) - 1) || '명'
-	    ELSE MIN(e.NAME)
-	    END AS managerName,
-	    TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS startDate,
-	    TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
-	    TRUNC(p.ENDDATE - p.STARTDATE) AS totalDays,
-	    CASE
-	    WHEN p.STARTDATE > TRUNC(SYSDATE) THEN '시작 전'
-	    WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '0'
-	    ELSE TO_CHAR(GREATEST(TRUNC(p.ENDDATE - SYSDATE), 0)) || ' / ' ||
-	    TO_CHAR(TRUNC(p.ENDDATE - p.STARTDATE))
-	    END AS remainDays,
-	    p.PROGRESS,
-	    CASE
-	    WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '4'
-	    WHEN p.STARTDATE &lt;= TRUNC(SYSDATE) AND p.ENDDATE >= TRUNC(SYSDATE)
-	    THEN '2'
-	    ELSE p.STATUS
-	    END AS status
-	    FROM PROJECT p
-	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
-	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-	    WHERE p.PROJECTID IN (
-	        SELECT projectId FROM EMPPROJECT WHERE empId = #{empId}
-	    )
-	    AND ep.ROLE = 'M'
-	    <if test="kwd != null and kwd != ''">
-	        AND <include refid="where-project" />
-	    </if>
-	    GROUP BY p.PROJECTID, p.TITLE, p.PROJECTTYPE, p.STARTDATE, p.ENDDATE, p.PROGRESS, p.STATUS
-	    ORDER BY p.PROJECTID DESC
-	    OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+
+	<select id="myProjectslist" parameterType="map"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+		p.PROJECTID,
+		p.TITLE,
+		p.PROJECTTYPE,
+		CASE
+		WHEN COUNT(e.NAME) > 1
+		THEN MIN(e.NAME) || ' 외 ' || (COUNT(e.NAME) - 1) || '명'
+		ELSE
+		MIN(e.NAME)
+		END AS managerName,
+		TO_CHAR(p.STARTDATE, 'YYYY/MM/DD') AS
+		startDate,
+		TO_CHAR(p.ENDDATE, 'YYYY/MM/DD') AS endDate,
+		TRUNC(p.ENDDATE
+		- p.STARTDATE) AS totalDays,
+		CASE
+		WHEN p.STARTDATE > TRUNC(SYSDATE) THEN
+		'시작 전'
+		WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '0'
+		ELSE
+		TO_CHAR(GREATEST(TRUNC(p.ENDDATE - SYSDATE), 0)) || ' / ' ||
+		TO_CHAR(TRUNC(p.ENDDATE - p.STARTDATE))
+		END AS remainDays,
+		p.PROGRESS,
+		CASE
+		WHEN p.ENDDATE &lt; TRUNC(SYSDATE) THEN '4'
+		WHEN p.STARTDATE &lt;=
+		TRUNC(SYSDATE) AND p.ENDDATE >= TRUNC(SYSDATE)
+		THEN '2'
+		ELSE p.STATUS
+		END AS status
+		FROM PROJECT p
+		JOIN EMPPROJECT ep ON p.PROJECTID =
+		ep.PROJECTID
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE p.PROJECTID IN
+		(
+		SELECT projectId FROM EMPPROJECT WHERE empId = #{empId}
+		)
+		AND ep.ROLE =
+		'M'
+		<if test="kwd != null and kwd != ''">
+			AND
+			<include refid="where-project" />
+		</if>
+		GROUP BY p.PROJECTID, p.TITLE, p.PROJECTTYPE, p.STARTDATE, p.ENDDATE,
+		p.PROGRESS, p.STATUS
+		ORDER BY p.PROJECTID DESC
+		OFFSET #{offset} ROWS
+		FETCH FIRST #{size} ROWS ONLY
 	</select>
-	
-	<select id="myDataCount" parameterType="map" resultType="Integer">
-	    SELECT NVL(COUNT(*), 0)
-	    FROM PROJECT p
-	    JOIN EMPPROJECT ep ON p.PROJECTID = ep.PROJECTID
-	    JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
-	    WHERE p.PROJECTID IN (
-	        SELECT projectId FROM EMPPROJECT WHERE empId = #{empId}
-	    )
-	    AND ep.ROLE = 'M'
-	    <if test="kwd != null and kwd != ''">
-	        AND <include refid="where-project" />
-	    </if>
+
+	<select id="myDataCount" parameterType="map"
+		resultType="Integer">
+		SELECT NVL(COUNT(*), 0)
+		FROM PROJECT p
+		JOIN EMPPROJECT ep ON p.PROJECTID
+		= ep.PROJECTID
+		JOIN EMPLOYEE2 e ON ep.EMPID = e.EMPID
+		WHERE p.PROJECTID
+		IN (
+		SELECT projectId FROM EMPPROJECT WHERE empId = #{empId}
+		)
+		AND
+		ep.ROLE = 'M'
+		<if test="kwd != null and kwd != ''">
+			AND
+			<include refid="where-project" />
+		</if>
 	</select>
-	
+
 	<update id="taskForceStopByProject" parameterType="long">
-	    UPDATE task
-	    SET taskStatus = '6'
-	    WHERE taskId IN (
-	        SELECT t.taskId
-	        FROM task t
-	        JOIN stage s ON t.stageId = s.stageId
-	        WHERE s.projectId = #{projectId}
-	        AND t.taskStatus NOT IN ('4')
-	    )
+		UPDATE task
+		SET taskStatus = '6'
+		WHERE taskId IN (
+		SELECT t.taskId
+		FROM task t
+		JOIN
+		stage s ON t.stageId = s.stageId
+		WHERE s.projectId = #{projectId}
+		AND
+		t.taskStatus NOT IN ('4')
+		)
 	</update>
-	
-	<select id="findEmpTaskId" parameterType="string" resultType="string">
-	    SELECT EMPTASKID FROM EMPTASK WHERE TASKID = #{taskId}
+
+	<select id="findEmpTaskId" parameterType="string"
+		resultType="string">
+		SELECT EMPTASKID FROM EMPTASK WHERE TASKID = #{taskId}
 	</select>
-	
+
+	<select id="myTasklist" parameterType="map"
+		resultType="com.mvc.app.domain.dto.ProjectsDto">
+		SELECT
+			t.taskId,
+			t.stageId,
+			s.projectId,
+			p.TITLE AS title,      t.taskTitle,
+			t.taskDescription,
+			TO_CHAR(t.taskStartDate, 'YYYY-MM-DD') AS taskStartDate,
+			TO_CHAR(t.taskEndDate, 'YYYY-MM-DD') AS taskEndDate,
+			t.taskStatus,
+			t.taskcreator,
+			TO_CHAR(t.taskCreatedDate, 'YYYY-MM-DD') AS taskCreatedDate,
+			s.stgTitle,
+			s.sequence,
+			e1.NAME AS taskCreaterName,
+			ep.EMPTASKID AS empTaskId,
+			e2.NAME AS name,
+			e2.empId AS empId,
+			ROUND(
+				(SELECT COUNT(*) FROM TASKDAILYLOG dl
+				JOIN EMPTASK et ON dl.empTaskId = et.empTaskId
+				WHERE et.taskId = t.taskId AND et.empId = #{empId, jdbcType=VARCHAR} AND
+				dl.logStatus = 'F')
+				* 100.0 /
+				NULLIF((SELECT taskEndDate - taskStartDate + 1 FROM TASK WHERE taskId = t.taskId), 0)
+			) AS taskProgress
+		FROM TASK t
+		LEFT JOIN STAGE s ON t.stageId = s.stageId
+		LEFT JOIN PROJECT p ON s.projectId = p.projectId  LEFT JOIN EMPLOYEE2 e1 ON t.taskcreator = e1.empId
+		LEFT JOIN EMPTASK ep ON t.taskId = ep.taskId
+		LEFT JOIN EMPLOYEE2 e2 ON ep.empId = e2.empId
+		WHERE ep.empId = #{empId, jdbcType=VARCHAR}
+		<if test="projectId != null and projectId != 0">
+			AND s.PROJECTID = #{projectId, jdbcType=NUMERIC}
+		</if>
+		<if test="kwd != null and kwd != ''">
+			AND (
+			<choose>
+				<when test="schType == 'taskTitle'">INSTR(t.TASKTITLE, #{kwd}) &gt; 0</when>
+				<when test="schType == 'stgTitle'">INSTR(s.STGTITLE, #{kwd}) &gt; 0</when>
+				<when test="schType == 'taskStartDate'">INSTR(TO_CHAR(t.TASKSTARTDATE,'YYYY-MM-DD'), #{kwd}) &gt; 0</when>
+				<when test="schType == 'taskEndDate'">INSTR(TO_CHAR(t.TASKENDDATE,'YYYY-MM-DD'), #{kwd}) &gt; 0</when>
+				<when test="schType == 'taskCreater'">INSTR(e1.NAME, #{kwd}) &gt; 0</when>
+				<otherwise>1=1</otherwise>
+			</choose>
+			)
+		</if>
+		ORDER BY t.taskEndDate ASC, t.taskStartDate ASC
+		OFFSET #{offset, jdbcType=INTEGER} ROWS FETCH FIRST #{size, jdbcType=INTEGER} ROWS ONLY
+	</select>
+
+	<select id="myTaskDataCount" parameterType="map"
+		resultType="Integer">
+		SELECT NVL(COUNT(*), 0)
+		FROM TASK t
+		LEFT JOIN STAGE s ON t.stageId = s.stageId
+		LEFT JOIN EMPTASK ep ON t.taskId = ep.taskId
+		WHERE ep.empId = #{empId, jdbcType=VARCHAR}
+		<if test="projectId != null and projectId != 0">
+			AND s.projectId = #{projectId, jdbcType=NUMERIC}
+		</if>
+		<if test="kwd != null and kwd != ''">
+			AND (
+			<choose>
+				<when test="schType == 'taskTitle'">INSTR(t.TASKTITLE, #{kwd}) &gt; 0</when>
+				<when test="schType == 'stgTitle'">INSTR(s.STGTITLE, #{kwd}) &gt; 0</when>
+				<when test="schType == 'taskStartDate'">INSTR(TO_CHAR(t.TASKSTARTDATE,'YYYY-MM-DD'), #{kwd})
+					&gt; 0</when>
+				<when test="schType == 'taskEndDate'">INSTR(TO_CHAR(t.TASKENDDATE,'YYYY-MM-DD'), #{kwd})
+					&gt; 0</when>
+				<when test="schType == 'taskCreater'">INSTR(e1.NAME, #{kwd}) &gt; 0</when>
+				<otherwise>1=1</otherwise>
+			</choose>
+			)
+		</if>
+	</select>
 </mapper>

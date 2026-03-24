@@ -32,5 +32,7 @@ public interface TaskService {
 	public void taskForceStopByProject(long projectId) throws Exception;
 	
 	public String findEmpTaskId(String taskId) throws Exception;
+	public List<ProjectsDto> myTasklist(Map<String, Object> map) throws Exception;
+	public int myTaskDataCount(Map<String, Object> map) throws Exception;
 
 }

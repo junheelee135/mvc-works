@@ -8,16 +8,14 @@
 
 <aside id="sidebar">
 	<a href="${pageContext.request.contextPath}/home" class="sidebar-brand">
-		<img src="${pageContext.request.contextPath}/dist/images/logo_full.png"
+		<img
+		src="${pageContext.request.contextPath}/dist/images/logo_full.png"
 		alt="MVC" class="sidebar-logo">
-	</a>
-	
-	<a href="${pageContext.request.contextPath}/home" class="nav-link"><i
+	</a> <a href="${pageContext.request.contextPath}/home" class="nav-link"><i
 		class="fas fa-th-large"></i> 대시보드</a> <a
 		href="${pageContext.request.contextPath}/projects/list"
-		class="nav-link"><i class="bi bi-folder"></i> 전사 프로젝트</a>
-
-	<a href="${pageContext.request.contextPath}/groupware/notice"
+		class="nav-link"><i class="bi bi-folder"></i> 전사 프로젝트</a> <a
+		href="${pageContext.request.contextPath}/groupware/notice"
 		class="nav-link"> <i class="fas fa-bullhorn"></i> 공지사항
 	</a>
 
@@ -35,7 +33,7 @@
 
 	<%-- 프로젝트관리 토글 메뉴 --%>
 	<a href="#" class="nav-link nav-toggle" id="projectToggle"><i
-		class="fa-solid fa-chart-gantt"></i>내 프로젝트 <i
+		class="fa-solid fa-chart-gantt"></i>프로젝트 관리<i
 		class="fas fa-chevron-down toggle-icon" id="projectArrow"></i></a>
 	<ul class="sub-menu" id="projectSubMenu">
 		<li><a href="${pageContext.request.contextPath}/projects/create">프로젝트
@@ -46,9 +44,11 @@
 		<li><a
 			href="${pageContext.request.contextPath}/projects/myProjectList">프로젝트
 				리스트</a></li>
+		<li><a
+			href="${pageContext.request.contextPath}/projects/myTask">나의 태스크</a></li>
 	</ul>
-	
-		<%-- 결재관리 토글 메뉴 --%>
+
+	<%-- 결재관리 토글 메뉴 --%>
 	<a href="#" class="nav-link nav-toggle" id="approvalToggle"> <i
 		class="fa-solid fa-clipboard"></i> 결재관리 <i
 		class="fas fa-chevron-down toggle-icon" id="approvalArrow"></i>
@@ -66,8 +66,8 @@
 		<li><a href="${pageContext.request.contextPath}/approval/absence">부재
 				등록</a></li>
 	</ul>
-	
-		<%-- 인사관리 토글 메뉴 --%>
+
+	<%-- 인사관리 토글 메뉴 --%>
 	<a href="#" class="nav-link nav-toggle" id="hrmToggle"> <i
 		class="fas fa-file-signature"></i> 인사관리 <i
 		class="fas fa-chevron-down toggle-icon" id="hrmArrow"></i>
@@ -97,28 +97,25 @@
 	</ul>
 
 	<%-- 설문관리 토글 메뉴 --%>
-	<a href="#" class="nav-link nav-toggle" id="surveyToggle">
-		<i class="fas fa-poll"></i> 설문관리
-		<i class="fas fa-chevron-down toggle-icon" id="surveyArrow"></i>
+	<a href="#" class="nav-link nav-toggle" id="surveyToggle"> <i
+		class="fas fa-poll"></i> 설문관리 <i
+		class="fas fa-chevron-down toggle-icon" id="surveyArrow"></i>
 	</a>
 	<ul class="sub-menu" id="surveySubMenu">
-		<li><a href="${pageContext.request.contextPath}/survey/list">설문 목록</a></li>
+		<li><a href="${pageContext.request.contextPath}/survey/list">설문
+				목록</a></li>
 	</ul>
-	
+
 	<hr>
 
 	<a href="${pageContext.request.contextPath}/qnaBot" class="nav-link">
 		<i class="fa-solid fa-question"></i> 질문봇
-	</a> 
-	
-	<a href="${pageContext.request.contextPath}/layout/lunchLadder"
+	</a> <a href="${pageContext.request.contextPath}/layout/lunchLadder"
 		class="nav-link"> <i class="fa-solid fa-gamepad"></i> 쉬어가기
+	</a> <a href="${pageContext.request.contextPath}/snack" class="nav-link">
+		<i class="fas fa-cookie-bite"></i> 탕비실 신청
 	</a>
-	
-	<a href="${pageContext.request.contextPath}/snack" class="nav-link">
-        <i class="fas fa-cookie-bite"></i> 탕비실 신청
-    </a>
-    
+
 </aside>
 
 <!-- 사이드바 토글 버튼 (접기/펼치기 하나로 통합) -->
@@ -127,5 +124,6 @@
 </button>
 
 <%-- sidebar 전용 Js --%>
-<script src="${pageContext.request.contextPath}/dist/js/main-sidebar.js?v=2"></script>
+<script
+	src="${pageContext.request.contextPath}/dist/js/main-sidebar.js?v=2"></script>
 

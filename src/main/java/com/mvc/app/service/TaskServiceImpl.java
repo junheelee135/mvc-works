@@ -221,4 +221,27 @@ public class TaskServiceImpl implements TaskService{
 	    return empTaskId;
 	}
 
+	@Override
+	public List<ProjectsDto> myTasklist(Map<String, Object> map) throws Exception {
+	    List<ProjectsDto> list = null;
+	    try {
+	        list = mapper.myTasklist(map);
+	    } catch (Exception e) {
+	        log.info("myTasklist : ", e);
+	        throw e;
+	    }
+	    return list;
+	}
+
+	@Override
+	public int myTaskDataCount(Map<String, Object> map) throws Exception {
+	    int result = 0;
+	    try {
+	        result = mapper.myTaskDataCount(map);
+	    } catch (Exception e) {
+	        log.info("myTaskDataCount : ", e);
+	        throw e;
+	    }
+	    return result;
+	}
 }

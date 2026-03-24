@@ -332,6 +332,94 @@ public class ProjectController {
 	    return "projects/task";
 	}
 
+	@GetMapping("/myTask")
+	public String myTaskList(
+	        @RequestParam(name = "page", defaultValue = "1") int current_page,
+	        @RequestParam(name = "projectId", required = false, defaultValue = "0") long projectId,
+	        @RequestParam(name = "schType", defaultValue = "all") String schType,
+	        @RequestParam(name = "kwd", defaultValue = "") String kwd,
+	        Model model) {
+
+	    try {
+	        // 자동 상태 업데이트 서비스 호출
+	        service.projectAutoStart();
+	        service.projectAutoDelay();
+	        taskService.taskAutoDelay();
+
+	        int size = 30;
+	        int total_page = 0;
+	        kwd = myUtil.decodeUrl(kwd);
+
+	        SessionInfo info = LoginMemberUtil.getSessionInfo();
+	        String loginEmpId = info.getEmpId();
+
+	        // 1. 셀렉트 박스용 내 프로젝트 목록 (이미 서비스에 구현됨)
+	        Map<String, Object> projectParams = new HashMap<>();
+	        projectParams.put("empId", loginEmpId);
+	        projectParams.put("offset", 0);
+	        projectParams.put("size", 1000); 
+	        List<ProjectsDto> myProjects = service.myProjectsList(projectParams); 
+	        model.addAttribute("myProjects", myProjects); 
+
+	        // 2. 검색 및 페이징 설정
+	        Map<String, Object> map = new HashMap<>();
+	        if (projectId != 0) map.put("projectId", projectId);
+	        map.put("empId", loginEmpId); 
+	        map.put("schType", schType);
+	        map.put("kwd", kwd);
+
+	        int taskDataCount = taskService.myTaskDataCount(map);
+	        if (taskDataCount != 0) {
+	            total_page = (int) Math.ceil((double) taskDataCount / size);
+	        }
+
+	        current_page = Math.min(current_page, total_page > 0 ? total_page : 1);
+	        int offset = (current_page - 1) * size;
+	        map.put("offset", offset < 0 ? 0 : offset);
+	        map.put("size", size);
+
+	        // 3. 내 업무 목록 조회
+	        List<ProjectsDto> list = taskService.myTasklist(map); 
+	        model.addAttribute("list", list);
+
+	        // 페이징 유틸
+	        String cp = RequestUtils.getContextPath();
+	        String listUrl = cp + "/projects/myTask?projectId=" + projectId;
+	        String paging = paginateUtil.paging(current_page, total_page, listUrl);
+
+	        model.addAttribute("paging", paging);
+	        model.addAttribute("projectId", projectId);
+	        model.addAttribute("schType", schType);
+	        model.addAttribute("kwd", kwd);
+
+	        // 4. 프로젝트 선택 시 상세 정보 및 권한 체크
+	        if (projectId != 0) {
+	            ProjectsDto dto = service.projectarticle(projectId);
+	            if (dto != null) {
+	                model.addAttribute("projectTitle", dto.getTitle());
+	                model.addAttribute("projectStart", dto.getStartDate() != null ? dto.getStartDate().replace("/", "-") : "");
+	                model.addAttribute("projectEnd", dto.getEndDate() != null ? dto.getEndDate().replace("/", "-") : "");
+	                
+	                // [수정] 서비스의 getManagerProjects를 사용하여 PM 여부 확인
+	                List<Map<String, Object>> managerProjects = service.ManagerProjects(loginEmpId);
+	                boolean isManager = managerProjects != null && managerProjects.stream()
+	                        .anyMatch(m -> String.valueOf(m.get("PROJECTID")).equals(String.valueOf(projectId)));
+	                
+	                model.addAttribute("isManager", isManager);
+	                
+	                // 모달용 데이터 (단계 및 멤버)
+	                model.addAttribute("stages", taskService.findStagesByProjectId(projectId));
+	                model.addAttribute("members", service.projectMembers(projectId));
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        log.info("myTaskList error : ", e);
+	    }
+
+	    return "projects/myTask"; 
+	}
+	
 	@PostMapping("task/insert")
 	@ResponseBody
 	public ResponseEntity<?> insertTask(@RequestBody ProjectsDto dto, HttpServletRequest req) throws Exception {

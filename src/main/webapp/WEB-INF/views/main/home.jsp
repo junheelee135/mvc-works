@@ -63,7 +63,7 @@
 			<div class="card todo-card">
 				<div class="project-header">
 					<div class="card-title"
-						onclick="location.href='<c:url value="projects/myProjectList"/>'">내
+						onclick="location.href='<c:url value="projects/myTask"/>'">내
 						할일</div>
 					<div class="project-nav-wrap">
 						<button class="project-nav" onclick="todoPrev()">‹</button>

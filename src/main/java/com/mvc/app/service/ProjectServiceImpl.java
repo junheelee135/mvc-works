@@ -158,7 +158,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 		return dto;
 	}
-	
+
 	@Override
 	public List<ProjectsDto> projectslist(String empId) throws Exception {
 
@@ -172,30 +172,30 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	public int myProjectsCount(Map<String, Object> map) {
-	    int count = 0;
-	    try {
-	        count = mapper.myProjectsCount(map);
-	    } catch (Exception e) {
-	        log.info("myProjectsCount : ", e);
-	    }
-	    return count;
+		int count = 0;
+		try {
+			count = mapper.myProjectsCount(map);
+		} catch (Exception e) {
+			log.info("myProjectsCount : ", e);
+		}
+		return count;
 	}
 
 	@Override
 	public List<ProjectsDto> myProjectsList(Map<String, Object> map) {
-	    List<ProjectsDto> list = null;
-	    try {
-	        list = mapper.myProjectsList(map);
-	    } catch (Exception e) {
-	        log.info("myProjectsList : ", e);
-	    }
-	    return list;
+		List<ProjectsDto> list = null;
+		try {
+			list = mapper.myProjectsList(map);
+		} catch (Exception e) {
+			log.info("myProjectsList : ", e);
+		}
+		return list;
 	}
 
 	@Override
 	public List<ProjectsDto> statusCount(Map<String, Object> map) {
 		List<ProjectsDto> list = null;
-		
+
 		try {
 			list = mapper.statusCount(map);
 		} catch (Exception e) {
@@ -207,7 +207,7 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	public List<ProjectsDto> myProjectstatusCount(String empId) {
 		List<ProjectsDto> list = null;
-		
+
 		try {
 			list = mapper.myProjectstatusCount(empId);
 		} catch (Exception e) {
@@ -218,54 +218,54 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	public void projectAutoStart() throws Exception {
-	    try {
-	        mapper.projectAutoStart();
-	    } catch (Exception e) {
-	        log.info("projectAutoStart : ", e);
-	        throw e;
-	    }
+		try {
+			mapper.projectAutoStart();
+		} catch (Exception e) {
+			log.info("projectAutoStart : ", e);
+			throw e;
+		}
 	}
 
 	@Override
 	public void projectAutoDelay() throws Exception {
-	    try {
-	        mapper.projectAutoDelay();
-	    } catch (Exception e) {
-	        log.info("projectAutoDelay : ", e);
-	        throw e;
-	    }
+		try {
+			mapper.projectAutoDelay();
+		} catch (Exception e) {
+			log.info("projectAutoDelay : ", e);
+			throw e;
+		}
 	}
 
 	@Override
 	public void projectForceStop(long projectId) throws Exception {
-	    try {
-	        mapper.projectForceStop(projectId);
-	    } catch (Exception e) {
-	        log.info("projectForceStop : ", e);
-	        throw e;
-	    }
+		try {
+			mapper.projectForceStop(projectId);
+		} catch (Exception e) {
+			log.info("projectForceStop : ", e);
+			throw e;
+		}
 	}
 
 	@Override
 	public void changeMember(Map<String, Object> map) throws Exception {
 		try {
-	        mapper.changeEmpTask(map);
-	        mapper.updatePredecessor(map);
-	        mapper.updateNewEmpId(map);
-	    } catch (Exception e) {
-	        log.info("changeMember : ", e);
-	        throw e;
-	    }
+			mapper.changeEmpTask(map);
+			mapper.updatePredecessor(map);
+			mapper.updateNewEmpId(map);
+		} catch (Exception e) {
+			log.info("changeMember : ", e);
+			throw e;
+		}
 	}
 
 	@Override
 	public void projectAutoCompleteAll() throws Exception {
-	    try {
-	        mapper.projectAutoCompleteAll();
-	    } catch (Exception e) {
-	        log.info("projectAutoCompleteAll : ", e);
-	        throw e;
-	    }
+		try {
+			mapper.projectAutoCompleteAll();
+		} catch (Exception e) {
+			log.info("projectAutoCompleteAll : ", e);
+			throw e;
+		}
 	}
 
 	@Override
@@ -275,7 +275,32 @@ public class ProjectServiceImpl implements ProjectService {
 		} catch (Exception e) {
 			log.info("updateProjectDate : ", e);
 		}
-		
+
 	}
 
+	@Override
+	public boolean isProjectManager(long projectId, String empId) {
+		try {
+			// 사용자가 PM인 프로젝트 리스트를 가져옴
+			List<Map<String, Object>> managerProjects = noticeMapper.getMyPmProjects(empId);
+
+			if (managerProjects == null || managerProjects.isEmpty()) {
+				return false;
+			}
+
+			// 가져온 리스트 중 현재 projectId와 일치하는 것이 있는지 확인
+			return managerProjects.stream().anyMatch(m -> {
+				Object pid = m.get("PROJECTID");
+				return pid != null && String.valueOf(pid).equals(String.valueOf(projectId));
+			});
+		} catch (Exception e) {
+			log.info("isProjectManager error : ", e);
+			return false;
+		}
+	}
+
+	@Override // 인터페이스에 정의된 이름과 맞춤
+	public List<Map<String, Object>> ManagerProjects(String empId) {
+		return noticeMapper.getMyPmProjects(empId);
+	}
 }
