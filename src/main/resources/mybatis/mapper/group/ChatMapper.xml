@@ -4,10 +4,7 @@
 
 <mapper namespace="com.mvc.app.group.mapper.ChatMapper">
 
-    <!-- ============================================================
-         직원 목록 (무한스크롤, 프로젝트 + 키워드 필터)
-         정렬: 1.미읽음 2.최근 받은 메시지 3.최근 보낸 메시지 4.이름 가나다
-         ============================================================ -->
+    <!-- 직원 목록 -->
     <select id="listChatUsers" parameterType="com.mvc.app.group.dto.ChatUserDto"
             resultType="com.mvc.app.group.dto.ChatUserDto">
         SELECT *
@@ -91,21 +88,19 @@
                   )
                   </if>
                 ORDER BY
-                    NVL(unread.cnt, 0)                                DESC,  -- 1. 미읽음 수
+                    NVL(unread.cnt, 0)                                DESC,  -- 미읽음 수
                     CASE WHEN cm_last.senderId != #{myEmpId}
-                         THEN cm_last.sentAt END                      DESC,  -- 2. 최근 받은 메시지
+                         THEN cm_last.sentAt END                      DESC,  -- 최근 받은 메시지
                     CASE WHEN cm_last.senderId  = #{myEmpId}
-                         THEN cm_last.sentAt END                      DESC,  -- 3. 최근 보낸 메시지
-                    NLSSORT(e2.name, 'NLS_SORT=BINARY_AI')            ASC    -- 4. 이름 가나다
+                         THEN cm_last.sentAt END                      DESC,  -- 최근 보낸 메시지
+                    NLSSORT(e2.name, 'NLS_SORT=BINARY_AI')            ASC    -- 이름 가나다
             ) inner_q
         )
         WHERE rn > #{offset}
           AND rn &lt;= #{offset} + #{size}
     </select>
 
-    <!-- ============================================================
-         내가 참여 중인 프로젝트 목록
-         ============================================================ -->
+    <!-- 사용자의 참여 프로젝트 목록 -->
     <select id="listMyProjects" resultType="map">
         SELECT DISTINCT
             p.projectId AS "projectId",
@@ -117,9 +112,7 @@
         ORDER BY p.title
     </select>
 
-    <!-- ============================================================
-         채팅방
-         ============================================================ -->
+    <!-- 채팅방 -->
     <select id="findRoomByUsers" resultType="com.mvc.app.group.dto.ChatRoomDto">
         SELECT roomId, userAid, userBid, status,
                TO_CHAR(createdAt,     'YYYY-MM-DD"T"HH24:MI:SS') AS createdAt,
@@ -163,9 +156,7 @@
         SELECT SEQ_CHATROOM.NEXTVAL FROM DUAL
     </select>
 
-    <!-- ============================================================
-         채팅 메시지
-         ============================================================ -->
+    <!-- 채팅 메시지 -->
     <insert id="insertMessage" parameterType="com.mvc.app.group.dto.ChatMessageDto">
         INSERT INTO chatmessage (
             messageId, roomId, senderId, msgType,
@@ -247,9 +238,7 @@
         WHERE expireAt &lt; SYSTIMESTAMP
     </delete>
 
-    <!-- ============================================================
-         채팅 파일
-         ============================================================ -->
+    <!-- 채팅 파일 -->
     <insert id="insertFile" parameterType="com.mvc.app.group.dto.ChatFileDto">
         INSERT INTO chatfile (
             fileId, messageId, roomId, uploaderId,

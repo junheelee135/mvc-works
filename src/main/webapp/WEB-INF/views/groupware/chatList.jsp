@@ -2,21 +2,12 @@
 <%@ taglib prefix="c"   uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-<%--
-    chatList.jsp
-    위치: /WEB-INF/views/groupware/chatList.jsp
-    역할: 채팅 전체 UI (직원 목록 패널 + 채팅방 영역)
-    Vue 템플릿으로 동작 — chatStore.js(Pinia)와 연동
---%>
-
 <div class="chat-layout">
 
-    <!-- ============================================================
-         왼쪽: 직원 목록 패널
-         ============================================================ -->
+    <!-- 직원 목록 -->
     <div class="chat-user-panel">
 
-        <!-- 참여 프로젝트 필터 -->
+        <!-- 참여 프로젝트 검색 -->
         <div class="chat-filter-area">
             <div class="chat-filter-title">참여 프로젝트</div>
             <select class="chat-project-select"
@@ -67,7 +58,7 @@
                  :class="{ active: store.activeEmpId === user.empId }"
                  @click="store.openChat(user)">
 
-                <!-- 아바타 + 온라인 상태 -->
+                <!-- 프로필, 온라인 상태 -->
                 <div class="chat-avatar">
                     <div v-if="user.profilePhoto"
                          class="chat-avatar-img chat-avatar-photo">
@@ -104,7 +95,7 @@
                     </div>
                 </div>
 
-                <!-- 시간 + 미읽음 배지 + 재직상태 -->
+                <!-- 최근 메세지 시간, 미읽음 배지, 재직상태 -->
                 <div class="chat-user-right">
                     <span class="chat-user-time">
                         {{ store.formatListTime(user.lastMessageAt) }}
@@ -117,23 +108,17 @@
                         {{ user.empStatusName }}
                     </span>
                 </div>
-
             </div>
-
-            <!-- 무한스크롤 로딩 표시 -->
+            <!-- 무한스크롤 로딩 -->
             <div v-if="store.userLoading && store.allUsers.length > 0"
                  class="chat-list-loading">
                 <i class="bi bi-arrow-repeat chat-spin"></i>
             </div>
-
-        </div><!-- /chat-user-list -->
-
-    </div><!-- /chat-user-panel -->
+        </div>
+    </div>
 
 
-    <!-- ============================================================
-         오른쪽: 채팅방 영역
-         ============================================================ -->
+    <!-- 채팅방 -->
     <div class="chat-room-area">
 
         <!-- 채팅방 미선택 상태 -->
@@ -206,7 +191,7 @@
                          class="msg-row"
                          :class="{ mine: item.isMine }">
 
-                        <!-- 아바타: 상대방만, 연속 메시지는 숨김 -->
+                        <!-- 프로필: 상대방 -->
                         <div class="msg-avatar"
                              :class="[
                                  item.isMine ? '' : store.getAvatarColor(item.senderId),
@@ -219,7 +204,7 @@
 
                         <div class="msg-content-wrap">
 
-                            <!-- 발신자 이름: 상대방 + 첫 메시지만 -->
+                            <!-- 발신자 이름: 상대방, 메세지 -->
                             <div v-if="!item.isMine && !item.hiddenAvatar"
                                  class="msg-sender-name">
                                 {{ item.senderName }}
@@ -250,7 +235,7 @@
                                  class="msg-bubble"
                                  v-html="store.formatMsgText(item.content)"></div>
 
-                            <!-- 메타: 읽음 + 시간 -->
+                            <!-- 메타: 읽음, 시간 -->
 							<div class="msg-meta">
 							    <span v-if="item.isMine"
 							          class="read-status"
@@ -265,7 +250,7 @@
 
                 </template>
 
-            </div><!-- /chat-messages -->
+            </div>
 
             <!-- 입력 영역 -->
             <div class="chat-input-area">
@@ -302,16 +287,13 @@
                         {{ store.inputText.length }}/200
                     </span>
                 </div>
-                <%-- 파일 input (숨김) --%>
+                <%-- 파일 --%>
                 <input type="file"
                        id="chatFileInput"
                        style="display:none"
                        multiple
                        @change="store.handleFileSelect($event)">
             </div>
-
-        </template><%-- /채팅방 활성화 --%>
-
-    </div><%-- /chat-room-area --%>
-
-</div><%-- /chat-layout --%>
+        </template>
+    </div>
+</div>
