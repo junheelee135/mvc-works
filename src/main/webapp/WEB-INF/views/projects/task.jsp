@@ -90,8 +90,8 @@
 							<i class="fas fa-plus"></i>
 						</button>
 						<button type="button" class="btn-icon btn-edit" id="editBtn"
-							onclick="toggleEditMode()">
-							<i class="fas fa-edit"></i>
+							title="편집">
+							<i class="fas fa-pencil-alt"></i>
 						</button>
 					</c:if>
 
@@ -233,7 +233,7 @@
 							id="modalMember">
 							<option value="">담당자 선택</option>
 							<c:forEach var="m" items="${members}">
-								<option value="${m.empId}">${m.name} (${m.role == 'M' ? '매니저' : m.role == 'D' ? '디자이너' : '개발자'})
+								<option value="${m.empId}">${m.name}(${m.role == 'M' ? '매니저' : m.role == 'D' ? '디자이너' : '개발자'})
 								</option>
 							</c:forEach>
 						</select>
