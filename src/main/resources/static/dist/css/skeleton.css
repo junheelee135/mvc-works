@@ -1,0 +1,84 @@
+/* Vue 마운트 전 FOUC 방지용 스켈레톤 로더 & v-cloak 공통 스타일 */
+/* ── 스켈레톤 공통 래퍼 ─────────────────────────────────────── */
+#vue-skeleton {
+    padding: 25px;
+}
+
+
+/* ── shimmer 애니메이션 블록 (공통) ─────────────────────────── */
+.skeleton-block {
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+    border-radius: 6px;
+}
+
+@keyframes skeleton-shimmer {
+    0%   { background-position:  200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+
+/* ── 필터 카드 영역 ─────────────────────────────────────────── */
+.skeleton-filter {
+    height: 64px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+}
+
+
+/* ── 툴바 영역 ──────────────────────────────────────────────── */
+.skeleton-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* 툴바 좌측: 건수 텍스트 자리 */
+.skeleton-text-sm {
+    height: 18px;
+    width: 80px;
+}
+
+/* 툴바 우측: 버튼 그룹 */
+.skeleton-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.skeleton-btn {
+    height: 32px;
+    width: 88px;
+    border-radius: 6px;
+}
+
+
+/* ── 테이블 영역 ────────────────────────────────────────────── */
+
+/* 테이블 헤더 행 */
+.skeleton-table-head {
+    height: 42px;
+    margin-bottom: 4px;
+    border-radius: 6px 6px 0 0;
+}
+
+/* 테이블 데이터 행 */
+.skeleton-row {
+    height: 48px;
+    margin-bottom: 3px;
+    border-radius: 4px;
+    opacity: 1;
+}
+
+/* 아래로 갈수록 점점 흐려지는 페이드 효과 */
+.skeleton-row:nth-child(2) { opacity: .85; }
+.skeleton-row:nth-child(3) { opacity: .70; }
+.skeleton-row:nth-child(4) { opacity: .55; }
+.skeleton-row:nth-child(5) { opacity: .40; }
+.skeleton-row:nth-child(6) { opacity: .25; }
