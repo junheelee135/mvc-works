@@ -84,11 +84,11 @@ if (member != null) {
 .snack-table tr { transition: background 0.2s; cursor: pointer; }
 .snack-table tr:hover { background: #fbfcfe; }
 
-/* --- 4. 상태 뱃지 및 요소 --- */
-.snack-status { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; display: inline-block; }
-.snack-PENDING { background: #fff4e0; color: #d97706; }
-.snack-APPROVED { background: #ecfdf5; color: #059669; }
-.snack-REJECTED { background: #fef2f2; color: #dc2626; }
+/* --- 4. 상태 뱃지 (결재 리스트 통일) --- */
+.status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.status-PENDING  { background: #fff4e0; color: #d97706; }
+.status-APPROVED { background: #e0f5ef; color: #1a9660; }
+.status-REJECTED { background: #ffe0e0; color: #d93025; }
 
 .vote-tag { display: inline-flex; align-items: center; gap: 4px; color: #4e73df; font-weight: 700; }
 .comment-tag { display: inline-flex; align-items: center; gap: 4px; color: #9aa0b4; }
@@ -129,6 +129,13 @@ if (member != null) {
     font-size: 14px;
 }
 .comment-item { background: #f8f9fc; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 13px; }
+
+/* --- 7. 페이지네이션 (결재 리스트 통일) --- */
+.table-pagination { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 16px; border-top: 1px solid #f0f2f9; }
+.page-btn { background: none; border: 1px solid #e6eaf4; border-radius: 5px; padding: 5px 10px; font-size: 12px; color: #7b82a0; cursor: pointer; transition: all .15s; }
+.page-btn:hover { background: #f0f3ff; border-color: #4e73df; color: #4e73df; }
+.page-btn.active { background: #4e73df; border-color: #4e73df; color: #fff; font-weight: 700; }
+.page-btn:disabled { opacity: .4; cursor: default; }
 </style>
 </head>
 <body>
@@ -177,8 +184,8 @@ function FormModal({ onClose, onSubmit }) {
     };
 
     return createPortal(
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay">
+            <div className="modal">
                 <div className="modal-header">
                     <h3 style={{margin:0}}>비품 신청하기</h3>
                     <button onClick={onClose} style={{background:'none', border:'none', cursor:'pointer'}}>
@@ -301,7 +308,7 @@ function DetailModal({ snackId, onClose, onRefresh }) {
                 <div className="modal-body">
                     <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px'}}>
                         <span style={{fontWeight:700, fontSize:'16px'}}>{detail.itemName}</span>
-                        <span className={`snack-status snack-${detail.status}`}>{statusLabel(detail.status)}</span>
+                        <span className={`status-badge status-\${detail.status}`}>{statusLabel(detail.status)}</span>
                     </div>
                     <div style={{fontSize:'13px', color:'#667085', marginBottom:'8px'}}>수량: {detail.quantity}개</div>
                     <div style={{fontSize:'13px', color:'#667085', marginBottom:'8px'}}>신청자: {detail.requesterName}</div>
@@ -373,25 +380,37 @@ function SnackApp() {
     const [list, setList] = useState([]);
     const [selectedId, setSelectedId] = useState(null);
     const [showForm, setShowForm] = useState(false);
+    const [pageNo, setPageNo] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const pageSize = 10;
+    const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
     // 이미지 2, 4번의 HTML 반환 에러 방지를 위한 fetch 로직
-    const fetchList = useCallback(async () => {
+    const fetchList = useCallback(async (page) => {
+        const p = page || pageNo;
         try {
-            const response = await fetch(`${SNACK_CTX}/api/snack/list?pageNo=1&pageSize=20`);
+            const response = await fetch(`\${SNACK_CTX}/api/snack/list?pageNo=\${p}&pageSize=\${pageSize}`);
             const text = await response.text();
-            
+
             // HTML이 반환되었는지 체크 (로그인 만료 등)
             if (text.trim().startsWith("<!DOCTYPE")) {
                 console.error("API 경로가 잘못되었거나 서버 에러 페이지가 반환되었습니다.");
                 return;
             }
-            
+
             const data = JSON.parse(text);
             setList(data.list || []);
+            setTotalCount(data.total || 0);
         } catch (e) {
             console.error("데이터 로딩 실패:", e);
         }
-    }, []);
+    }, [pageNo]);
+
+    const changePage = (p) => {
+        if (p < 1 || p > totalPages || p === pageNo) return;
+        setPageNo(p);
+        fetchList(p);
+    };
 
     useEffect(() => { fetchList(); }, [fetchList]);
 
@@ -412,7 +431,7 @@ function SnackApp() {
                 <thead>
                     <tr>
                         <th style={{width:'80px'}}>번호</th>
-                        <th>신청 품목</th>
+                        <th>제목</th>
                         <th style={{width:'120px'}}>신청자</th>
                         <th style={{width:'120px'}}>상태</th>
                         <th style={{width:'100px'}}>공감</th>
@@ -428,12 +447,12 @@ function SnackApp() {
                             </td>
                             <td>{item.requesterName}</td>
                             <td>
-                                <span className={`snack-status snack-${item.status}`}>
+                                <span className={`status-badge status-\${item.status}`}>
                                     {statusLabel(item.status)}
                                 </span>
                             </td>
                             <td>
-                                <span className={`vote-tag ${item.voted ? 'voted' : ''}`}>
+                                <span className={`vote-tag \${item.voted ? 'voted' : ''}`}>
                                     <span className="material-symbols-outlined" style={{fontSize:'16px'}}>thumb_up</span>
                                     {item.voteCount}
                                 </span>
@@ -450,6 +469,17 @@ function SnackApp() {
                     )}
                 </tbody>
             </table>
+
+            {/* 페이지네이션 */}
+            <div className="table-pagination">
+                <button className="page-btn" disabled={pageNo <= 1} onClick={() => changePage(1)}>&laquo; 처음</button>
+                <button className="page-btn" disabled={pageNo <= 1} onClick={() => changePage(pageNo - 1)}>&lsaquo; 이전</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                    <button key={p} className={`page-btn\${p === pageNo ? ' active' : ''}`} onClick={() => changePage(p)}>{p}</button>
+                ))}
+                <button className="page-btn" disabled={pageNo >= totalPages} onClick={() => changePage(pageNo + 1)}>다음 &rsaquo;</button>
+                <button className="page-btn" disabled={pageNo >= totalPages} onClick={() => changePage(totalPages)}>마지막 &raquo;</button>
+            </div>
 
             {/* 모달 컴포넌트 연결 */}
             {selectedId && <DetailModal snackId={selectedId} onClose={() => setSelectedId(null)} onRefresh={fetchList} />}
