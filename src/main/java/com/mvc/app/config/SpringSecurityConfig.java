@@ -46,7 +46,7 @@ public class SpringSecurityConfig {
 			.requestMatchers("/admin", "/admin/**").hasAnyRole("ADMIN")
 			.requestMatchers("/api/projectnotice/**").hasAnyRole("EMP","ADMIN")
 			.requestMatchers("/api/notifications/**").authenticated()// 알림 처리 허용
-			.requestMatchers("/**").hasAnyRole("EMP", "ADMIN") // configurer 에서 ROLE_ 붙여줌
+			.requestMatchers("/**").hasAnyRole("EMP", "ADMIN", "USER") // configurer 에서 ROLE_ 붙여줌
 			.anyRequest().authenticated() // 설정 외 모든 요청은 권한과 무관하고 로그인 유저만 사용
 		)
 		.formLogin(login -> login
