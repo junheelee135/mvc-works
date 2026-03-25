@@ -270,7 +270,9 @@ function SnackApp() {
         setTotal(data.total || 0);
     }, [pageNo, keyword, filterStatus]);
 
-    useEffect(() => { fetchList(1, '', ''); }, []);
+	useEffect(() => {
+	    fetchList();
+	}, [fetchList]);
 
     const setFilter = (s) => { setFilterStatus(s); setPageNo(1); fetchList(1, keyword, s); };
     const changePage = (p) => { if (p < 1 || p > totalPages) return; setPageNo(p); fetchList(p, keyword, filterStatus); };

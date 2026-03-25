@@ -55,7 +55,7 @@ public class SnackRestController {
 
     // ── 단건 조회 ──
     @GetMapping("/{snackId}")
-    public ResponseEntity<?> get(@PathVariable long snackId) {
+    public ResponseEntity<?> get(@PathVariable("snackId") long snackId) {
         try {
             SessionInfo info = LoginMemberUtil.getSessionInfo();
             Map<String, Object> map = new HashMap<>();
@@ -88,7 +88,7 @@ public class SnackRestController {
     // ── 상태 변경 (관리자: 승인/반려) ──
     @PutMapping("/{snackId}/status")
     public ResponseEntity<?> updateStatus(
-            @PathVariable long snackId,
+            @PathVariable("snackId") long snackId,
             @RequestBody Map<String, String> body) {
         try {
             SessionInfo info = LoginMemberUtil.getSessionInfo();
@@ -107,7 +107,7 @@ public class SnackRestController {
 
     // ── 삭제 (본인 또는 관리자) ──
     @DeleteMapping("/{snackId}")
-    public ResponseEntity<?> delete(@PathVariable long snackId) {
+    public ResponseEntity<?> delete(@PathVariable("snackId") long snackId) {
         try {
             SessionInfo info = LoginMemberUtil.getSessionInfo();
             Map<String, Object> param = new HashMap<>();
