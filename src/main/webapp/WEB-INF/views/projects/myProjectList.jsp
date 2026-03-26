@@ -256,6 +256,11 @@
 				</table>
 			</div>
 
+
+            <%-- 페이징 --%>
+            <div class="d-flex justify-content-center py-4 border-top">
+                ${dataCount == 0 ? "" : paging}
+            </div>
 		</div>
 	</main>
 

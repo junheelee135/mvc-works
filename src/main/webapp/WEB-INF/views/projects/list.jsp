@@ -173,7 +173,7 @@
 
             <%-- 페이징 --%>
             <div class="d-flex justify-content-center py-4 border-top">
-                ${dataCount == 0 ? "등록된 게시글이 없습니다" : paging}
+                ${dataCount == 0 ? "" : paging}
             </div>
         </div>
     </main>
