@@ -21,7 +21,6 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
     }),
 
     actions: {
-        // 날짜별 예약 목록
         async fetchByDate(date) {
             try {
                 this.selectedDate = date;
@@ -32,7 +31,6 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
             }
         },
 
-        // 월별 캘린더 이벤트
         async fetchMonthEvents(yearMonth) {
             try {
                 const res = await http.get('/meeting/reserve/month', { params: { yearMonth } });
@@ -42,7 +40,6 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
             }
         },
 
-        // 통계
         async fetchStats() {
             try {
                 const res = await http.get('/meeting/reserve/stats');
@@ -52,7 +49,6 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
             }
         },
 
-        // 사용중인 회의실 목록
         async fetchRooms() {
             try {
                 const res = await http.get('/meeting/reserve/rooms');
@@ -62,17 +58,14 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
             }
         },
 
-        // 예약 등록
         async saveReserve() {
             await http.post('/meeting/reserve', this.form);
-            // 등록 후 목록 + 캘린더 + 통계 갱신
             await this.fetchByDate(this.selectedDate);
             const ym = this.selectedDate.substring(0, 7);
             await this.fetchMonthEvents(ym);
             await this.fetchStats();
         },
 
-        // 예약 취소
         async cancelReserve(reserveId) {
             await http.delete('/meeting/reserve/' + reserveId);
             await this.fetchByDate(this.selectedDate);
@@ -81,7 +74,6 @@ export const useMeetingReserveStore = defineStore('meetingReserve', {
             await this.fetchStats();
         },
 
-        // 폼 초기화
         resetForm(date) {
             this.form = {
                 roomId: this.rooms.length > 0 ? this.rooms[0].roomId : '',

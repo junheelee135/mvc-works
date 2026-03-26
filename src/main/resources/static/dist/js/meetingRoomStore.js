@@ -6,7 +6,7 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
     state: () => ({
         list: [],
         currentRoom: null,
-        formMode: '',        // '' | 'ADD' | 'EDIT'
+        formMode: '',
         form: {
             roomName: '',
             location: '',
@@ -18,20 +18,17 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
     }),
 
     actions: {
-        // 목록 조회
         async fetchList() {
             const res = await http.get('/meeting/room');
             this.list = res.data.list || [];
         },
 
-        // 상세 조회
         async fetchRoom(roomId) {
             const res = await http.get('/meeting/room/' + roomId);
             this.currentRoom = res.data;
             return res.data;
         },
 
-        // 등록 폼 열기
         openAddForm() {
             this.formMode = 'ADD';
             this.form = {
@@ -44,7 +41,6 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
             };
         },
 
-        // 수정 폼 열기
         openEditForm(room) {
             this.formMode = 'EDIT';
             this.currentRoom = room;
@@ -58,16 +54,13 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
             };
         },
 
-        // 저장 (등록/수정 공용)
         async saveRoom(photoFiles) {
             try {
                 const formData = new FormData();
 
-                // JSON 데이터
                 const blob = new Blob([JSON.stringify(this.form)], { type: 'application/json' });
                 formData.append('data', blob);
 
-                // 사진 파일
                 if (photoFiles && photoFiles.length > 0) {
                     for (const file of photoFiles) {
                         formData.append('photos', file);
@@ -90,7 +83,6 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
             }
         },
 
-        // 순서 일괄 저장
         async saveSortOrders() {
             try {
                 const payload = this.list.map((item, i) => ({
@@ -104,7 +96,6 @@ export const useMeetingRoomStore = defineStore('meetingRoom', {
             }
         },
 
-        // 삭제
         async deleteRoom(roomId) {
             await http.delete('/meeting/room/' + roomId);
             await this.fetchList();

@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-/* ── 레이아웃 ── */
 #main-content {
     margin-left: 260px !important;
     padding: 8px 24px 14px !important;
@@ -9,7 +8,6 @@
     background: #f8f9fc;
 }
 
-/* ── 페이지 헤더 한 줄 ── */
 .page-header {
     display: flex;
     align-items: center;
@@ -32,9 +30,6 @@
     color: #4e73df;
 }
 
-/* ════════════════════════════════
-   모달 오버레이
-════════════════════════════════ */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -122,9 +117,6 @@
 }
 .btn-close-modal:hover { background: #e2e6f0; }
 
-/* ════════════════════════════════
-   결재 작성 폼
-════════════════════════════════ */
 .approval-form-wrap { display: none; }
 .approval-form-wrap.active { display: block; }
 
@@ -157,7 +149,6 @@
 
 .form-section-body { padding: 12px 16px; }
 
-/* 기본정보 그리드 */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -200,9 +191,6 @@
     cursor: not-allowed;
 }
 
-/* ════════════════════════════════
-   조직도 사원 검색 모달
-════════════════════════════════ */
 .org-search-box { width: 720px; max-width: 95vw; }
 .org-search-body { padding: 0 !important; }
 
@@ -244,7 +232,6 @@
     height: 380px;
 }
 
-/* 조직도 트리 패널 */
 .org-tree-panel {
     width: 220px;
     border-right: 1px solid #f0f2f9;
@@ -311,7 +298,6 @@
 .tree-children { display: none; }
 .tree-children.open { display: block; }
 
-/* 사원 목록 패널 */
 .org-emp-panel {
     flex: 1;
     display: flex;
@@ -386,9 +372,6 @@
 }
 .org-emp-item.added .org-emp-action { color: #9aa0b4; }
 
-/* ════════════════════════════════
-   결재선 / 참조자 리스트
-════════════════════════════════ */
 .btn-add-line {
     display: inline-flex;
     align-items: center;
@@ -497,11 +480,9 @@
     color: #9aa0b4;
 }
 
-/* 참조자는 드래그 불필요 */
 .ref-item .drag-handle,
 .ref-item .line-seq { display: none; }
 
-/* 세부정보 그리드 */
 .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -516,7 +497,6 @@
 .detail-grid-input input { flex: 1; }
 .detail-grid-input select { width: 70px; }
 
-/* 참고사항 */
 .reference-list {
     list-style: disc;
     padding-left: 16px;
@@ -527,7 +507,6 @@
 }
 .reference-list li strong { color: #1d2939; }
 
-/* 첨부파일 */
 .attach-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -587,7 +566,6 @@
     background: #f8f9fc;
 }
 
-/* 첨부 파일 목록 */
 .attach-file-list {
     border: 1px solid #e6eaf4;
     border-radius: 5px;
@@ -640,13 +618,11 @@
     color: #d93025;
 }
 
-/* textarea 높이 줄이기 */
 .form-field textarea {
     resize: vertical;
     min-height: 60px;
 }
 
-/* 하단 버튼 */
 .form-footer {
     display: flex;
     justify-content: flex-end;
@@ -711,9 +687,6 @@
     border: 1px solid #1cc88a;
 }
 
-/* ════════════════════════════════
-   템플릿 불러오기 모달
-════════════════════════════════ */
 .tpl-load-box { width: 440px; }
 
 .tpl-list {
@@ -776,7 +749,6 @@
 }
 .btn-tpl-delete:hover { opacity: 1; background: #ffe0e0; }
 
-/* 2열 그리드 */
 .detail-grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -784,7 +756,6 @@
     margin-bottom: 10px;
 }
 
-/* 3열 그리드 */
 .detail-grid-3 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -792,7 +763,6 @@
     margin-bottom: 10px;
 }
 
-/* 지출 세부항목 */
 .expense-section { margin-top: 10px; }
 .expense-header {
     display: flex;
@@ -858,7 +828,6 @@
 .text-center { text-align: center; }
 .text-right { text-align: right; }
 
-/* ── 동행자 (FM002) ── */
 .btn-companion-add {
     display: inline-flex;
     align-items: center;

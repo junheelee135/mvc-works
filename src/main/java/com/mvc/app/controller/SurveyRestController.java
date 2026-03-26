@@ -47,12 +47,10 @@ public class SurveyRestController {
     @Value("${file.upload-root}/survey")
     private String uploadPath;
 
-    // 관리자 여부 확인
     private boolean isAdmin(SessionInfo info) {
         return info != null && info.getUserLevel() == 99;
     }
 
-    // 설문 목록
     @GetMapping
     public ResponseEntity<?> list(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -73,7 +71,6 @@ public class SurveyRestController {
         }
     }
 
-    // 설문 상세
     @GetMapping("/{surveyId}")
     public ResponseEntity<?> findById(@PathVariable("surveyId") long surveyId) {
         try {
@@ -83,7 +80,6 @@ public class SurveyRestController {
         }
     }
 
-    // 설문 등록 (관리자만) — 멀티파트
     @PostMapping
     public ResponseEntity<?> create(
             @RequestPart("data") String dataJson,
@@ -121,7 +117,6 @@ public class SurveyRestController {
         }
     }
 
-    // 설문 수정 (관리자만) — 멀티파트
     @PostMapping("/{surveyId}")
     public ResponseEntity<?> update(
             @PathVariable("surveyId") long surveyId,
@@ -161,7 +156,6 @@ public class SurveyRestController {
         }
     }
 
-    // 설문 삭제 (관리자만)
     @DeleteMapping("/{surveyId}")
     public ResponseEntity<?> delete(@PathVariable("surveyId") long surveyId) {
         try {
@@ -176,7 +170,6 @@ public class SurveyRestController {
         }
     }
 
-    // 배포 (DRAFT → ACTIVE) (관리자만)
     @PostMapping("/{surveyId}/publish")
     public ResponseEntity<?> publish(@PathVariable("surveyId") long surveyId) {
         try {
@@ -198,7 +191,6 @@ public class SurveyRestController {
         }
     }
 
-    // 마감 (ACTIVE → CLOSED) (관리자만)
     @PostMapping("/{surveyId}/close")
     public ResponseEntity<?> close(@PathVariable("surveyId") long surveyId) {
         try {
@@ -220,7 +212,6 @@ public class SurveyRestController {
         }
     }
 
-    // 응답 여부 확인
     @GetMapping("/{surveyId}/check")
     public ResponseEntity<?> checkResponse(@PathVariable("surveyId") long surveyId) {
         try {
@@ -236,7 +227,6 @@ public class SurveyRestController {
         }
     }
 
-    // 응답 제출
     @PostMapping("/{surveyId}/respond")
     public ResponseEntity<?> respond(@PathVariable("surveyId") long surveyId, @RequestBody SurveyResponseDto dto) {
         try {
@@ -245,19 +235,16 @@ public class SurveyRestController {
                 return ResponseEntity.status(401).body(Map.of("msg", "로그인이 필요합니다."));
             }
 
-            // 설문 조회 + 상태 검증
             Map<String, Object> detail = service.findById(surveyId);
             SurveyDto survey = (SurveyDto) detail.get("survey");
             if (!"ACTIVE".equals(survey.getStatus())) {
                 return ResponseEntity.badRequest().body(Map.of("msg", "응답 가능한 상태가 아닙니다."));
             }
 
-            // 대상자 검증
             if (!service.checkTarget(surveyId, info.getEmpId(), info.getDeptCode())) {
                 return ResponseEntity.status(403).body(Map.of("msg", "설문 대상자가 아닙니다."));
             }
 
-            // 날짜 검증
             LocalDate today = LocalDate.now();
             try {
                 if (survey.getStartDate() != null && !survey.getStartDate().isEmpty()) {
@@ -285,7 +272,6 @@ public class SurveyRestController {
         }
     }
 
-    // 결과 통계 (관리자 또는 대상자만)
     @GetMapping("/{surveyId}/result")
     public ResponseEntity<?> result(@PathVariable("surveyId") long surveyId) {
         try {
@@ -302,7 +288,6 @@ public class SurveyRestController {
         }
     }
 
-    // 첨부파일 다운로드 (관리자 또는 대상자만)
     @GetMapping("/file/{fileId}")
     public ResponseEntity<?> downloadFile(@PathVariable("fileId") long fileId) {
         try {
@@ -323,7 +308,6 @@ public class SurveyRestController {
         }
     }
 
-    // 제목 + 날짜 + 선택지 공통 검증
     private ResponseEntity<?> validateSurveyInput(Map<String, Object> body, List<SurveyQuestionDto> questions) {
         String title = (String) body.get("title");
         if (title == null || title.isBlank()) {
@@ -357,7 +341,6 @@ public class SurveyRestController {
             q.setQuestionType((String) qMap.get("questionType"));
             q.setSortOrder(qMap.get("sortOrder") != null ? ((Number) qMap.get("sortOrder")).intValue() : 1);
 
-            // 선택지 파싱
             List<Map<String, Object>> optList = (List<Map<String, Object>>) qMap.get("options");
             if (optList != null) {
                 List<SurveyOptionDto> options = new java.util.ArrayList<>();

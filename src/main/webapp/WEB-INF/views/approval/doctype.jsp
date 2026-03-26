@@ -26,7 +26,6 @@
 
     <div id="vue-app" v-cloak>
 
-        <!-- 상단 헤더 -->
         <div class="doctype-header">
             <div>
                 <h4>
@@ -41,7 +40,6 @@
             </button>
         </div>
 
-        <!-- 통계 카드 -->
         <div class="stat-row">
             <div class="stat-item">
                 <div class="stat-num total">{{ list.length }}</div>
@@ -57,7 +55,6 @@
             </div>
         </div>
 
-        <!-- 테이블 -->
         <div class="table-panel">
             <div class="doctype-table-header">문서유형 목록</div>
             <table class="doctype-table">
@@ -104,7 +101,6 @@
             </div>
         </div>
 
-        <!-- 추가/수정 모달 -->
         <div class="modal fade" id="formModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -163,7 +159,7 @@
                                   </label>
                               </div>
                           </div>
-                      </div>                    
+                      </div>
                     <div class="modal-footer">
                         <button class="btn-modal-cancel" data-bs-dismiss="modal">취소</button>
                         <button class="btn-modal-save" @click="handleSave">저장</button>

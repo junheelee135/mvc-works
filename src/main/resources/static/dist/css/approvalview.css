@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-/* ── 레이아웃 ── */
 #main-content {
     margin-left: 260px !important;
     padding: 14px 32px !important;
@@ -9,7 +8,6 @@
     background: #f8f9fc;
 }
 
-/* ── 페이지 헤더 ── */
 .page-header {
     display: flex;
     align-items: center;
@@ -21,7 +19,6 @@
 .page-header-divider { font-size: 13px; color: #b0b7cc; }
 .page-header-doc { font-size: 13px; font-weight: 600; color: #4e73df; }
 
-/* ── 섹션 공통 ── */
 .view-section {
     background: #fff;
     border: 1px solid #e6eaf4;
@@ -42,7 +39,6 @@
 .view-section-header .material-symbols-outlined { font-size: 15px; color: #4e73df; }
 .view-section-body { padding: 14px 16px; }
 
-/* ── 기본정보 그리드 ── */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -66,7 +62,6 @@
     border-radius: 5px;
 }
 
-/* ── 상태 뱃지 ── */
 .status-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -83,7 +78,6 @@
 .status-MYAPPROVED  { background: #e0f5ef; color: #1a9660; }
 .status-INPROGRESS  { background: #e0ecff; color: #2563eb; }
 
-/* ── 결재선 ── */
 .line-grid {
     display: flex;
     gap: 10px;
@@ -118,7 +112,6 @@
     margin-bottom: 8px;
 }
 
-/* ── 결재선 상태별 색상 ── */
 .line-WAIT     { border-color: #e6eaf4; }
 .line-WAIT .line-card-header     { background: #f8f9fc; color: #667085; }
 .line-APPROVED { border-color: #b6e5d8; }
@@ -128,7 +121,6 @@
 .line-HOLD     { border-color: #fde0a5; }
 .line-HOLD .line-card-header     { background: #fff4e0; color: #d97706; }
 
-/* ── 참조자 읽음/안읽음 ── */
 .ref-READ      { border-color: #a3c4f3; }
 .ref-READ .line-card-header      { background: #e0ecff; color: #2563eb; }
 .ref-UNREAD    { border-color: #e6eaf4; }
@@ -136,7 +128,6 @@
 .status-READ   { background: #e0ecff; color: #2563eb; }
 .status-UNREAD { background: #f1f3f9; color: #667085; }
 
-/* ── 세부정보 그리드 ── */
 .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -154,7 +145,6 @@
     white-space: pre-wrap;
 }
 
-/* ── 첨부파일 ── */
 .file-list { display: flex; flex-direction: column; gap: 6px; }
 .file-item {
     display: flex;
@@ -183,7 +173,6 @@
 .file-item-btn:hover { background: #3a5abf; }
 .no-file { font-size: 12px; color: #9aa0b4; padding: 10px 0; }
 
-/* ── 하단 버튼 ── */
 .view-footer {
     display: flex;
     justify-content: flex-end;
@@ -266,7 +255,6 @@
 }
 .btn-resubmit:hover { background: #3a5abf; }
 
-/* ── 대결 뱃지 ── */
 .deputy-badge {
     display: inline-block;
     margin-top: 6px;
@@ -282,7 +270,6 @@
     color: #d97706;
 }
 
-/* ── 대결 안내 문구 ── */
 .deputy-notice {
     display: inline-flex;
     align-items: center;

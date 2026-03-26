@@ -1,9 +1,7 @@
 @charset "UTF-8";
 
-/* Vue 마운트 전 깜박임 방지 */
 [v-cloak] { display: none; }
 
-/* ── 문서유형 관리 전용 스타일 ── */
 .doctype-header {
     display: flex;
     align-items: center;
@@ -46,7 +44,6 @@
 .btn-add-type:hover { background: #17ada0; }
 .btn-add-type .material-symbols-outlined { font-size: 18px; }
 
-/* 통계 카드 */
 .stat-row {
     display: flex;
     gap: 16px;
@@ -73,7 +70,6 @@
     margin-top: 4px;
 }
 
-/* 테이블 헤더 */
 .doctype-table-header {
     padding: 14px 20px;
     border-bottom: 1px solid #e6eaf4;
@@ -82,7 +78,6 @@
     color: #3a3f51;
 }
 
-/* 테이블 */
 .doctype-table {
     width: 100%;
     border-collapse: collapse;
@@ -158,7 +153,6 @@
 }
 .table-footer .material-symbols-outlined { font-size: 14px; }
 
-/* ── 모달 오버라이드 ── */
 .modal-content {
     border-radius: 10px;
     border: 1px solid #e6eaf4;

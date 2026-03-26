@@ -24,7 +24,6 @@ type="text/css">
 <main id="main-content">
     <div id="vue-app" v-cloak>
 
-        <!-- ===== 목록 화면 ===== -->
         <div v-if="viewMode === 'list'">
 
             <div class="survey-header">
@@ -37,7 +36,6 @@ type="text/css">
                 </div>
             </div>
 
-            <!-- 검색 -->
             <div class="survey-searchbar">
                 <select v-model="store.statusFilter" @change="store.search()">
                     <option value="">전체 상태</option>
@@ -53,7 +51,6 @@ type="text/css">
                 </button>
             </div>
 
-            <!-- 테이블 -->
             <table class="survey-table">
                 <thead>
                     <tr>
@@ -106,7 +103,6 @@ type="text/css">
                 </tbody>
             </table>
 
-            <!-- 페이징 -->
             <div class="table-pagination" v-if="store.totalPages > 1">
                 <button class="page-btn" :disabled="store.pageNo <= 1" @click="store.goPage(1)">&laquo; 처음</button>
                 <button class="page-btn" :disabled="store.pageNo <= 1" @click="store.goPage(store.pageNo - 1)">&lsaquo; 이전</button>
@@ -117,8 +113,7 @@ type="text/css">
             </div>
 
         </div>
-        
-        <!-- ===== 생성/수정 화면 (관리자만) ===== -->
+
         <div v-if="isAdmin && (viewMode === 'create' || viewMode === 'edit')">
 
             <div class="survey-header">
@@ -135,7 +130,6 @@ type="text/css">
 
             <div class="survey-form">
 
-                <!-- 기본 정보 -->
                 <div class="form-group">
                     <label>설문 제목 *</label>
                     <input type="text" v-model="store.form.title" placeholder="설문 제목을 입력하세요">
@@ -164,7 +158,6 @@ type="text/css">
                     </div>
                 </div>
 
-                <!-- 대상자 설정 -->
                 <div class="form-group">
                     <label>대상자 설정</label>
                     <div class="target-input-row">
@@ -189,7 +182,6 @@ type="text/css">
                     </div>
                 </div>
 
-                <!-- 첨부파일 -->
                 <div class="form-group">
                     <label>첨부파일</label>
                     <div>
@@ -200,7 +192,6 @@ type="text/css">
                             파일 선택
                         </button>
                     </div>
-                    <!-- 기존 파일 (수정 모드) -->
                     <div v-if="store.existingFiles.length > 0" style="margin-top:8px;">
                         <div class="file-item" v-for="(f, fi) in store.existingFiles" :key="'ex-'+fi">
                             <span class="material-symbols-outlined" style="font-size:16px;color:#4b7bec;vertical-align:middle;">description</span>
@@ -211,7 +202,6 @@ type="text/css">
                             </button>
                         </div>
                     </div>
-                    <!-- 새 파일 -->
                     <div v-if="store.attachedFiles.length > 0" style="margin-top:8px;">
                         <div class="file-item" v-for="(f, fi) in store.attachedFiles" :key="'new-'+fi">
                             <span class="material-symbols-outlined" style="font-size:16px;color:#1a9660;vertical-align:middle;">upload_file</span>
@@ -230,7 +220,6 @@ type="text/css">
 
                 <hr style="border:none;border-top:1px solid #e6eaf4;margin:24px 0;">
 
-                <!-- 질문 목록 -->
                 <label style="font-size:14px;font-weight:700;color:#1d2939;margin-bottom:12px;display:block;">
                     질문 ({{ store.form.questions.length }}개)
                 </label>
@@ -257,7 +246,6 @@ type="text/css">
                         </div>
                     </div>
 
-                    <!-- SINGLE / MULTI 선택지 -->
                     <div v-if="q.questionType === 'SINGLE' || q.questionType === 'MULTI'">
                         <div class="option-row" v-for="(opt, oi) in q.options" :key="oi">
                             <span style="font-size:12px;color:#9aa0b4;width:20px;">{{ oi + 1 }}.</span>
@@ -269,13 +257,11 @@ type="text/css">
                         <button class="btn-add-option" @click="store.addOption(qi)">+ 선택지 추가</button>
                     </div>
 
-                    <!-- TEXT -->
                     <div v-if="q.questionType === 'TEXT'" class="question-type-hint">
                         <i class="fas fa-pen-to-square"></i>
                         응답자가 자유롭게 텍스트를 입력합니다.
                     </div>
 
-                    <!-- SCORE -->
                     <div v-if="q.questionType === 'SCORE'" class="question-type-hint">
                         <i class="fas fa-star"></i>
                         응답자가 1~5점을 선택합니다.
@@ -485,4 +471,4 @@ const app = createApp({
 
 app.use(createPinia());
 app.mount('#vue-app');
-</script>        
+</script>

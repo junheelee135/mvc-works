@@ -19,19 +19,16 @@
 <main id="main-content">
     <div id="vue-app" v-cloak>
 
-        <!-- 로딩 -->
         <div v-if="store.loading" style="text-align:center;padding:60px;color:#9aa0b4;">
             결과를 불러오는 중...
         </div>
 
         <div v-else>
 
-            <!-- 뒤로가기 -->
             <button class="btn-back" @click="goList">
                 <i class="fas fa-arrow-left"></i> 설문 목록
             </button>
 
-            <!-- 결과 헤더 -->
             <div class="result-header">
                 <h4>{{ store.survey.title }}</h4>
                 <div class="result-meta">
@@ -45,7 +42,6 @@
                 </div>
             </div>
 
-            <!-- 첨부파일 -->
             <div v-if="store.files.length > 0" style="background:#f8f9fb;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
                 <div style="font-weight:600;font-size:13px;color:#1d2939;margin-bottom:8px;">
                     <i class="fas fa-paperclip"></i> 첨부파일 ({{ store.files.length }})
@@ -58,18 +54,15 @@
                 </div>
             </div>
 
-            <!-- 응답 없음 -->
             <div v-if="store.responseCount === 0" class="no-response">
                 <i class="fas fa-chart-bar" style="font-size:36px;margin-bottom:12px;display:block;"></i>
                 아직 응답이 없습니다.
             </div>
 
-            <!-- 질문별 통계 카드 -->
             <div class="result-card" v-for="(stat, si) in store.stats" :key="si">
                 <div class="q-title">Q{{ si + 1 }}. {{ stat.question.questionText }}</div>
                 <span class="q-type-badge" :class="stat.question.questionType">{{ typeName(stat.question.questionType) }}</span>
 
-                <!-- SINGLE / MULTI: 가로 막대 차트 -->
                 <div v-if="stat.question.questionType === 'SINGLE' || stat.question.questionType === 'MULTI'" class="bar-chart">
                     <div class="bar-item" v-for="opt in stat.options" :key="opt.optionId">
                         <span class="bar-label">{{ opt.optionText }}</span>
@@ -80,7 +73,6 @@
                     </div>
                 </div>
 
-                <!-- TEXT: 서술형 답변 목록 -->
                 <div v-if="stat.question.questionType === 'TEXT'" class="text-answers">
                     <div v-if="!stat.textAnswers || stat.textAnswers.length === 0" style="color:#9aa0b4;font-size:13px;">
                         텍스트 응답이 없습니다.
@@ -90,7 +82,6 @@
                     </div>
                 </div>
 
-                <!-- SCORE: 평균 점수 + 별 -->
                 <div v-if="stat.question.questionType === 'SCORE'" class="score-result">
                     <div>
                         <div class="score-big">{{ stat.avgScore ? stat.avgScore.toFixed(1) : '0.0' }}</div>

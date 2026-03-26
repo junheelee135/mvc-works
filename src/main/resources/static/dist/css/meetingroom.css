@@ -1,8 +1,5 @@
 @charset "UTF-8";
 
-/* ── 회의실 관리 전용 스타일 ── */
-
-/* 레이아웃 — 사이드바 오프셋 */
 #main-content {
     margin-left: 260px !important;
     padding: 8px 24px 14px;
@@ -11,7 +8,6 @@
     background: #f8f9fc;
 }
 
-/* 추가 버튼 (doctype.jsp 유형추가 버튼과 동일) */
 .btn-add-type {
     display: inline-flex;
     align-items: center;
@@ -29,7 +25,6 @@
 .btn-add-type:hover { background: #17ada0; }
 .btn-add-type .material-symbols-outlined { font-size: 18px; }
 
-/* 상단 헤더 */
 .room-header {
     display: flex;
     align-items: center;
@@ -55,7 +50,6 @@
     margin: 4px 0 0 30px;
 }
 
-/* 통계 카드 */
 .stat-row {
     display: flex;
     gap: 16px;
@@ -82,7 +76,6 @@
     margin-top: 4px;
 }
 
-/* 카드 그리드 */
 .room-card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -97,7 +90,6 @@
     font-size: 13px;
 }
 
-/* 카드 */
 .room-card {
     border: 1px solid #e6eaf4;
     border-radius: 10px;
@@ -111,7 +103,6 @@
     box-shadow: 0 4px 16px rgba(78, 115, 223, 0.10);
 }
 
-/* 사진 영역 */
 .room-card-img {
     height: 160px;
     background: #f8f9fd;
@@ -134,7 +125,6 @@
     font-size: 48px;
 }
 
-/* 정보 영역 */
 .room-card-body {
     padding: 16px;
     flex: 1;
@@ -158,7 +148,6 @@
     color: #9aa0b4;
 }
 
-/* 비품 뱃지 */
 .equip-badges {
     display: flex;
     flex-wrap: wrap;
@@ -175,7 +164,6 @@
     border: none;
 }
 
-/* 사용여부 뱃지 */
 .use-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -186,7 +174,6 @@
 .use-badge.on { background: #e0f5ef; color: #1a9660; }
 .use-badge.off { background: #f0f2f5; color: #9aa0b4; }
 
-/* 카드 푸터 버튼 */
 .room-card-footer {
     padding: 10px 16px;
     border-top: 1px solid #f0f2f9;
@@ -209,7 +196,6 @@
 .room-card-footer .btn-del { color: #d93025; }
 .room-card-footer .btn-del:hover { background: #fff0f0; border-color: #d93025; }
 
-/* 비품 체크박스 그룹 */
 .equip-check-group {
     display: flex;
     flex-wrap: wrap;
@@ -217,7 +203,6 @@
     padding: 8px 0;
 }
 
-/* 모달 오버라이드 */
 .modal-content {
     border-radius: 10px;
     border: 1px solid #e6eaf4;
@@ -278,7 +263,6 @@
 }
 .btn-modal-save:hover { background: #3a5abf; }
 
-/* 파일 인풋 */
 .file-input-wrap input[type="file"] {
     border: 1px solid #d8dde6;
     border-radius: 6px;
@@ -294,11 +278,6 @@
     display: block;
 }
 
-/* ══════════════════════════════════════════
-   예약 현황 (reserve.jsp)
-   ══════════════════════════════════════════ */
-
-/* 날짜 네비 + 통계 툴바 */
 .reserve-toolbar {
     display: flex;
     align-items: center;
@@ -414,7 +393,6 @@
     margin-left: 4px;
 }
 
-/* 시간표 패널 */
 .timetable-panel {
     background: #fff;
     border: 1px solid #e6eaf4;
@@ -452,7 +430,6 @@
     font-weight: 600;
 }
 
-/* 빈 일정 */
 .schedule-empty {
     text-align: center;
     padding: 60px 0;
@@ -468,7 +445,6 @@
     margin: 0;
 }
 
-/* ── 컬럼식 시간표 ── */
 .timetable-wrap {
     overflow-x: auto;
 }
@@ -478,7 +454,6 @@
     table-layout: fixed;
 }
 
-/* 헤더 */
 .timetable thead th {
     position: sticky;
     top: 0;
@@ -527,7 +502,6 @@
     color: #4e73df;
 }
 
-/* 회의실 상세 모달 */
 .room-detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -587,7 +561,6 @@
     border: 1px solid #e6eaf4;
 }
 
-/* 시간 컬럼 */
 .tt-time-td {
     text-align: right;
     padding: 0 8px 0 0;
@@ -599,13 +572,12 @@
     vertical-align: top;
     line-height: 1;
 }
-/* 정시 행만 위쪽 구분선 */
+
 .tt-hour-row .tt-time-td,
 .tt-hour-row .tt-cell {
     border-top: 1px solid #e6eaf4;
 }
 
-/* 셀 공통 */
 .tt-cell {
     height: 28px;
     border-right: 1px solid #f0f2f9;
@@ -618,7 +590,6 @@
     border-right: none;
 }
 
-/* 빈 셀 */
 .tt-free {
     cursor: pointer;
 }
@@ -626,7 +597,6 @@
     background: #eef8e8 !important;
 }
 
-/* 예약 시작 셀 */
 .tt-start {
     border-left: 3px solid;
 }
@@ -650,18 +620,15 @@
     text-overflow: ellipsis;
 }
 
-/* 예약 연속 셀 */
 .tt-cont {
     border-left: 3px solid;
 }
 
-/* 내 예약만 보기 — 다른 사람 예약 흐리게 */
 .tt-dimmed {
     opacity: 0.2;
     pointer-events: none;
 }
 
-/* 예약 셀 클릭 가능 */
 .tt-start, .tt-cont {
     cursor: pointer;
 }
@@ -669,7 +636,6 @@
     filter: brightness(0.95);
 }
 
-/* 모달 date input */
 .modal-body input[type="date"] {
     border: 1px solid #d8dde6;
     border-radius: 6px;
@@ -683,7 +649,6 @@
 }
 .modal-body input[type="date"]:focus { border-color: #4e73df; }
 
-/* ── 예약 상세 모달 ── */
 .reserve-detail-title {
     font-size: 18px;
     font-weight: 700;
@@ -722,7 +687,6 @@
 }
 .btn-modal-danger:hover { background: #c12717; }
 
-/* 반응형 */
 @media (max-width: 768px) {
     .reserve-toolbar {
         flex-direction: column;

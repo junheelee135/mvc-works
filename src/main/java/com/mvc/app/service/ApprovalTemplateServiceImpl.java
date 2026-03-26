@@ -22,10 +22,8 @@ public class ApprovalTemplateServiceImpl implements ApprovalTemplateService {
     @Transactional
     public void saveTemplate(ApprovalTemplateDto dto) throws Exception {
         try {
-            // 1. 템플릿 헤더 저장 (selectKey로 tempId 자동 세팅)
             mapper.insertTemplate(dto);
 
-            // 2. 템플릿 상세 (결재자 목록) 저장
             int order = 1;
             for (ApprovalTemplateLineDto line : dto.getLines()) {
                 line.setTempId(dto.getTempId());
@@ -62,7 +60,6 @@ public class ApprovalTemplateServiceImpl implements ApprovalTemplateService {
     @Transactional
     public void deleteTemplate(long tempId) throws Exception {
         try {
-            // 상세 먼저 삭제 → 헤더 삭제
             mapper.deleteTemplateLine(tempId);
             mapper.deleteTemplate(tempId);
         } catch (Exception e) {

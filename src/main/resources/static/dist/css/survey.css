@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-/* ── 레이아웃 ── */
 #main-content {
     margin-left: 260px !important;
     padding: 24px 32px !important;
@@ -9,7 +8,6 @@
     background: #f8f9fc;
 }
 
-/* ── 페이지 헤더 ── */
 .survey-header {
     display: flex;
     align-items: center;
@@ -29,7 +27,6 @@
     gap: 8px;
 }
 
-/* ── 공통 버튼 ── */
 .btn-primary {
     background: #4e73df;
     color: #fff;
@@ -82,7 +79,6 @@
 }
 .btn-success:hover { background: #17ada0; }
 
-/* ── 검색 바 ── */
 .survey-searchbar {
     display: flex;
     align-items: center;
@@ -103,7 +99,6 @@
 }
 .survey-searchbar input[type="text"] { width: 220px; }
 
-/* ── 테이블 ── */
 .survey-table {
     width: 100%;
     border-collapse: collapse;
@@ -141,7 +136,6 @@
     vertical-align: middle;
 }
 
-/* ── 상태 뱃지 ── */
 .survey-status {
     display: inline-block;
     padding: 3px 10px;
@@ -154,7 +148,6 @@
 .survey-status.ACTIVE { background: #e0f5ef; color: #1a9660; }
 .survey-status.CLOSED { background: #f0f0f0; color: #6b7280; }
 
-/* ── 폼 영역 (생성/수정) ── */
 .survey-form {
     background: #fff;
     border-radius: 10px;
@@ -204,7 +197,6 @@
 }
 .form-row .form-group { flex: 1; }
 
-/* ── 질문 카드 ── */
 .question-card {
     background: #f8f9fc;
     border: 1px solid #e6eaf4;
@@ -235,7 +227,6 @@
 }
 .question-card-header .btn-remove-q:hover { color: #e74c3c; }
 
-/* 선택지 입력 */
 .option-row {
     display: flex;
     align-items: center;
@@ -290,7 +281,6 @@
 }
 .btn-add-question:hover { border-color: #4e73df; color: #4e73df; }
 
-/* ── 질문유형 안내 (TEXT/SCORE) ── */
 .question-type-hint {
     display: flex;
     align-items: center;
@@ -308,7 +298,6 @@
     color: #9aa0b4;
 }
 
-/* ── 대상자 영역 ── */
 .target-input-row {
     display: flex;
     align-items: center;
@@ -366,7 +355,6 @@
 }
 .target-tag .btn-remove-target:hover { color: #e74c3c; }
 
-/* ── 동작 버튼 (테이블 내) ── */
 .btn-action {
     border: none;
     border-radius: 4px;

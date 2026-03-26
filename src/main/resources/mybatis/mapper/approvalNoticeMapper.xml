@@ -74,7 +74,6 @@
         VALUES (approvalNoticeFile_seq.NEXTVAL, #{noticeId}, #{oriFilename}, #{saveFilename}, #{fileSize}, SYSDATE)
     </insert>
 
-  
     <select id="listFilesByNoticeId" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalNoticeFileDto">
         SELECT fileId, noticeId, oriFilename, saveFilename, fileSize,
                TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
@@ -87,15 +86,14 @@
         DELETE FROM approvalNoticeFile WHERE fileId = #{fileId}
     </delete>
 
-  
     <delete id="deleteFilesByNoticeId" parameterType="long">
         DELETE FROM approvalNoticeFile WHERE noticeId = #{noticeId}
     </delete>
-    
+
     <select id="findFileById" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalNoticeFileDto">
         SELECT fileId, noticeId, oriFilename, saveFilename, fileSize,
                TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
         FROM approvalNoticeFile
         WHERE fileId = #{fileId}
-    </select>    
+    </select>
 </mapper>

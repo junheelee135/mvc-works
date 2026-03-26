@@ -4,7 +4,6 @@
 
 <mapper namespace="com.mvc.app.mapper.MeetingReserveMapper">
 
-    <!-- 날짜별 예약 목록 (roomId 선택적 필터) -->
     <select id="listByDate" parameterType="map"
             resultType="com.mvc.app.domain.dto.MeetingReserveDto">
         SELECT r.reserveId, r.roomId, m.roomName,
@@ -23,7 +22,6 @@
         ORDER BY r.startTime, m.roomName
     </select>
 
-    <!-- 월별 예약 (캘린더 이벤트용) -->
     <select id="listByMonth" parameterType="map"
             resultType="com.mvc.app.domain.dto.MeetingReserveDto">
         SELECT r.reserveId, r.roomId, m.roomName,
@@ -38,7 +36,6 @@
         ORDER BY r.reserveDate, r.startTime
     </select>
 
-    <!-- 예약 상세 -->
     <select id="getReserve" parameterType="long"
             resultType="com.mvc.app.domain.dto.MeetingReserveDto">
         SELECT r.reserveId, r.roomId, m.roomName,
@@ -52,7 +49,6 @@
         WHERE r.reserveId = #{reserveId}
     </select>
 
-    <!-- 예약 등록 (원자적 중복 방지: INSERT...SELECT WHERE NOT EXISTS) -->
     <insert id="insertReserve" parameterType="com.mvc.app.domain.dto.MeetingReserveDto">
         <selectKey keyProperty="reserveId" resultType="long" order="BEFORE">
             SELECT meetingReserve_seq.NEXTVAL FROM dual
@@ -77,14 +73,12 @@
         )
     </insert>
 
-    <!-- 예약 취소 -->
     <update id="cancelReserve" parameterType="long">
         UPDATE meetingReserve
         SET status = 'CANCEL'
         WHERE reserveId = #{reserveId}
     </update>
 
-    <!-- 시간 중복 체크 -->
     <select id="checkOverlap" parameterType="map" resultType="int">
         SELECT COUNT(*) FROM meetingReserve
         WHERE roomId = #{roomId}
@@ -94,7 +88,6 @@
           AND endTime &gt; #{startTime}
     </select>
 
-    <!-- 오늘 예약 수 (본인) -->
     <select id="countToday" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM meetingReserve
         WHERE reserveDate = TRUNC(SYSDATE)
@@ -102,7 +95,6 @@
           AND reserveEmpId = #{empId}
     </select>
 
-    <!-- 이번주 예약 수 (본인) -->
     <select id="countWeek" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM meetingReserve
         WHERE reserveDate BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 6
@@ -110,7 +102,6 @@
           AND reserveEmpId = #{empId}
     </select>
 
-    <!-- 이번달 예약 수 (본인) -->
     <select id="countMonth" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM meetingReserve
         WHERE TO_CHAR(reserveDate, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')

@@ -10,7 +10,6 @@
 
 [v-cloak] { display: none; }
 
-/* 판넬 */
 .table-panel {
     background: #fff;
     border: 1px solid #e6eaf4;
@@ -18,8 +17,6 @@
     overflow: hidden;
 }
 
-
-/* 리스트 */
 .notice-header {
     display: flex;
     align-items: center;
@@ -45,7 +42,6 @@
     margin: 4px 0 0 30px;
 }
 
-/* 글쓰기 */
 .btn-write {
     display: inline-flex;
     align-items: center;
@@ -63,7 +59,6 @@
 .btn-write:hover { background: #3a5abf; }
 .btn-write .material-symbols-outlined { font-size: 18px; }
 
-/* 검색 */
 .notice-search {
     display: flex;
     gap: 8px;
@@ -91,7 +86,6 @@
 }
 .notice-search button:hover { background: #3a5abf; }
 
-/* 리스트:내용 */
 .notice-table {
     width: 100%;
     border-collapse: collapse;
@@ -128,7 +122,6 @@
     white-space: nowrap;
 }
 
-/* 리스트:페이지 */
 .table-pagination {
     display: flex;
     justify-content: center;
@@ -151,7 +144,6 @@
 .page-btn:disabled { opacity: 0.4; cursor: default; }
 .page-btn:disabled:hover { background: #fff; border-color: #d8dde6; color: #7b82a0; }
 
-/* 글상세 */
 .notice-view {
     background: #fff;
     border: 1px solid #e6eaf4;
@@ -196,7 +188,6 @@
     overflow-wrap: break-word;
 }
 
-/* quill 넘치기 방지 */
 .ql-editor img {
     max-width: 100%;
     height: auto;
@@ -209,7 +200,6 @@
     border-top: 1px solid #e6eaf4;
 }
 
-/* 글쓰기,수정 */
 .notice-form {
     background: #fff;
     border: 1px solid #e6eaf4;
@@ -252,7 +242,6 @@
     margin-top: 24px;
 }
 
-/* 버튼 */
 .btn-list, .btn-cancel {
     background: #fff;
     border: 1px solid #d8dde6;
@@ -303,7 +292,6 @@
 }
 .btn-del:hover { background: #fff0f0; }
 
-/* 첨부파일 (상세보기) */
 .detail-files {
     padding: 16px 28px;
     border-top: 1px solid #e6eaf4;
@@ -335,7 +323,6 @@
 .file-item:hover { background: #e0e8ff; }
 .file-item .material-symbols-outlined { font-size: 14px; }
 
-/* 첨부파일 섹션 (글쓰기/수정) */
 .attach-section {
     border-top: 1px solid #e6eaf4;
     padding-top: 18px;

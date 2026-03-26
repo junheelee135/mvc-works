@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-/* ── 레이아웃 ── */
 #main-content {
     margin-left: 260px !important;
     padding: 24px 32px !important;
@@ -11,7 +10,6 @@
     flex-direction: column;
 }
 
-/* ── 상단 액션 바 ── */
 .absence-topbar {
     display: flex;
     align-items: center;
@@ -37,7 +35,6 @@
 .btn-new-absence:hover { background: #17ada0; }
 .btn-new-absence .material-symbols-outlined { font-size: 18px; }
 
-/* ── 본문 영역 ── */
 .absence-body {
     display: flex;
     gap: 20px;
@@ -45,7 +42,6 @@
     flex: 1;
 }
 
-/* ── 왼쪽 등록 폼 패널 ── */
 .form-panel {
     width: 320px;
     min-width: 300px;
@@ -76,7 +72,6 @@
     gap: 16px;
 }
 
-/* ── 프로젝트 정보 박스 ── */
 .form-info-box {
     display: flex;
     align-items: flex-start;
@@ -97,7 +92,6 @@
     margin-top: 2px;
 }
 
-/* ── 폼 필드 ── */
 .form-field {
     display: flex;
     flex-direction: column;
@@ -142,7 +136,6 @@
 }
 .form-select:focus { border-color: #4e73df; }
 
-/* ── 날짜 범위 ── */
 .date-range {
     display: flex;
     align-items: center;
@@ -155,7 +148,6 @@
     flex-shrink: 0;
 }
 
-/* ── 검색 바 ── */
 .search-bar {
     display: flex;
     gap: 6px;
@@ -179,7 +171,6 @@
 .btn-search:hover { background: #3a5abf; }
 .btn-search .material-symbols-outlined { font-size: 18px; }
 
-/* ── 멤버 목록 ── */
 .member-list {
     display: flex;
     flex-direction: column;
@@ -245,7 +236,6 @@
     color: #1a9660 !important;
 }
 
-/* ── 안내 박스 ── */
 .notice-box {
     display: flex;
     align-items: flex-start;
@@ -259,7 +249,6 @@
     line-height: 1.5;
 }
 
-/* ── 폼 하단 버튼 ── */
 .form-footer {
     display: flex;
     justify-content: flex-end;
@@ -293,7 +282,6 @@
 }
 .btn-submit:hover { background: #3a5abf; }
 
-/* ── 오른쪽 테이블 ── */
 .table-panel {
     flex: 1;
     min-width: 0;
@@ -338,7 +326,6 @@
 .td-period { font-weight: 600; color: #1d2939; }
 .td-days   { font-size: 11px; color: #9aa0b4; margin-top: 2px; }
 
-/* ── 상태 뱃지 ── */
 .status-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -352,7 +339,6 @@
 .status-DONE      { background: #f1f3f9; color: #667085; }
 .status-CANCELED  { background: #f0f0f0; color: #6b7280; }
 
-/* ── 삭제 버튼 ── */
 .btn-delete {
     background: #fff0f0;
     color: #e53e3e;
@@ -449,7 +435,6 @@
 }
 .btn-close-modal:hover { background: #e2e6f0; }
 
-/* ── 조직도 검색 모달 ── */
 .org-search-box { width: 720px; max-width: 95vw; }
 .org-search-body { padding: 0 !important; }
 
@@ -581,13 +566,12 @@
 
 }
 
-
 .modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,.45);
     z-index: 1000;
-    display: none;  /* 기본 숨김 */
+    display: none;
     align-items: center;
     justify-content: center;
 }
@@ -596,9 +580,6 @@
     display: flex !important;
 }
 
-
-
-/* ── 페이지네이션 ── */
 .table-pagination {
     display: flex;
     justify-content: center;
@@ -622,11 +603,9 @@
 .page-btn.active { background: #4e73df; border-color: #4e73df; color: #fff; font-weight: 700; }
 .page-btn:disabled { opacity: .4; cursor: default; }
 
-/* ── 상태 뱃지 활성/비활성 ── */
 .status-active   { background: #e0f5ef; color: #1a9660; }
 .status-inactive { background: #f0f0f0; color: #6b7280; }
 
-/* 컬럼 정렬: 부재기간(1), 부재사유(2), 상태(5), 관리(6) */
 .absence-table thead th:nth-child(1),
 .absence-table thead th:nth-child(2),
 .absence-table thead th:nth-child(5),

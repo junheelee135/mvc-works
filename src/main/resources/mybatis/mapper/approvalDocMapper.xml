@@ -4,7 +4,6 @@
 
 <mapper namespace="com.mvc.app.mapper.ApprovalDocMapper">
 
-    <!-- 동적 ORDER BY -->
     <sql id="dynamicOrderBy">
         ORDER BY
         <choose>
@@ -20,14 +19,12 @@
         </choose>
     </sql>
 
-    <!-- 결재상태 필터 조건 -->
     <sql id="statusFilter">
         <if test="statusFilter != null and statusFilter != ''">
             AND d.docStatus = #{statusFilter}
         </if>
     </sql>
 
-    <!-- 기안서 등록 (selectKey로 docId를 미리 받아옴) -->
     <insert id="insertDoc" parameterType="com.mvc.app.domain.dto.ApprovalDocDto">
         <selectKey keyProperty="docId" resultType="long" order="BEFORE">
             SELECT approvalDoc_seq.NEXTVAL FROM dual
@@ -48,10 +45,9 @@
             #{writerGradeName, jdbcType=VARCHAR},
             SYSDATE,
             CASE WHEN #{docStatus} = 'PENDING' THEN SYSDATE ELSE NULL END
-        )        
+        )
     </insert>
 
-    <!-- 결재선 등록 -->
     <insert id="insertLine" parameterType="com.mvc.app.domain.dto.ApprovalLineDto">
         INSERT INTO approvalLine (
             lineId, docId, stepOrder,
@@ -68,8 +64,6 @@
         )
     </insert>
 
-
-    <!-- 참조자 등록 -->
     <insert id="insertRef" parameterType="com.mvc.app.domain.dto.ApprovalRefDto">
         INSERT INTO approvalReference (
             refId, docId, refEmpId, refEmpName,
@@ -83,13 +77,11 @@
         )
     </insert>
 
-	<!-- 첨부파일 -->
     <insert id="insertFile" parameterType="com.mvc.app.domain.dto.ApprovalFileDto">
         INSERT INTO approvalFile (fileId, docId, oriFilename, saveFilename, fileSize, regDate)
         VALUES (approvalFile_seq.NEXTVAL, #{docId}, #{oriFilename}, #{saveFilename}, #{fileSize}, SYSDATE)
     </insert>
 
-    <!-- 임시저장 목록 -->
     <select id="listDraft" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
         SELECT d.docId, d.title, d.docStatus,
                d.writerEmpName, d.writerGradeName,
@@ -110,8 +102,7 @@
         <include refid="dynamicOrderBy"/>
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
-    
-    <!-- 임시저장 건수 -->
+
     <select id="countDraft" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM approvalDoc d
@@ -127,8 +118,7 @@
             AND d.regDate &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
         </if>
     </select>
-    
-  <!-- 보낸 결재함 목록 -->
+
   <select id="listSent" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
       SELECT d.docId, d.title, d.docStatus,
              d.writerEmpName, d.writerGradeName,
@@ -170,7 +160,6 @@
       </if>
   </select>
 
-  <!-- 받은 결재함 목록 (내 차례 WAIT + 내가 승인한 APPROVED + 대결) -->
   <select id="listInbox" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
       WITH firstWait AS (
           SELECT docId, MIN(stepOrder) AS minOrder
@@ -243,7 +232,6 @@
       </if>
   </select>
 
-  <!-- 미결재 문서 (내 차례 WAIT + 보류 HOLD + 대결 대상) -->
   <select id="listPendingInbox" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
       WITH firstAction AS (
           SELECT docId, apprEmpId
@@ -319,7 +307,6 @@
       </if>
   </select>
 
-  <!-- 미확인 문서 (참조 중 readYn='N') -->
   <select id="listUnreadRef" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
       SELECT d.docId, d.title, d.docStatus,
              d.writerEmpName, d.writerGradeName,
@@ -363,7 +350,6 @@
       </if>
   </select>
 
-  <!-- 참조자 읽음 처리 -->
   <update id="markRefAsRead" parameterType="map">
       UPDATE approvalReference
       SET readYn = 'Y', readDate = SYSDATE
@@ -469,7 +455,6 @@
         </if>
     </select>
 
-    <!-- 문서 상세 조회 -->
     <select id="getDoc" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalDocDto">
         SELECT d.docId, d.docTypeId, d.title, d.content, d.detailData,
                d.docStatus, d.writerEmpId, d.writerEmpName,
@@ -484,7 +469,6 @@
         WHERE d.docId = #{docId}
     </select>
 
-    <!-- 결재선 조회 -->
     <select id="getLines" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalLineDto">
         SELECT lineId, docId, stepOrder,
                apprEmpId, apprEmpName,
@@ -504,7 +488,6 @@
         ORDER BY stepOrder ASC
     </select>
 
-    <!-- 첨부파일 조회 -->
     <select id="getFiles" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalFileDto">
         SELECT fileId, docId, oriFilename, saveFilename, fileSize,
                TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
@@ -513,14 +496,12 @@
         ORDER BY fileId ASC
     </select>
 
-    <!-- 첨부파일 단건 조회 -->
     <select id="getFileById" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalFileDto">
         SELECT fileId, docId, oriFilename, saveFilename, fileSize
         FROM approvalFile
         WHERE fileId = #{fileId}
-    </select> 
+    </select>
 
-    <!-- 참조자 조회 -->
     <select id="getRefs" parameterType="long"
             resultType="com.mvc.app.domain.dto.ApprovalRefDto">
         SELECT refId, docId, refEmpId, refEmpName,
@@ -532,7 +513,6 @@
         ORDER BY refId ASC
     </select>
 
-    <!-- 임시저장 삭제 (하위 테이블 먼저 삭제) -->
     <delete id="deleteFiles" parameterType="long">
         DELETE FROM approvalFile WHERE docId = #{docId}
     </delete>
@@ -546,7 +526,6 @@
         DELETE FROM approvalDoc WHERE docId = #{docId} AND docStatus IN ('DRAFT', 'REJECTED')
     </delete>
 
-    <!-- 임시저장/재상신 수정 (문서 UPDATE) -->
     <update id="updateDoc" parameterType="com.mvc.app.domain.dto.ApprovalDocDto">
         UPDATE approvalDoc
         SET title = #{title},
@@ -560,7 +539,6 @@
         WHERE docId = #{docId}
     </update>
 
-    <!-- 결재취소 (기안자 본인, PENDING 상태에서 전원 WAIT일 때만) -->
     <update id="cancelDoc" parameterType="map">
         UPDATE approvalDoc
         SET docStatus = 'CANCELED'
@@ -574,14 +552,12 @@
           )
     </update>
 
-    <!-- 결재취소 시 결재선도 CANCELED 처리 -->
     <update id="cancelLines" parameterType="long">
         UPDATE approvalLine
         SET lineStatusCode = 'CANCELED'
         WHERE docId = #{docId}
     </update>
 
-    <!-- 승인 처리 (현재 순위 결재자 또는 보류한 본인) -->
     <update id="approveDoc" parameterType="map">
         UPDATE approvalLine
         SET lineStatusCode = 'APPROVED',
@@ -598,7 +574,6 @@
           )
     </update>
 
-    <!-- 대결 승인 처리 (WAIT 또는 HOLD) -->
     <update id="approveDocAsDeputy" parameterType="map">
         UPDATE approvalLine
         SET lineStatusCode = 'APPROVED',
@@ -623,7 +598,6 @@
           )
     </update>
 
-    <!-- 대결 반려 처리 (WAIT 또는 HOLD) -->
     <update id="rejectDocAsDeputy" parameterType="map">
         UPDATE approvalLine
         SET lineStatusCode = 'REJECTED',
@@ -648,7 +622,6 @@
           )
     </update>
 
-    <!-- 대결 보류 처리 -->
     <update id="holdDocAsDeputy" parameterType="map">
         UPDATE approvalLine
         SET lineStatusCode = 'HOLD',
@@ -671,7 +644,6 @@
           )
     </update>
 
-    <!-- 현재 WAIT 순서의 원결재자 empId 조회 -->
     <select id="getCurrentWaitApprover" parameterType="long" resultType="string">
         SELECT apprEmpId FROM approvalLine
         WHERE docId = #{docId}
@@ -682,20 +654,17 @@
           )
     </select>
 
-    <!-- 남은 WAIT 수 확인 -->
     <select id="countRemainingWait" parameterType="long" resultType="int">
         SELECT COUNT(*) FROM approvalLine
         WHERE docId = #{docId} AND lineStatusCode = 'WAIT'
     </select>
 
-    <!-- 문서 최종 승인 -->
     <update id="completeDoc" parameterType="long">
         UPDATE approvalDoc
         SET docStatus = 'APPROVED', completeDate = SYSDATE
         WHERE docId = #{docId}
     </update>
 
-    <!-- 반려 처리 (WAIT 또는 보류한 본인) -->
     <update id="rejectDoc" parameterType="map">
         UPDATE approvalLine
         SET lineStatusCode = 'REJECTED',
@@ -712,14 +681,12 @@
           )
     </update>
 
-    <!-- 문서 반려 상태 변경 -->
     <update id="rejectDocStatus" parameterType="long">
         UPDATE approvalDoc
         SET docStatus = 'REJECTED'
         WHERE docId = #{docId}
     </update>
 
-    <!-- 보류 처리 -->
     <update id="holdDoc" parameterType="map">
         UPDATE approvalLine
         SET lineStatusCode = 'HOLD',
@@ -734,21 +701,18 @@
           )
     </update>
 
-    <!-- 문서 보류 상태 변경 -->
     <update id="holdDocStatus" parameterType="long">
         UPDATE approvalDoc
         SET docStatus = 'ON_HOLD'
         WHERE docId = #{docId}
     </update>
 
-    <!-- 보류 해제 → PENDING 복원 (ON_HOLD일 때만) -->
     <update id="resumeDocStatus" parameterType="long">
         UPDATE approvalDoc
         SET docStatus = 'PENDING'
         WHERE docId = #{docId} AND docStatus = 'ON_HOLD'
     </update>
 
-    <!-- 참조자 코멘트 저장 -->
     <update id="updateRefComment" parameterType="map">
         UPDATE approvalReference
         SET refComment = #{comment, jdbcType=VARCHAR},

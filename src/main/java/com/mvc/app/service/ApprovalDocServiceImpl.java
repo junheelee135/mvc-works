@@ -33,19 +33,16 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
 
     @Value("${file.upload-root}/approval")
     private String uploadPath;
-    
+
     @Override
     @Transactional
     public void saveDraft(ApprovalDocDto dto, MultipartFile[] files) throws Exception {
         try {
-            // 1. 결재 저장
         	if (dto.getDocStatus() == null || dto.getDocStatus().isBlank()) {
         	    dto.setDocStatus("DRAFT");
         	}
 
             if (dto.getOldDocId() > 0) {
-                // 편집 모드: 결재선/참조자/파일 삭제 후 재생성, 문서는 UPDATE
-                // 물리 파일 먼저 삭제
                 List<ApprovalFileDto> oldFiles = mapper.getFiles(dto.getOldDocId());
                 for (ApprovalFileDto f : oldFiles) {
                     storageService.deleteFile(uploadPath, f.getSaveFilename());
@@ -59,7 +56,6 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 mapper.insertDoc(dto);
             }
 
-            // 2. 결재선 저장
             if (dto.getLines() != null) {
                 int order = 1;
                 for (ApprovalLineDto line : dto.getLines()) {
@@ -69,7 +65,6 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 }
             }
 
-            // 3. 참조자 저장
             if (dto.getRefs() != null) {
                 for (ApprovalRefDto ref : dto.getRefs()) {
                     ref.setDocId(dto.getDocId());
@@ -77,7 +72,6 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 }
             }
 
-            // 4. 첨부파일 저장
             if (files != null) {
                 for (MultipartFile file : files) {
                     if (file.isEmpty()) continue;
@@ -90,32 +84,30 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                     mapper.insertFile(fileDto);
                 }
             }
-            
-            // 5. 상신알림
+
             if ("PENDING".equals(dto.getDocStatus()) && dto.getLines() != null && !dto.getLines().isEmpty()) {
                 String firstApprover = dto.getLines().get(0).getApprEmpId();
                 pushAlarm(firstApprover, dto.getWriterEmpId(), dto.getWriterEmpName(), dto.getDocId(), dto.getTitle(), "SUBMIT");
                 pushAlarm(dto.getWriterEmpId(), dto.getWriterEmpId(), dto.getWriterEmpName(), dto.getDocId(), dto.getTitle(), "SUBMIT");
-                // 참조자 알림
                 if (dto.getRefs() != null) {
                     for (ApprovalRefDto ref : dto.getRefs()) {
                         pushAlarm(ref.getRefEmpId(), dto.getWriterEmpId(), dto.getWriterEmpName(), dto.getDocId(), dto.getTitle(), "REF");
                     }
                 }
-            }         
+            }
         } catch (Exception e) {
             log.error("saveDraft : ", e);
             throw e;
         }
     }
-    
+
     @Override
     public Map<String, Object> listDraft(Map<String, Object> map) throws Exception {
         int totalCount = mapper.countDraft(map);
         List<ApprovalDocDto> list = mapper.listDraft(map);
         return Map.of("totalCount", totalCount, "list", list);
     }
-    
+
     @Override
     public Map<String, Object> listSent(Map<String, Object> map) throws Exception {
         int totalCount = mapper.countSent(map);
@@ -129,7 +121,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
         List<ApprovalDocDto> list = mapper.listInbox(map);
         return Map.of("totalCount", totalCount, "list", list);
     }
-    
+
     @Override
     public Map<String, Object> listRef(Map<String, Object> map) throws Exception {
         int totalCount = mapper.countRef(map);
@@ -143,7 +135,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
         List<ApprovalDocDto> list = mapper.listAll(map);
         return Map.of("totalCount", totalCount, "list", list);
     }
-    
+
     @Override
     public ApprovalDocDto getDoc(long docId) throws Exception {
         ApprovalDocDto doc = mapper.getDoc(docId);
@@ -167,7 +159,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
         }
         return cnt > 0;
     }
-    
+
     @Override
     @Transactional
     public boolean approveDoc(long docId, String empId, String empName, String comment) throws Exception {
@@ -179,22 +171,19 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
 
         int cnt = mapper.approveDoc(map);
         if (cnt == 0) {
-            // 원결재자가 아님 → 대결자인지 확인
             cnt = mapper.approveDocAsDeputy(map);
             if (cnt == 0) return false;
         }
 
-        // 남은 WAIT가 0이면 최종 승인, 아니면 PENDING 복원 (ON_HOLD → PENDING)
         int remaining = mapper.countRemainingWait(docId);
         if (remaining == 0) {
             mapper.completeDoc(docId);
         } else {
             mapper.resumeDocStatus(docId);
         }
-        
+
         ApprovalDocDto doc = mapper.getDoc(docId);
-        
-        // 승인 알림
+
         if (remaining == 0) {
         	pushAlarm(doc.getWriterEmpId(), empId, empName, docId, doc.getTitle(), "APPROVE_FINAL");
         } else {
@@ -203,8 +192,8 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 pushAlarm(nextApprover, empId, empName, docId, doc.getTitle(), "APPROVE_NEXT");
             }
             pushAlarm(doc.getWriterEmpId(), empId, empName, docId, doc.getTitle(), "APPROVE");
-        }       
-        
+        }
+
         return true;
     }
 
@@ -225,15 +214,14 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
 
         mapper.rejectDocStatus(docId);
 
-        // 반려 알림
         ApprovalDocDto doc = mapper.getDoc(docId);
         pushAlarm(doc.getWriterEmpId(), empId, empName, docId, doc.getTitle(), "REJECT");
         for (ApprovalLineDto line : doc.getLines()) {
             if ("APPROVED".equals(line.getApprStatus())) {
                 pushAlarm(line.getApprEmpId(), empId, empName, docId, doc.getTitle(), "REJECT");
             }
-        }        
-        
+        }
+
         return true;
     }
 
@@ -254,7 +242,6 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
 
         mapper.holdDocStatus(docId);
 
-        // 보류 알림
         ApprovalDocDto doc = mapper.getDoc(docId);
         pushAlarm(doc.getWriterEmpId(), empId, empName, docId, doc.getTitle(), "HOLD");
         for (ApprovalLineDto line : doc.getLines()) {
@@ -262,7 +249,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
                 pushAlarm(line.getApprEmpId(), empId, empName, docId, doc.getTitle(), "HOLD");
             }
         }
-        
+
         return true;
     }
 
@@ -306,19 +293,15 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
 
     @Override
     public Map<String, Object> checkDeputy(long docId, String empId) throws Exception {
-        // 현재 WAIT 순서의 원결재자 조회
         String originalApprover = mapper.getCurrentWaitApprover(docId);
         if (originalApprover == null) {
             return Map.of("isDeputy", false);
         }
-        // 원결재자가 본인이면 대결 아님
         if (originalApprover.equals(empId)) {
             return Map.of("isDeputy", false);
         }
-        // 원결재자의 활성 대결자 조회
         ApprovalDeputyDto deputy = deputyMapper.findActiveDeputy(originalApprover);
         if (deputy != null && empId.equals(deputy.getDeputyEmpId())) {
-            // 원결재자 이름 조회
             List<ApprovalLineDto> lines = mapper.getLines(docId);
             String originalName = lines.stream()
                 .filter(l -> l.getApprEmpId().equals(originalApprover))
@@ -331,7 +314,7 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
         }
         return Map.of("isDeputy", false);
     }
-    
+
     private void pushAlarm(String receiverId, String senderId, String senderName, long docId, String docTitle, String actionType)
     {
         eventPublisher.publishEvent(
@@ -347,5 +330,5 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
         } catch (Exception e) {
             log.error("대결자 알림 조회 실패: ", e);
         }
-    } 
+    }
 }

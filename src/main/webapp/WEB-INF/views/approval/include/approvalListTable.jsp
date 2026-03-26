@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 
-<!-- 오른쪽 테이블 -->
 <div class="table-panel">
     <table class="approval-table">
         <thead>
@@ -54,13 +53,11 @@
             </tr>
         </thead>
         <tbody>
-            <!-- 데이터 없음 -->
             <tr v-if="store.list.length === 0">
                 <td colspan="6" style="text-align:center; padding:40px; color:#9aa0b4;">
                     조회된 문서가 없습니다.
                 </td>
             </tr>
-            <!-- 데이터 목록 -->
             <tr v-for="(item, index) in store.list" :key="item.docId"
                 @click="goDoc(item)"
                 :class="{ 'row-unread': (store.filterType === 'ref' || store.filterType === 'unreadRef') && item.readYn === 'N' }"
@@ -84,7 +81,6 @@
         </tbody>
     </table>
 
-    <!-- 페이지네이션 -->
     <div class="table-pagination">
         <button class="page-btn" :disabled="store.pageNo <= 1"
                 @click="store.changePage(1)">&laquo; 처음</button>

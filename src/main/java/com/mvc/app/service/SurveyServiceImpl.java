@@ -46,7 +46,6 @@ public class SurveyServiceImpl implements SurveyService {
             throw new IllegalArgumentException("존재하지 않는 설문입니다.");
         }
 
-        // 질문 목록 + 각 질문의 선택지
         List<SurveyQuestionDto> questions = mapper.listQuestion(surveyId);
         for (SurveyQuestionDto q : questions) {
             if ("SINGLE".equals(q.getQuestionType()) || "MULTI".equals(q.getQuestionType())) {
@@ -54,10 +53,8 @@ public class SurveyServiceImpl implements SurveyService {
             }
         }
 
-        // 대상자 목록
         List<SurveyTargetDto> targets = mapper.listTarget(surveyId);
 
-        // 첨부파일 목록
         List<SurveyFileDto> files = mapper.listFiles(surveyId);
 
         Map<String, Object> result = new HashMap<>();
@@ -71,11 +68,9 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     @Transactional
     public void createSurvey(SurveyDto dto, List<SurveyQuestionDto> questions, List<SurveyTargetDto> targets, MultipartFile[] files) throws Exception {
-        // 1. 설문 마스터 등록
         mapper.insertSurvey(dto);
         long surveyId = dto.getSurveyId();
 
-        // 2. 질문 + 선택지 등록
         for (SurveyQuestionDto q : questions) {
             q.setSurveyId(surveyId);
             mapper.insertQuestion(q);
@@ -88,13 +83,11 @@ public class SurveyServiceImpl implements SurveyService {
             }
         }
 
-        // 3. 대상자 등록
         for (SurveyTargetDto t : targets) {
             t.setSurveyId(surveyId);
             mapper.insertTarget(t);
         }
 
-        // 4. 첨부파일 저장
         saveFiles(surveyId, files);
     }
 
@@ -103,12 +96,10 @@ public class SurveyServiceImpl implements SurveyService {
     public void updateSurvey(SurveyDto dto, List<SurveyQuestionDto> questions, List<SurveyTargetDto> targets, MultipartFile[] files) throws Exception {
         long surveyId = dto.getSurveyId();
 
-        // 응답이 있으면 수정 차단
         if (mapper.countResponse(surveyId) > 0) {
             throw new IllegalStateException("이미 응답이 있는 설문은 수정할 수 없습니다.");
         }
 
-        // 1. 기존 자식 삭제 (선택지 → 질문 → 대상자)
         List<SurveyQuestionDto> oldQuestions = mapper.listQuestion(surveyId);
         for (SurveyQuestionDto q : oldQuestions) {
             mapper.deleteOptionsByQuestionId(q.getQuestionId());
@@ -116,10 +107,8 @@ public class SurveyServiceImpl implements SurveyService {
         mapper.deleteQuestionsBySurveyId(surveyId);
         mapper.deleteTargetsBySurveyId(surveyId);
 
-        // 2. 설문 마스터 수정
         mapper.updateSurvey(dto);
 
-        // 3. 질문 + 선택지 새로 등록
         for (SurveyQuestionDto q : questions) {
             q.setSurveyId(surveyId);
             mapper.insertQuestion(q);
@@ -132,13 +121,11 @@ public class SurveyServiceImpl implements SurveyService {
             }
         }
 
-        // 4. 대상자 새로 등록
         for (SurveyTargetDto t : targets) {
             t.setSurveyId(surveyId);
             mapper.insertTarget(t);
         }
 
-        // 5. 새 첨부파일 저장 (기존 파일은 유지, 새 파일만 추가)
         saveFiles(surveyId, files);
     }
 
@@ -153,30 +140,24 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     @Transactional
     public void deleteSurvey(long surveyId) throws Exception {
-        // 자식 → 부모 순서로 삭제
 
-        // 1. 답변 → 응답 삭제 (answer는 response에 종속)
         mapper.deleteAnswersBySurveyId(surveyId);
         mapper.deleteResponsesBySurveyId(surveyId);
 
-        // 2. 선택지 → 질문 삭제
         List<SurveyQuestionDto> questions = mapper.listQuestion(surveyId);
         for (SurveyQuestionDto q : questions) {
             mapper.deleteOptionsByQuestionId(q.getQuestionId());
         }
         mapper.deleteQuestionsBySurveyId(surveyId);
 
-        // 3. 대상자 삭제
         mapper.deleteTargetsBySurveyId(surveyId);
 
-        // 4. 첨부파일 삭제 (물리파일 + DB)
         List<SurveyFileDto> files = mapper.listFiles(surveyId);
         for (SurveyFileDto f : files) {
             storageService.deleteFile(uploadPath, f.getSaveFilename());
         }
         mapper.deleteFilesBySurveyId(surveyId);
 
-        // 5. 설문 마스터 삭제
         mapper.deleteSurvey(surveyId);
     }
 
@@ -200,15 +181,12 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     @Transactional
     public void submitResponse(SurveyResponseDto dto) throws Exception {
-        // 중복 응답 방지 (서버 측 재검증)
         if (checkResponse(dto.getSurveyId(), dto.getEmpId())) {
             throw new IllegalStateException("이미 응답한 설문입니다.");
         }
 
-        // 1. 응답 등록 → responseId 자동 세팅
         mapper.insertResponse(dto);
 
-        // 2. 각 답변 등록
         if (dto.getAnswers() != null) {
             for (SurveyAnswerDto answer : dto.getAnswers()) {
                 answer.setResponseId(dto.getResponseId());
@@ -222,7 +200,6 @@ public class SurveyServiceImpl implements SurveyService {
         SurveyDto survey = mapper.findById(surveyId);
         int responseCount = mapper.countResponse(surveyId);
 
-        // 질문별 통계 조합
         List<SurveyQuestionDto> questions = mapper.listQuestion(surveyId);
         List<Map<String, Object>> stats = new ArrayList<>();
 
@@ -253,7 +230,6 @@ public class SurveyServiceImpl implements SurveyService {
         result.put("responseCount", responseCount);
         result.put("stats", stats);
 
-        // 첨부파일 목록
         result.put("files", mapper.listFiles(surveyId));
 
         return result;
@@ -264,7 +240,6 @@ public class SurveyServiceImpl implements SurveyService {
         return mapper.getFileById(fileId);
     }
 
-    // ── 첨부파일 저장 헬퍼 ──
     private void saveFiles(long surveyId, MultipartFile[] files) throws Exception {
         if (files == null) return;
         for (MultipartFile mf : files) {

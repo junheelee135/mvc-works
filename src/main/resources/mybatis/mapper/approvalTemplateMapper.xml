@@ -3,7 +3,6 @@
 
 <mapper namespace="com.mvc.app.mapper.ApprovalTemplateMapper">
 
-    <!-- 템플릿 등록 -->
     <insert id="insertTemplate" parameterType="com.mvc.app.domain.dto.ApprovalTemplateDto">
         <selectKey keyProperty="tempId" resultType="long" order="BEFORE">
             SELECT approvalTemplate_seq.NEXTVAL FROM dual
@@ -12,7 +11,6 @@
         VALUES (#{tempId}, #{tempName}, #{writerEmpId}, SYSDATE)
     </insert>
 
-    <!-- 템플릿 상세 등록 -->
     <insert id="insertTemplateLine" parameterType="com.mvc.app.domain.dto.ApprovalTemplateLineDto">
         INSERT INTO approvalTemplateLine (tempLineId, tempId, stepOrder, apprEmpId, apprEmpName,
             apprDeptCode, apprDeptName, apprGradeCode, apprGradeName, apprTypeCode)
@@ -20,7 +18,6 @@
             #{apprDeptCode}, #{apprDeptName}, #{apprGradeCode}, #{apprGradeName}, 'APPROVER')
     </insert>
 
-    <!-- 내 템플릿 목록 -->
     <select id="listTemplate" parameterType="String" resultType="com.mvc.app.domain.dto.ApprovalTemplateDto">
         SELECT tempId, tempName, writerEmpId,
                TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
@@ -29,7 +26,6 @@
         ORDER BY regDate DESC
     </select>
 
-    <!-- 템플릿 상세 조회 -->
     <select id="listTemplateLine" parameterType="Long" resultType="com.mvc.app.domain.dto.ApprovalTemplateLineDto">
         SELECT tempLineId, tempId, stepOrder, apprEmpId, apprEmpName,
                apprDeptCode, apprDeptName, apprGradeCode, apprGradeName, apprTypeCode
@@ -38,13 +34,11 @@
         ORDER BY stepOrder
     </select>
 
-    <!-- 템플릿 상세 삭제 -->
     <delete id="deleteTemplateLine" parameterType="Long">
         DELETE FROM approvalTemplateLine
         WHERE tempId = #{tempId}
     </delete>
 
-    <!-- 템플릿 삭제 -->
     <delete id="deleteTemplate" parameterType="Long">
         DELETE FROM approvalTemplate
         WHERE tempId = #{tempId}

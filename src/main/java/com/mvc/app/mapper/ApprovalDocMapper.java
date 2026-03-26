@@ -39,36 +39,28 @@ public interface ApprovalDocMapper {
     public void deleteDoc(long docId) throws SQLException;
     public int cancelDoc(Map<String, Object> map) throws SQLException;
     public void cancelLines(long docId) throws SQLException;
-    
-    // 승인
+
     public int approveDoc(Map<String, Object> map) throws SQLException;
     public int countRemainingWait(long docId) throws SQLException;
     public void completeDoc(long docId) throws SQLException;
 
-    // 반려
     public int rejectDoc(Map<String, Object> map) throws SQLException;
     public void rejectDocStatus(long docId) throws SQLException;
 
-    // 보류
     public int holdDoc(Map<String, Object> map) throws SQLException;
     public void holdDocStatus(long docId) throws SQLException;
     public void resumeDocStatus(long docId) throws SQLException;
 
-    // 참조자 코멘트
     public int updateRefComment(Map<String, Object> map) throws SQLException;
 
-    // 미결재 문서
     public List<ApprovalDocDto> listPendingInbox(Map<String, Object> map) throws SQLException;
     public int countPendingInbox(Map<String, Object> map) throws SQLException;
 
-    // 미확인 문서
     public List<ApprovalDocDto> listUnreadRef(Map<String, Object> map) throws SQLException;
     public int countUnreadRef(Map<String, Object> map) throws SQLException;
 
-    // 참조 읽음 처리
     public int markRefAsRead(Map<String, Object> map) throws SQLException;
 
-    // 대결 처리
     public int approveDocAsDeputy(Map<String, Object> map) throws SQLException;
     public int rejectDocAsDeputy(Map<String, Object> map) throws SQLException;
     public int holdDocAsDeputy(Map<String, Object> map) throws SQLException;

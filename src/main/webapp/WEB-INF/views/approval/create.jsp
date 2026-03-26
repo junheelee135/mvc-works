@@ -25,7 +25,6 @@
 
     <div id="vue-app" v-cloak>
 
-        <!-- 페이지 타이틀 + 문서 타이틀 한 줄 -->
         <div class="page-header">
             <span class="material-symbols-outlined">forward_to_inbox</span>
             <span class="page-header-label">전자결재</span>
@@ -33,7 +32,6 @@
             <span class="page-header-doc">{{ store.selectedDocTypeName }}</span>
         </div>
 
-        <!-- 결재양식 선택 모달 -->
         <div class="modal-overlay" v-if="!store.formVisible">
             <div class="modal-box">
                 <div class="modal-header">
@@ -74,7 +72,6 @@
             </div>
         </div>
 
-        <!-- 결재자 검색 모달 (재사용 컴포넌트) -->
         <org-search-modal
             v-model:visible="approverModalVisible"
             title="결재자 검색"
@@ -82,7 +79,6 @@
             @add="store.addApprover($event)">
         </org-search-modal>
 
-        <!-- 참조자 검색 모달 (재사용 컴포넌트) -->
         <org-search-modal
             v-model:visible="referenceModalVisible"
             title="참조자 검색"
@@ -90,7 +86,6 @@
             @add="store.addReference($event)">
         </org-search-modal>
 
-        <!-- 동행자 검색 모달 (FM002 출장신청서용) -->
         <org-search-modal
             v-model:visible="companionModalVisible"
             title="동행자 검색"
@@ -98,7 +93,6 @@
             @add="store.addCompanion($event)">
         </org-search-modal>
 
-        <!-- 결재 작성 폼 -->
         <div class="approval-form-wrap" :class="{ active: store.formVisible }">
 
             <div class="form-doc-title">{{ store.selectedDocTypeName }}</div>
@@ -111,9 +105,9 @@
           			</div>
       			</div>
   			</div>
-            
+
             <jsp:include page="/WEB-INF/views/approval/include/approvalBasicInfo.jsp"/>
- 
+
             <jsp:include page="/WEB-INF/views/approval/include/approvalLine.jsp"/>
 
             <jsp:include page="/WEB-INF/views/approval/include/approvalRef.jsp"/>
@@ -136,7 +130,6 @@
                 <div class="form-section-body" v-html="store.selectedNotice"></div>
             </div>
 
-            <!-- 하단 버튼 -->
             <div class="form-footer">
                 <button class="btn-save-temp" @click="store.saveDraft()">
                     <span class="material-symbols-outlined" style="font-size:16px">save</span>
@@ -226,7 +219,7 @@
                 const ok = await store.loadTemplate(tempId);
                 if (ok) templateLoadModalVisible.value = false;
             };
-            
+
             // 템플릿 삭제
             const onDeleteTemplate = async (tempId) => {
                 if (!confirm('이 템플릿을 삭제하시겠습니까?')) return;

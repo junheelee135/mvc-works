@@ -4,7 +4,6 @@
 
 <mapper namespace="com.mvc.app.mapper.MeetingRoomMapper">
 
-    <!-- 회의실 목록 -->
     <select id="listRoom" resultType="com.mvc.app.domain.dto.MeetingRoomDto">
         SELECT roomId, roomName, location, capacity, sortOrder, useYn,
                TO_CHAR(regDate, 'YYYY-MM-DD') AS regDate
@@ -12,7 +11,6 @@
         ORDER BY sortOrder, roomId
     </select>
 
-    <!-- 회의실 상세 -->
     <select id="getRoom" parameterType="long"
             resultType="com.mvc.app.domain.dto.MeetingRoomDto">
         SELECT roomId, roomName, location, capacity, sortOrder, useYn,
@@ -21,7 +19,6 @@
         WHERE roomId = #{roomId}
     </select>
 
-    <!-- 회의실 등록 -->
     <insert id="insertRoom" parameterType="com.mvc.app.domain.dto.MeetingRoomDto">
         <selectKey keyProperty="roomId" resultType="long" order="BEFORE">
             SELECT meetingRoom_seq.NEXTVAL FROM dual
@@ -30,7 +27,6 @@
         VALUES (#{roomId}, #{roomName}, #{location}, #{capacity}, #{sortOrder}, 'Y')
     </insert>
 
-    <!-- 회의실 수정 -->
     <update id="updateRoom" parameterType="com.mvc.app.domain.dto.MeetingRoomDto">
         UPDATE meetingRoom
         SET roomName = #{roomName},
@@ -41,33 +37,27 @@
         WHERE roomId = #{roomId}
     </update>
 
-    <!-- 순서 변경 -->
     <update id="updateSortOrder" parameterType="com.mvc.app.domain.dto.MeetingRoomDto">
         UPDATE meetingRoom SET sortOrder = #{sortOrder} WHERE roomId = #{roomId}
     </update>
 
-    <!-- 회의실 삭제 -->
     <delete id="deleteRoom" parameterType="long">
         DELETE FROM meetingRoom WHERE roomId = #{roomId}
     </delete>
 
-    <!-- 비품목록 -->
     <select id="listEquipByRoom" parameterType="long" resultType="string">
         SELECT equipCode FROM roomEquipment WHERE roomId = #{roomId}
     </select>
 
-    <!-- 비품등록 -->
     <insert id="insertEquip" parameterType="map">
         INSERT INTO roomEquipment (roomId, equipCode)
         VALUES (#{roomId}, #{equipCode})
     </insert>
 
-    <!-- 비품삭제-->
     <delete id="deleteEquipByRoom" parameterType="long">
         DELETE FROM roomEquipment WHERE roomId = #{roomId}
     </delete>
 
-    <!-- 회의실 사진목록 -->
     <select id="listPhotoByRoom" parameterType="long"
             resultType="com.mvc.app.domain.dto.RoomPhotoDto">
         SELECT photoId, roomId, oriFilename, saveFilename, sortOrder,
@@ -77,7 +67,6 @@
         ORDER BY sortOrder, photoId
     </select>
 
-    <!-- 회의실사진등록 -->
     <insert id="insertPhoto" parameterType="com.mvc.app.domain.dto.RoomPhotoDto">
         <selectKey keyProperty="photoId" resultType="long" order="BEFORE">
             SELECT roomPhoto_seq.NEXTVAL FROM dual
@@ -86,17 +75,14 @@
         VALUES (#{photoId}, #{roomId}, #{oriFilename}, #{saveFilename}, #{sortOrder})
     </insert>
 
-    <!-- 사진 단건 삭제 -->
     <delete id="deletePhoto" parameterType="long">
         DELETE FROM roomPhoto WHERE photoId = #{photoId}
     </delete>
 
-    <!-- 사진 다건 삭제 -->
     <delete id="deletePhotoByRoom" parameterType="long">
         DELETE FROM roomPhoto WHERE roomId = #{roomId}
     </delete>
 
-    <!-- 활성 예약 수 (회의실 삭제 전 확인용) -->
     <select id="countActiveReserve" parameterType="long" resultType="int">
         SELECT COUNT(*) FROM meetingReserve
         WHERE roomId = #{roomId} AND status = 'ACTIVE'

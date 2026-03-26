@@ -25,7 +25,6 @@
 <main id="main-content">
     <div id="vue-app" v-cloak>
 
-        <!-- 상단 헤더 -->
         <div class="room-header">
             <div>
                 <h4>
@@ -40,7 +39,6 @@
             </button>
         </div>
 
-        <!-- 통계 카드 -->
         <div class="stat-row">
             <div class="stat-item">
                 <div class="stat-num total">{{ store.list.length }}</div>
@@ -56,7 +54,6 @@
             </div>
         </div>
 
-        <!-- 카드 목록 -->
         <div class="room-card-grid">
 
             <div v-if="store.list.length === 0" class="empty-msg">
@@ -66,7 +63,6 @@
             <div class="room-card" v-for="room in store.list" :key="room.roomId"
                  style="position:relative;">
                 <span class="drag-handle">⠿</span>
-                <!-- 사진 영역 -->
                 <div class="room-card-img">
                     <img v-if="room.photos && room.photos.length > 0"
                          :src="ctx + '/uploads/meeting/' + room.photos[0].saveFilename"
@@ -76,7 +72,6 @@
                     </div>
                 </div>
 
-                <!-- 정보 영역 -->
                 <div class="room-card-body">
                     <h5>{{ room.roomName }}</h5>
                     <p class="room-info">
@@ -88,7 +83,6 @@
                         {{ room.capacity }}명
                     </p>
 
-                    <!-- 비품 뱃지 -->
                     <div class="equip-badges" v-if="room.equipCodes && room.equipCodes.length > 0">
                         <span class="badge"
                               v-for="eq in room.equipCodes" :key="eq">
@@ -96,13 +90,11 @@
                         </span>
                     </div>
 
-                    <!-- 사용여부 -->
                     <span class="use-badge" :class="room.useYn === 'Y' ? 'on' : 'off'">
                         {{ room.useYn === 'Y' ? '사용중' : '미사용' }}
                     </span>
                 </div>
 
-                <!-- 버튼 영역 -->
                 <div class="room-card-footer">
                     <button class="btn-edit" @click="openEdit(room)">수정</button>
                     <button class="btn-del" @click="confirmDelete(room)">삭제</button>
@@ -110,7 +102,6 @@
             </div>
         </div>
 
-        <!-- 등록/수정 모달 -->
         <div class="modal fade" id="roomModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -158,7 +149,6 @@
                             </div>
                         </div>
 
-                        <!-- 비품 체크박스 -->
                         <div class="mb-3">
                             <label>비품</label>
                             <div class="equip-check-group">
@@ -177,7 +167,6 @@
                             </div>
                         </div>
 
-                        <!-- 사진 첨부 -->
                         <div class="mb-3 file-input-wrap">
                             <label>사진</label>
                             <input type="file" ref="photoInput"

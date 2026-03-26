@@ -1,9 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 
-<!-- 왼쪽 필터 패널 -->
 <div class="filter-panel">
 
-    <!-- Approval Action -->
     <div class="filter-section">
         <div class="filter-label">Approval Action</div>
         <a class="filter-link" :class="{ active: store.filterType === 'pendingInbox' }" href="#"
@@ -20,7 +18,6 @@
         </a>
     </div>
 
-    <!-- Approval List -->
     <div class="filter-section">
         <div class="filter-label">Approval List</div>
        <a class="filter-link" :class="{ active: store.filterType === 'all' }" href="#" @click.prevent="store.filterType = 'all'; store.search()">

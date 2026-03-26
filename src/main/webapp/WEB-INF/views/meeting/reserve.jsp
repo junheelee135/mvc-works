@@ -21,7 +21,6 @@
 <main id="main-content">
     <div id="vue-app" v-cloak>
 
-        <!-- 상단 헤더 -->
         <div class="room-header">
             <div>
                 <h4>
@@ -35,7 +34,6 @@
             </button>
         </div>
 
-        <!-- 날짜 네비 + 통계 -->
         <div class="reserve-toolbar">
             <div class="date-nav">
                 <button class="date-nav-btn" @click="changeDate(-1)">
@@ -65,7 +63,6 @@
             </div>
         </div>
 
-        <!-- 시간표 (전체 너비) -->
         <div class="timetable-panel">
                 <div class="schedule-header">
                     <h5>
@@ -113,7 +110,6 @@
                 </div>
             </div>
 
-        <!-- 예약 등록 모달 -->
         <div class="modal fade" id="reserveModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -181,7 +177,6 @@
             </div>
         </div>
 
-        <!-- 회의실 상세 모달 -->
         <div class="modal fade" id="roomDetailModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -234,7 +229,6 @@
             </div>
         </div>
 
-        <!-- 예약 상세 모달 -->
         <div class="modal fade" id="reserveDetailModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">

@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 
-<!-- 결재선 정보 -->
 <div class="form-section">
     <div class="form-section-header">
         <div class="form-section-title">
@@ -50,7 +49,6 @@
             드래그하여 결재 순서를 변경할 수 있습니다.
         </div>
     </div>
-    <!-- 템플릿 불러오기 모달 -->
     <div class="modal-overlay" v-if="templateLoadModalVisible">
         <div class="modal-box tpl-load-box">
             <div class="modal-header">

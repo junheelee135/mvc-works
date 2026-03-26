@@ -105,14 +105,13 @@
         DELETE FROM survey WHERE surveyId = #{surveyId}
     </delete>
 
-
     <select id="listQuestion" parameterType="long" resultType="com.mvc.app.domain.dto.SurveyQuestionDto">
         SELECT questionId, surveyId, questionText, questionType, sortOrder
         FROM surveyQuestion
         WHERE surveyId = #{surveyId}
         ORDER BY sortOrder
     </select>
-    
+
     <insert id="insertQuestion" parameterType="com.mvc.app.domain.dto.SurveyQuestionDto">
         <selectKey keyProperty="questionId" resultType="long" order="BEFORE">
             SELECT surveyQuestion_seq.NEXTVAL FROM dual
@@ -120,18 +119,18 @@
         INSERT INTO surveyQuestion (questionId, surveyId, questionText, questionType, sortOrder)
         VALUES (#{questionId}, #{surveyId}, #{questionText}, #{questionType}, #{sortOrder})
     </insert>
-    
+
     <delete id="deleteQuestionsBySurveyId" parameterType="long">
         DELETE FROM surveyQuestion WHERE surveyId = #{surveyId}
     </delete>
-    
+
     <select id="listOption" parameterType="long" resultType="com.mvc.app.domain.dto.SurveyOptionDto">
         SELECT optionId, questionId, optionText, sortOrder
         FROM surveyOption
         WHERE questionId = #{questionId}
         ORDER BY sortOrder
     </select>
-    
+
     <insert id="insertOption" parameterType="com.mvc.app.domain.dto.SurveyOptionDto">
         <selectKey keyProperty="optionId" resultType="long" order="BEFORE">
             SELECT surveyOption_seq.NEXTVAL FROM dual
@@ -139,11 +138,11 @@
         INSERT INTO surveyOption (optionId, questionId, optionText, sortOrder)
         VALUES (#{optionId}, #{questionId}, #{optionText}, #{sortOrder})
     </insert>
-    
+
     <delete id="deleteOptionsByQuestionId" parameterType="long">
         DELETE FROM surveyOption WHERE questionId = #{questionId}
     </delete>
-    
+
     <select id="listTarget" parameterType="long" resultType="com.mvc.app.domain.dto.SurveyTargetDto">
         SELECT t.targetId, t.surveyId, t.targetType, t.targetValue,
                CASE t.targetType
@@ -154,7 +153,7 @@
         FROM surveyTarget t
         WHERE t.surveyId = #{surveyId}
     </select>
-    
+
     <insert id="insertTarget" parameterType="com.mvc.app.domain.dto.SurveyTargetDto">
         <selectKey keyProperty="targetId" resultType="long" order="BEFORE">
             SELECT surveyTarget_seq.NEXTVAL FROM dual
@@ -162,11 +161,11 @@
         INSERT INTO surveyTarget (targetId, surveyId, targetType, targetValue)
         VALUES (#{targetId}, #{surveyId}, #{targetType}, #{targetValue})
     </insert>
-    
+
     <delete id="deleteTargetsBySurveyId" parameterType="long">
         DELETE FROM surveyTarget WHERE surveyId = #{surveyId}
     </delete>
-    
+
     <select id="checkTarget" parameterType="map" resultType="int">
         SELECT CASE
             WHEN (SELECT COUNT(*) FROM surveyTarget WHERE surveyId = #{surveyId}) = 0 THEN 1
@@ -183,7 +182,6 @@
         END
         FROM dual
     </select>
-
 
       <insert id="insertResponse" parameterType="com.mvc.app.domain.dto.SurveyResponseDto">
           <selectKey keyProperty="responseId" resultType="long" order="BEFORE">
@@ -243,7 +241,6 @@
             AND scoreValue IS NOT NULL
       </select>
 
-    <!-- ── 첨부파일 ── -->
     <insert id="insertFile" parameterType="com.mvc.app.domain.dto.SurveyFileDto">
         <selectKey keyProperty="fileId" resultType="long" order="BEFORE">
             SELECT surveyFile_seq.NEXTVAL FROM dual

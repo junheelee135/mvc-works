@@ -41,7 +41,6 @@ public class ApprovalDocRestController {
     @Value("${file.upload-root}/approval")
     private String uploadPath;
 
-    // 임시저장
     @PostMapping
     public ResponseEntity<?> saveDraft(
             @RequestPart("data") ApprovalDocDto dto,
@@ -54,10 +53,10 @@ public class ApprovalDocRestController {
             dto.setWriterDeptName(info.getDeptName());
             dto.setWriterGradeCode(info.getGradeCode());
             dto.setWriterGradeName(info.getGradeName());
-        	
+
             log.info("★ deptCode={}, deptName={}, gradeCode={}, gradeName={}",
             	      info.getDeptCode(), info.getDeptName(), info.getGradeCode(), info.getGradeName());
-            
+
             service.saveDraft(dto, files);
             return ResponseEntity.ok(Map.of("msg", "임시저장 완료"));
         } catch (Exception e) {
@@ -65,7 +64,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "임시저장에 실패했습니다."));
         }
     }
-    
+
     @GetMapping
     public ResponseEntity<?> listDraft(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -96,8 +95,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
-    
-    // 보낸 결재함
+
     @GetMapping("/sent")
     public ResponseEntity<?> listSent(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -127,7 +125,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 받은 결재함
     @GetMapping("/inbox")
     public ResponseEntity<?> listInbox(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -156,7 +153,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
-    
+
     @GetMapping("/ref")
     public ResponseEntity<?> listRef(
             @RequestParam(name = "keyword",   required = false) String keyword,
@@ -214,8 +211,7 @@ public class ApprovalDocRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
         }
     }
-    
- // 문서 접근 권한 검증 (작성자/결재자/대결자/참조자)
+
     private boolean hasDocAccess(ApprovalDocDto doc, String empId) {
         if (empId.equals(doc.getWriterEmpId())) return true;
         if (doc.getLines() != null) {
@@ -232,7 +228,6 @@ public class ApprovalDocRestController {
         return false;
     }
 
-    // 문서 상세 조회
     @GetMapping("/{docId}")
     public ResponseEntity<?> getDoc(@PathVariable("docId") long docId) {
         try {
@@ -249,7 +244,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 결재취소
     @PostMapping("/{docId}/cancel")
     public ResponseEntity<?> cancelDoc(@PathVariable("docId") long docId) {
         try {
@@ -266,7 +260,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 승인
     @PostMapping("/{docId}/approve")
     public ResponseEntity<?> approveDoc(
             @PathVariable("docId") long docId,
@@ -282,7 +275,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 반려
     @PostMapping("/{docId}/reject")
     public ResponseEntity<?> rejectDoc(
             @PathVariable("docId") long docId,
@@ -302,7 +294,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 보류
     @PostMapping("/{docId}/hold")
     public ResponseEntity<?> holdDoc(
             @PathVariable("docId") long docId,
@@ -318,7 +309,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 참조자 코멘트
     @PostMapping("/{docId}/ref-comment")
     public ResponseEntity<?> refComment(
             @PathVariable("docId") long docId,
@@ -334,7 +324,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 미결재 문서
     @GetMapping("/inbox/pending")
     public ResponseEntity<?> listPendingInbox(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -364,7 +353,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 미확인 문서
     @GetMapping("/ref/unread")
     public ResponseEntity<?> listUnreadRef(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -394,7 +382,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 뱃지 카운트 (미결재 + 미확인)
     @GetMapping("/badge-counts")
     public ResponseEntity<?> badgeCounts() {
         try {
@@ -408,7 +395,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 대결 여부 확인
     @GetMapping("/{docId}/deputy-check")
     public ResponseEntity<?> deputyCheck(@PathVariable("docId") long docId) {
         try {
@@ -421,7 +407,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // 참조 읽음 처리
     @PostMapping("/{docId}/mark-read")
     public ResponseEntity<?> markRead(@PathVariable("docId") long docId) {
         try {
@@ -434,7 +419,6 @@ public class ApprovalDocRestController {
         }
     }
 
-    // ── 첨부파일 다운로드 ──
     @GetMapping("/file/{fileId}")
     public ResponseEntity<?> downloadFile(@PathVariable("fileId") long fileId) {
         try {
@@ -442,7 +426,6 @@ public class ApprovalDocRestController {
             if (file == null) {
                 return ResponseEntity.notFound().build();
             }
-            // 파일이 속한 문서에 대한 접근 권한 검증
             SessionInfo info = LoginMemberUtil.getSessionInfo();
             ApprovalDocDto doc = service.getDoc(file.getDocId());
             if (doc == null || !hasDocAccess(doc, info.getEmpId())) {

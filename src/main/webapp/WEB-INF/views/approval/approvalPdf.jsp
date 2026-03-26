@@ -15,7 +15,6 @@
 
 <div id="vue-app" v-cloak>
 
-    <!-- 상단 버튼 바 (인쇄 시 숨김) -->
     <div class="pdf-toolbar">
         <button class="btn-pdf-download" @click="downloadPdf">
             <span class="material-symbols-outlined" style="font-size:15px">download</span>
@@ -27,12 +26,9 @@
         </button>
     </div>
 
-    <!-- PDF 영역 (이 안의 내용이 PDF로 변환됨) -->
     <div id="pdf-content" class="pdf-page" v-if="store.doc">
-        <!-- 문서 제목 -->
         <h1 class="pdf-title">{{ store.doc?.typeName }}</h1>
 
-        <!-- 결재선 도장란 -->
         <div class="stamp-box">
             <div class="stamp-card">
                 <div class="stamp-card-header">작성자</div>
@@ -55,7 +51,6 @@
             </div>
         </div>
 
-        <!-- 기본 정보 -->
         <table class="info-table">
             <tr>
                 <th>문서번호</th>
@@ -75,7 +70,6 @@
             </tr>
         </table>
 
-        <!-- FM001 휴가신청서 -->
         <template v-if="store.selectedFormCode === 'FM001'">
             <table class="info-table">
                 <tr>
@@ -98,8 +92,7 @@
                 </tr>
             </table>
         </template>
-        
-        <!-- FM002 출장신청서 -->
+
         <template v-if="store.selectedFormCode === 'FM002'">
             <table class="info-table">
                 <tr>
@@ -126,8 +119,7 @@
                 </tr>
             </table>
         </template>
-        
-        <!-- FM003 지출결의서 -->
+
         <template v-if="store.selectedFormCode === 'FM003'">
             <table class="info-table">
                 <tr>
@@ -175,8 +167,7 @@
                 </tr>
             </table>
         </template>
-        
-        <!-- FM004 비용청구서 -->
+
         <template v-if="store.selectedFormCode === 'FM004'">
             <table class="info-table">
                 <tr>
@@ -222,8 +213,7 @@
                 </tr>
             </table>
         </template>
-        
-        <!-- FM005 일반신청서 -->
+
         <template v-if="store.selectedFormCode === 'FM005'">
             <table class="info-table">
                 <tr>
@@ -237,7 +227,6 @@
             </table>
         </template>
 
-        <!-- 하단 문구 -->
         <p class="pdf-footer-text">
             위와 같은 사유로 결재를 요청드리니 검토 후 승인하여 주시기 바랍니다.
         </p>

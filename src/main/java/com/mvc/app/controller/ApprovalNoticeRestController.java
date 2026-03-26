@@ -32,8 +32,8 @@ public class ApprovalNoticeRestController {
 	private final ApprovalNoticeService service;
 
 	@Value("${file.upload-root}/approval/notice")
-	private String uploadPath;	
-	
+	private String uploadPath;
+
 	@GetMapping
 	public ResponseEntity<?> list(
 			@RequestParam(name = "keyword", defaultValue="") String keyword,
@@ -44,16 +44,16 @@ public class ApprovalNoticeRestController {
 			map.put("keyword", keyword);
 			map.put("offset", (pageNo - 1) * pageSize);
 			map.put("pageSize", pageSize);
-			
+
 			Map<String, Object> result = service.listNotice(map);
-			
+
 			return ResponseEntity.ok(result);
 		} catch (Exception e) {
 			log.info("list : ", e);
 			return ResponseEntity.badRequest().body(Map.of("msg", "목록 조회에 실패했습니다."));
 		}
 	}
-	
+
 	@GetMapping("/{noticeId}")
 	public ResponseEntity<?> detail(@PathVariable("noticeId") long noticeId) {
 		try {
@@ -67,7 +67,7 @@ public class ApprovalNoticeRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "조회에 실패했습니다."));
 		}
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<?> insert(
 	        @RequestPart("data") ApprovalNoticeDto dto,
@@ -87,7 +87,7 @@ public class ApprovalNoticeRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "등록에 실패했습니다."));
 		}
     }
-    
+
 	@PostMapping("/{noticeId}")
 	public ResponseEntity<?> update(@PathVariable("noticeId") long noticeId,
 	                                @RequestPart("data") ApprovalNoticeDto dto,
@@ -105,9 +105,9 @@ public class ApprovalNoticeRestController {
             log.info("update : ", e);
             return ResponseEntity.badRequest().body(Map.of("msg", "수정에 실패했습니다."));
 		}
-    	
+
     }
-    
+
     @DeleteMapping("/{noticeId}")
     public ResponseEntity<?> delete(@PathVariable("noticeId") long noticeId) {
         try {
@@ -123,23 +123,20 @@ public class ApprovalNoticeRestController {
             return ResponseEntity.badRequest().body(Map.of("msg", "삭제에 실패했습니다."));
         }
     }
-    
+
     @GetMapping("/file/{fileId}/download")
     public ResponseEntity<?> downloadFile(@PathVariable("fileId") long fileId) {
         try {
-            // 로그인 확인
             SessionInfo info = LoginMemberUtil.getSessionInfo();
             if (info == null) {
                 return ResponseEntity.status(401).body(Map.of("msg", "로그인이 필요합니다."));
             }
 
-            // 1. DB에서 파일 정보 조회
             ApprovalNoticeFileDto fileDto = service.findFileById(fileId);
             if (fileDto == null) {
                 return ResponseEntity.status(404).body(Map.of("msg", "파일을 찾을 수 없습니다"));
             }
 
-            // 2. 물리 파일 읽기
             java.nio.file.Path filePath = java.nio.file.Paths.get(uploadPath, fileDto.getSaveFilename());
             org.springframework.core.io.Resource resource =
                     new org.springframework.core.io.UrlResource(filePath.toUri());
@@ -148,7 +145,6 @@ public class ApprovalNoticeRestController {
                 return ResponseEntity.status(404).body(Map.of("msg", "파일이 존재하지 않습니다"));
             }
 
-            // 3. 한글 파일명 인코딩 + 다운로드 응답
             String encodedName = java.net.URLEncoder.encode(fileDto.getOriFilename(), "UTF-8")
                     .replaceAll("\\+", "%20");
 
@@ -165,5 +161,5 @@ public class ApprovalNoticeRestController {
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") long fileId) {
         service.deleteFile(fileId);
         return ResponseEntity.ok("deleted");
-    }    
+    }
 }

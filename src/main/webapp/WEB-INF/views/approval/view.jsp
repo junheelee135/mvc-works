@@ -40,19 +40,16 @@
 <main id="main-content">
 <div id="vue-app" v-cloak>
 
-   
     <div v-if="store.loading" style="text-align:center; padding:60px; color:#9aa0b4;">
         <span class="material-symbols-outlined" style="font-size:32px;">hourglass_empty</span>
         <p>불러오는 중...</p>
     </div>
 
-    
     <div v-else-if="store.error" style="text-align:center; padding:60px; color:#e53e3e;">
         <span class="material-symbols-outlined" style="font-size:32px;">error</span>
         <p>{{ store.error }}</p>
     </div>
 
-    
     <template v-else-if="store.doc">
 
 	    <div class="page-header">
@@ -67,7 +64,7 @@
 	            PDF 저장
 	        </button>
 	    </div>
-        
+
         <div class="view-section">
             <div class="view-section-header">
                 <span class="material-symbols-outlined">info</span>
@@ -107,7 +104,6 @@
             </div>
         </div>
 
-        
         <div class="view-section">
             <div class="view-section-header">
                 <span class="material-symbols-outlined">group</span>
@@ -145,7 +141,6 @@
             </div>
         </div>
 
-        <!-- 참조자 정보 -->
         <div class="view-section" v-if="store.doc.refs && store.doc.refs.length > 0">
             <div class="view-section-header">
                 <span class="material-symbols-outlined">visibility</span>
@@ -173,7 +168,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- 참조자 의견 입력 (내가 참조자일 때) -->
                 <div v-if="store.isReference(currentEmpId)" style="margin-top:12px; display:flex; gap:8px;">
                     <input type="text" class="form-control" v-model="refCommentText"
                            placeholder="참조 의견을 입력하세요"
@@ -184,14 +178,12 @@
             </div>
         </div>
 
-
         <jsp:include page="/WEB-INF/views/approval/include/approvalDetailLeave.jsp"/>
         <jsp:include page="/WEB-INF/views/approval/include/approvalDetailBiztrip.jsp"/>
         <jsp:include page="/WEB-INF/views/approval/include/approvalDetailExpense.jsp"/>
         <jsp:include page="/WEB-INF/views/approval/include/approvalDetailClaim.jsp"/>
         <jsp:include page="/WEB-INF/views/approval/include/approvalDetailGeneral.jsp"/>
 
-        
         <div class="view-section">
             <div class="view-section-header">
                 <span class="material-symbols-outlined">attach_file</span>
@@ -213,14 +205,11 @@
             </div>
         </div>
 
-        
         <div class="view-footer">
-            <!-- 대결 안내 -->
             <span v-if="store.isDeputy && store.isCurrentApprover(currentEmpId)" class="deputy-notice">
                 <span class="material-symbols-outlined" style="font-size:14px">swap_horiz</span>
                 대결 처리 중 (원결재자: {{ store.originalApproverName }})
             </span>
-            <!-- 결재자 버튼 (현재 내 순서일 때만, 대결자 포함) -->
             <template v-if="store.isCurrentApprover(currentEmpId)">
                 <button class="btn-approve" @click="openApproveModal('approve')">
                     <span class="material-symbols-outlined" style="font-size:15px">check_circle</span>
@@ -235,7 +224,7 @@
                     보류
                 </button>
             </template>
-        
+
             <button class="btn-cancel"
                     v-if="store.doc.writerEmpId === currentEmpId && store.canCancel"
                     @click="cancelDoc">
@@ -253,7 +242,6 @@
                 목록
             </button>
         </div>
-        <!-- 결재 처리 모달 -->
         <div class="modal fade" id="approveModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -315,7 +303,7 @@
             const modalTitle = ref('');
             const modalBtnClass = ref('');
             const refCommentText = ref('');
-          
+
             const openApproveModal = (type) => {
                 modalType.value = type;
                 if (type === 'approve') { modalTitle.value = '승인'; modalBtnClass.value = 'btn-success'; }
@@ -324,7 +312,7 @@
                 apprComment.value = '';
                 new bootstrap.Modal(document.getElementById('approveModal')).show();
             };
-          
+
             const processApproval = async () => {
                 let ok = false;
                 if (modalType.value === 'approve') {
@@ -343,7 +331,7 @@
                     await store.fetchDoc(docId);
                 }
             };
-          
+
             const submitRefComment = async () => {
                 if (!refCommentText.value.trim()) { alert('의견을 입력해주세요.'); return; }
                 const ok = await store.saveRefComment(docId, refCommentText.value);
@@ -410,7 +398,6 @@
                           try { await http.post('/approval/doc/' + docId + '/mark-read'); } catch(e) {}
                       }
             }
-
 
                 if (typeof Quill !== 'undefined') {
                     const tryInit = setInterval(() => {

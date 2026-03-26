@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-/* ── 레이아웃 ── */
 #main-content {
     margin-left: 260px !important;
     padding: 24px 32px !important;
@@ -9,7 +8,6 @@
     background: #f8f9fc;
 }
 
-/* ── 결과 헤더 ── */
 .result-header {
     background: #fff;
     border-radius: 10px;
@@ -44,7 +42,6 @@
     color: #4e73df;
 }
 
-/* ── 질문별 통계 카드 ── */
 .result-card {
     background: #fff;
     border-radius: 10px;
@@ -73,7 +70,6 @@
 .result-card .q-type-badge.TEXT   { background: #fff4e0; color: #d97706; }
 .result-card .q-type-badge.SCORE  { background: #fef3f2; color: #e74c3c; }
 
-/* ── 가로 막대 차트 (SINGLE / MULTI) ── */
 .bar-chart {
     display: flex;
     flex-direction: column;
@@ -118,7 +114,6 @@
     flex-shrink: 0;
 }
 
-/* ── 점수형 통계 (SCORE) ── */
 .score-result {
     display: flex;
     align-items: center;
@@ -148,7 +143,6 @@
 .score-stars .star-filled { color: #f59e0b; }
 .score-stars .star-empty  { color: #e6eaf4; }
 
-/* ── 서술형 답변 목록 (TEXT) ── */
 .text-answers {
     display: flex;
     flex-direction: column;
@@ -165,7 +159,6 @@
     border-left: 3px solid #4e73df;
 }
 
-/* ── 응답 없음 안내 ── */
 .no-response {
     text-align: center;
     padding: 40px 20px;
@@ -173,7 +166,6 @@
     font-size: 14px;
 }
 
-/* ── 뒤로가기 버튼 ── */
 .btn-back {
     display: inline-flex;
     align-items: center;

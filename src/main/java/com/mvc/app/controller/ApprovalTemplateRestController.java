@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ApprovalTemplateRestController {
     private final ApprovalTemplateService service;
 
-    // 템플릿 저장
     @PostMapping
     public ResponseEntity<?> save(@RequestBody ApprovalTemplateDto dto) {
         try {
@@ -43,7 +42,6 @@ public class ApprovalTemplateRestController {
         }
     }
 
-    // 내 템플릿 목록
     @GetMapping
     public ResponseEntity<?> list() {
         try {
@@ -56,7 +54,6 @@ public class ApprovalTemplateRestController {
         }
     }
 
-    // 템플릿 상세 (결재자 목록)
     @GetMapping("/{tempId}")
     public ResponseEntity<?> detail(@PathVariable("tempId") long tempId) {
         try {
@@ -68,7 +65,6 @@ public class ApprovalTemplateRestController {
         }
     }
 
-    // 템플릿 삭제
     @DeleteMapping("/{tempId}")
     public ResponseEntity<?> delete(@PathVariable("tempId") long tempId) {
         try {

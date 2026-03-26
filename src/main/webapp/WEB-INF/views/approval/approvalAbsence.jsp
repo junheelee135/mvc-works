@@ -56,13 +56,12 @@
 
     <div class="absence-body">
 
-        <!-- 왼쪽: 부재 등록 폼 -->
         <div class="form-panel" v-if="showForm">
             <div class="form-panel-header">
                 <span class="material-symbols-outlined">event_busy</span>
                 부재 등록
             </div>
-            <div class="form-panel-body">          
+            <div class="form-panel-body">
 
                 <div class="form-field">
                     <label class="form-label">부재 기간 <span class="required">*</span></label>
@@ -73,7 +72,6 @@
                     </div>
                 </div>
 
-                <!-- 부재 사유 (LEAVETYPE 공통코드) -->
                 <div class="form-field">
                     <label class="form-label">부재 사유</label>
                     <select v-model="form.reason" class="form-select">
@@ -86,7 +84,6 @@
                     </select>
                 </div>
 
-                <!-- 대결자 검색 -->
                 <div class="form-field">
                     <label class="form-label">대결자 <span class="required">*</span></label>
 
@@ -121,7 +118,6 @@
             </div>
         </div>
 
-        <!-- 오른쪽: 부재 목록 테이블 -->
         <div class="table-panel">
             <table class="absence-table">
                 <thead>
@@ -159,7 +155,6 @@
                 </tbody>
             </table>
 
-            <!-- 페이지네이션 -->
             <div class="table-pagination">
                 <button class="page-btn" :disabled="pageNo <= 1"
                         @click="changePage(1)">&laquo; 처음</button>
@@ -180,7 +175,6 @@
 </div>
 </main>
 
-<!-- Bootstrap 대결자 검색 모달 -->
 <div class="modal fade" id="absenceOrgModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -353,7 +347,6 @@
     app.mount('#vue-app');
 </script>
 
-<!-- Bootstrap 모달 전용 순수 JS -->
 <script>
 const CTX = document.querySelector('meta[name="ctx"]').content;
 

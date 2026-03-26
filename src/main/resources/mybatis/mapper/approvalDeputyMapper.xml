@@ -4,7 +4,6 @@
 
 <mapper namespace="com.mvc.app.mapper.ApprovalDeputyMapper">
 
-    <!-- 부재 등록 -->
     <insert id="insertDeputy" parameterType="com.mvc.app.domain.dto.ApprovalDeputyDto">
         <selectKey keyProperty="deputyRegId" resultType="long" order="BEFORE">
             SELECT APPROVALDEPUTYREG_SEQ.NEXTVAL FROM dual
@@ -29,7 +28,6 @@
         )
     </insert>
 
-    <!-- 부재 취소 (본인 등록 건만, isActive = N 처리) -->
     <update id="cancelDeputy" parameterType="map">
         UPDATE approvalDeputyReg
         SET isActive = 'N'
@@ -37,7 +35,6 @@
           AND delegatorEmpId = #{empId}
     </update>
 
-    <!-- 부재 수정 (본인 등록 건만) -->
     <update id="updateDeputy" parameterType="com.mvc.app.domain.dto.ApprovalDeputyDto">
         UPDATE approvalDeputyReg
         SET deputyEmpId = #{deputyEmpId, jdbcType=VARCHAR},
@@ -50,7 +47,6 @@
           AND delegatorEmpId = #{delegatorEmpId}
     </update>
 
-    <!-- 부재 목록 조회 (employee2 JOIN으로 부서·직급 포함) -->
     <select id="listDeputy" parameterType="map" resultType="com.mvc.app.domain.dto.ApprovalDeputyDto">
         SELECT r.deputyRegId, r.delegatorEmpId, r.deputyEmpId, r.deputyName,
                r.docId, r.reason, r.regTypeCode, r.regEmpId, r.isActive,
@@ -68,14 +64,12 @@
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
 
-    <!-- 부재 건수 -->
     <select id="countDeputy" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM approvalDeputyReg
         WHERE delegatorEmpId = #{empId}
     </select>
 
-    <!-- 부재 단건 조회 (employee2 JOIN으로 부서·직급 포함) -->
     <select id="getDeputy" parameterType="long" resultType="com.mvc.app.domain.dto.ApprovalDeputyDto">
         SELECT r.deputyRegId, r.delegatorEmpId, r.deputyEmpId, r.deputyName,
                r.docId, r.reason, r.regTypeCode, r.regEmpId, r.isActive,
@@ -91,7 +85,6 @@
         WHERE r.deputyRegId = #{deputyRegId}
     </select>
 
-    <!-- 특정 원결재자의 활성 대결자 조회 -->
     <select id="findActiveDeputy" parameterType="string" resultType="com.mvc.app.domain.dto.ApprovalDeputyDto">
         SELECT deputyEmpId, deputyName
         FROM approvalDeputyReg
