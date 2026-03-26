@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/groupware")
 public class NoticeController {
 
-    // 공지사항 페이지
     @GetMapping("/notice")
     public String notice() {
-        return "groupware/notice";   // /WEB-INF/views/groupware/notice.jsp
+        return "groupware/notice";
     }
 }
