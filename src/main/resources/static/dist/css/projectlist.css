@@ -378,7 +378,7 @@ body {
 }
 .dept-children.open { display: block; }
 
-/* 사원 카드 */
+
 .member-card {
     cursor: pointer;
     border: 1px solid #dee2e6;

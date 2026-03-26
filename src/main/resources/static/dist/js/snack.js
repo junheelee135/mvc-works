@@ -5,7 +5,7 @@ const MY_EMP_ID = document.querySelector('meta[name="myEmpId"]').content;
 
 const statusLabel = s => ({ PENDING: '대기중', APPROVED: '승인', REJECTED: '반려' }[s] || s);
 
-/* 공감 버튼 */
+
 function VoteBtn({ voted, count, onClick }) {
     return (
         <button className={`vote-btn${voted ? ' voted' : ''}`}
@@ -15,12 +15,12 @@ function VoteBtn({ voted, count, onClick }) {
     );
 }
 
-/* 상태 */
+
 function StatusBadge({ status }) {
     return <span className={`status-badge status-${status}`}>{statusLabel(status)}</span>;
 }
 
-/* 🔥 게시판 Row */
+
 function SnackRow({ item, onVote, onOpen }) {
     return (
         <tr onClick={() => onOpen(item.snackId)} style={{cursor:'pointer'}}>
@@ -47,7 +47,7 @@ function SnackRow({ item, onVote, onOpen }) {
     );
 }
 
-/* 상세 모달 (기존 유지) */
+
 function DetailModal({ snackId, onClose, onRefresh }) {
     const [detail, setDetail] = useState(null);
     const [newComment, setNewComment] = useState('');
@@ -103,7 +103,7 @@ function DetailModal({ snackId, onClose, onRefresh }) {
     );
 }
 
-/* 메인 */
+
 function SnackApp() {
     const [list, setList] = useState([]);
     const [detailId, setDetailId] = useState(null);

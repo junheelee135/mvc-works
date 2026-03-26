@@ -10,13 +10,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ApprovalNoticeDto {
-    private long noticeId;         // PK (approvalNotice_seq)
-    private String title;          // 제목
-    private String content;        // 내용 (CLOB, Quill HTML)
-    private String writerEmpId;    // 작성자 사원번호
-    private String writerName;     // 작성자 이름
-    private int hitCount;          // 조회수
-    private String regDate;        // 등록일
-    private String updateDate;     // 수정일
+    private long noticeId;         
+    private String title;          
+    private String content;        
+    private String writerEmpId;    
+    private String writerName;     
+    private int hitCount;          
+    private String regDate;        
+    private String updateDate;     
     private List<ApprovalNoticeFileDto> files;
 }
