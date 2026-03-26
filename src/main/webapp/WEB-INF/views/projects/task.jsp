@@ -73,9 +73,6 @@
 									${schType == 'taskStartDate' ? 'selected' : ''}>시작일</option>
 								<option value="taskEndDate"
 									${schType == 'taskEndDate' ? 'selected' : ''}>종료일</option>
-								<option value="taskCreater"
-									${schType == 'taskCreater' ? 'selected' : ''}>생성자</option>
-								<option value="member" ${schType == 'member' ? 'selected' : ''}>담당자</option>
 							</select> <input type="text" name="kwd" placeholder="Task 검색..."
 								value="${kwd}"> <i class="fas fa-search"></i>
 						</div>
@@ -90,7 +87,7 @@
 							<i class="fas fa-plus"></i>
 						</button>
 						<button type="button" class="btn-icon btn-edit" id="editBtn"
-							title="편집">
+							onclick="toggleEditMode()" title="편집">
 							<i class="fas fa-pencil-alt"></i>
 						</button>
 					</c:if>

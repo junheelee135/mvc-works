@@ -114,12 +114,6 @@
 				&gt; 0
 				OR INSTR(TO_CHAR(t.TASKENDDATE, 'YYYY-MM-DD'), #{kwd}) &gt; 0)
 			</when>
-			<when test="schType == 'taskCreater'">
-				INSTR(${schType}, #{kwd}) &gt; 0
-			</when>
-			<when test="schType == 'member'">
-				INSTR(${schType}, #{kwd}) &gt; 0
-			</when>
 		</choose>
 	</sql>
 

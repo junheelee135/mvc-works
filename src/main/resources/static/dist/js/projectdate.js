@@ -41,8 +41,21 @@ function initDatePickers() {
 			],
 
             onReady: function (selectedDates, dateStr, instance) {
-                setDefaultMonth(instance);
-            },
+				setDefaultMonth(instance);
+				    
+				    // 년도 ▲▼ 클릭 시 달력 갱신
+				    const yearInput = instance.calendarContainer.querySelector('.numInput.cur-year');
+				    if (yearInput) {
+				        yearInput.addEventListener('change', function () {
+				            instance.changeYear(parseInt(this.value));
+				        });
+				        yearInput.addEventListener('keyup', function () {
+				            if (this.value.length === 4) {
+				                instance.changeYear(parseInt(this.value));
+				            }
+				        });
+				    }
+				},
             onOpen: function (selectedDates, dateStr, instance) {
                 setDefaultMonth(instance);
             },

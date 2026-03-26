@@ -32,15 +32,6 @@
     <h2 class="section-title">Project manage</h2>
     <p class="section-desc">프로젝트를 관리할 수 있는 권한을 설정합니다.</p>
 
-    <div class="select-card" onclick="selectOnlyOne(event.currentTarget, 'pmoType', 'A')">
-        <div class="icon-box"><i class="fas fa-globe"></i></div>
-        <div class="card-content">
-            <div class="title">Everyone</div>
-            <div class="desc">모든 구성원이 프로젝트를 보고 참여할 수 있습니다.</div>
-        </div>
-        <i class="fas fa-check-circle check-mark"></i>
-    </div>
-
     <div class="select-card" onclick="selectOnlyOne(event.currentTarget, 'pmoType', 'S')">
         <div class="icon-box"><i class="fas fa-user-shield"></i></div>
         <div class="card-content">
