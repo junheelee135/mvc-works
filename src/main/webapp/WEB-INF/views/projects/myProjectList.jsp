@@ -114,7 +114,7 @@
 						</div>
 						<button type="submit" class="btn btn-primary">검색</button>
 						<button type="button" class="btn btn-secondary"
-							onclick="location.href='${pageContext.request.contextPath}/projects/list'">↺</button>
+							onclick="location.href='${pageContext.request.contextPath}/projects/myProjectList'">↺</button>
 					</form>
 
 					<%-- 상태 필터 --%>
