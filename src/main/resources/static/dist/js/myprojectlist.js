@@ -226,13 +226,13 @@ function forceStopProject() {
                 .then(res => {
                     if (res.ok) {
                         toast('프로젝트가 중단되었습니다.', 'success');
-                        setTimeout(() => location.reload(), 1000);
+                        setTimeout(() => location.reload(), 5000);
                     } else {
                         toast('중단 처리 중 오류가 발생했습니다.');
                     }
                 });
         });
-    }, 400);
+    }, 5000);
 }
 
 function saveMemberChange() {
@@ -324,7 +324,7 @@ function doSaveMemberChange(projectId, newEmpId, startDate, endDate) {
         if (allOk) {
             bootstrap.Modal.getInstance(document.getElementById('projectEditModal')).hide();
             toast('저장되었습니다.', 'success');
-            setTimeout(() => location.reload(), 800);
+            setTimeout(() => location.reload(), 5000);
         } else {
             toast('저장 중 오류가 발생했습니다.');
         }
@@ -336,7 +336,7 @@ function toast(msg, icon = 'warning') {
         title: '알림',
         html: `<div style="font-size:0.95rem;font-weight:500;margin-top:10px;">${msg}</div>`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 5000,
         icon: icon,
         iconColor: '#4e73df',
         width: '320px',
@@ -503,7 +503,7 @@ function saveProjectDate(projectId, startDate, endDate) {
         if (res.ok) {
             bootstrap.Modal.getInstance(document.getElementById('projectEditModal')).hide();
             toast('날짜가 저장되었습니다.', 'success');
-            setTimeout(() => location.reload(), 800);
+            setTimeout(() => location.reload(), 5000);
         } else {
             toast('날짜 저장 중 오류가 발생했습니다.');
         }

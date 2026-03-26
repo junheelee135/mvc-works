@@ -315,7 +315,7 @@ const toast = (msg) => {
     Swal.fire({
         html: `<div style="font-size:0.95rem; font-weight:500; text-align:center; display:flex; align-items:center; justify-content:center; min-height:40px;">${msg}</div>`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 5000,
         timerProgressBar: false,
         iconColor: '#4e73df',
         width: '320px',
@@ -436,7 +436,7 @@ function submitTask() {
             setTimeout(() => {
                 closeTaskModal();
                 location.reload();
-            }, 1500);
+            }, 5000);
         } else {
             toast('생성 실패. 다시 시도해주세요.');
         }
@@ -908,7 +908,7 @@ function submitDailyCheck() {
 	                closeDailyCheckModal();
 	                closeTaskDailyModal();
 	                location.reload();
-	            }, 1500);
+	            }, 5000);
 	        } else {
 	            toast('저장 실패. 다시 시도해주세요.');
 	        }

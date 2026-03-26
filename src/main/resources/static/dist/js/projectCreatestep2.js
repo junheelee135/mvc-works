@@ -5,7 +5,7 @@ function toast (msg, icon = 'warning'){
 			html: `<div style="font-size: 0.95rem; font-weight: 500; margin-top: 10px;">${msg}</div>`,
 			position: 'top',
 			showConfirmButton: false,
-			timer: 700,
+			timer: 5000,
 			timerProgressBar: false,
 			icon: icon,
 			iconColor: '#4e73df',
