@@ -3,8 +3,8 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
 
-<input type="hidden" name="projectType" id="projectType" value="T">
-<input type="hidden" name="pmoType" id="pmoType" value="S">
+<input type="hidden" name="projectType" id="projectType" value="">
+<input type="hidden" name="pmoType" id="pmoType" value="">
 <div class="mb-5">
     <h2 class="section-title">Project type</h2>
     <p class="section-desc">먼저 프로젝트의 타입을 선택해 주세요.</p>

@@ -1,6 +1,6 @@
 (function() {
 
-	const toast = (msg, icon = 'warning') => {
+	window.toast = (msg, icon = 'warning') => {
 		Swal.fire({
 			title: '알림',
 			html: `<div style="font-size: 0.95rem; font-weight: 500; margin-top: 10px;">${msg}</div>`,
@@ -19,6 +19,13 @@
 
 	const TOTAL_STEPS = 4;
 	let currentStep = 1;
+
+	// RANK 번호 추출 (예: 'RANK06' → 6), RANK05(차장) 이하만 매니저 가능
+	window.getRankNum = function(gradeCode){
+		if (!gradeCode) return 0;
+		const match = gradeCode.match(/RANK(\d+)/i);
+		return match ? parseInt(match[1], 10) : 0;
+	}
 
 	// 개인 프로젝트 여부
 	function isPersonal() {
@@ -44,56 +51,71 @@
 	}
 
 	function validateStep(step) {
-		// Step1: 프로젝트 타입 선택 여부
-		if (step === 1) {
-			const projectType = document.getElementById('projectType').value;
-			const pmoType = document.getElementById('pmoType').value;
-			if (!projectType) {
-				toast('프로젝트 타입을 선택해 주세요.');
-				return false;
-			}
-			if (!isPersonal() && !pmoType) {
-				toast('프로젝트 관리 권한을 선택해 주세요.');
-				return false;
-			}
-			return true;
-		}
+	    // Step1: 프로젝트 타입 선택 여부
+	    if (step === 1) {
+	        const projectType = document.getElementById('projectType').value;
+	        const pmoType = document.getElementById('pmoType').value;
+	        if (!projectType) {
+	            toast('프로젝트 타입을 선택해 주세요.');
+	            return false;
+	        }
+	        if (!isPersonal() && !pmoType) {
+	            toast('프로젝트 관리 권한을 선택해 주세요.');
+	            return false;
+	        }
+	        return true;
+	    }
 
-		// Step2: 제목, 날짜, 팀 멤버
-		if (step === 2) {
-			const title = document.querySelector('[name="title"]').value.trim();
-			const startDate = document.querySelector('[name="startDate"]').value;
-			const endDate = document.querySelector('[name="endDate"]').value;
+	    // Step2: 제목, 날짜, 팀 멤버
+	    if (step === 2) {
+	        const title = document.querySelector('[name="title"]').value.trim();
+	        const startDate = document.querySelector('[name="startDate"]').value;
+	        const endDate = document.querySelector('[name="endDate"]').value;
 
-			if (!title) { toast('프로젝트 제목을 입력하세요.'); return false; }
-			if (!startDate) { toast('시작일을 입력하세요.'); return false; }
-			if (!endDate) { toast('종료일을 입력하세요.'); return false; }
-			const today = new Date().toISOString().slice(0, 10);
-			if (startDate < today) { toast('시작일은 오늘 날짜 이후여야 합니다.'); return false; }
-			if (startDate > endDate) { toast('종료일이 시작일보다 빠를 수 없습니다.'); return false; }
+	        if (!title) { toast('프로젝트 제목을 입력하세요.'); return false; }
+	        if (!startDate) { toast('시작일을 입력하세요.'); return false; }
+	        if (!endDate) { toast('종료일을 입력하세요.'); return false; }
+	        const today = new Date().toISOString().slice(0, 10);
+	        if (startDate < today) { toast('시작일은 오늘 날짜 이후여야 합니다.'); return false; }
+	        if (startDate > endDate) { toast('종료일이 시작일보다 빠를 수 없습니다.'); return false; }
 
-			if (!isPersonal()) {
-				const memberIds = document.querySelectorAll('#hiddenInputContainer input[name="memberIds"]');
-				if (memberIds.length === 0) {
-					toast('팀 멤버를 추가하세요.');
-					return false;
+	        if (!isPersonal()) {
+				const maxInput = document.querySelector('#step-panel-2 input[type="number"]');
+				const maxCount = maxInput ? parseInt(maxInput.value) || 0 : 0;
+				if (maxCount === 0) {
+				    toast('총 인원을 먼저 입력해 주세요.');
+				    return false;
 				}
-			}
-			return true;
-		}
+				
+	            const memberIds = document.querySelectorAll('#hiddenInputContainer input[name="memberIds"]');
+	            if (memberIds.length === 0) {
+	                toast('팀 멤버를 추가하세요.');
+	                return false;
+	            }
+	        }
+	        return true;
+	    }
 
-		// Step3: 역할 미선택 멤버 검사
-		if (step === 3) {
-			const roleInputs = [...document.querySelectorAll('input.role-input')];
-			const unassigned = roleInputs.filter(r => !r.value);
-			if (unassigned.length > 0) {
-				toast('모든 멤버의 역할을 선택해 주세요.');
-				return false;
-			}
-			return true;
-		}
+	    // Step3: 역할 미선택 멤버 검사
+	    if (step === 3) {
+	        const roleInputs = [...document.querySelectorAll('input.role-input')];
+	        const unassigned = roleInputs.filter(r => !r.value);
+	        if (unassigned.length > 0) {
+	            toast('모든 멤버의 역할을 선택해 주세요.');
+	            return false;
+	        }
 
-		return true;
+	        if (!isPersonal()) {
+	            const hasManager = roleInputs.some(r => r.value === 'M');
+	            if (!hasManager) {
+	                toast('매니저를 최소 1명 이상 지정해 주세요.');
+	                return false;
+	            }
+	        }
+	        return true;
+	    }
+
+	    return true;
 	}
 
 	// Step3 멤버 리스트 렌더링
@@ -149,6 +171,7 @@
 				'<input type="hidden" class="role-input" name="memberRoles" data-emp-id="' + empId + '" value="">' +
 				'</div>' +
 				'</div>';
+
 			container.appendChild(row);
 		});
 	}

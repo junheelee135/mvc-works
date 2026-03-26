@@ -25,7 +25,7 @@
 				<div class="form-section">
 				    <div class="d-flex align-items-center justify-content-between mb-3">
 				        <label class="form-label mb-0">팀 멤버 상세 구성</label>
-				        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#memberSearchModal">
+				        <button type="button" class="btn btn-sm btn-outline-primary" id="btnOpenMemberModal">
 				        	<i class="fas fa-plus"></i>
 				       </button>
 				     </div>
@@ -98,4 +98,20 @@
 				        </div>
 				    </div>
 				</div>
+				
+<script type="text/javascript">
+	document.getElementById('btnOpenMemberModal').addEventListener('click', function() {
+	    const projectType = document.getElementById('projectType').value;
+	    if (projectType !== 'I') {
+	        const maxInput = document.querySelector('#step-panel-2 input[type="number"]');
+	        const maxCount = maxInput ? parseInt(maxInput.value) || 0 : 0;
+	        if (maxCount === 0) {
+	            toast('총 인원을 먼저 입력해 주세요.');
+	            return;
+	        }
+	    }
+	    // 통과하면 모달 열기
+	    new bootstrap.Modal(document.getElementById('memberSearchModal')).show();
+});
+</script>
 				

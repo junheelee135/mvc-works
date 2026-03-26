@@ -133,6 +133,7 @@ public class ProjectController {
 		model.addAttribute("empName", emp.getName());
 		model.addAttribute("empDept", emp.getDeptName());
 		model.addAttribute("empGrade", emp.getGradeName());
+		model.addAttribute("empGradeCode", emp.getGradeCode());
 
 		return "projects/create";
 	}

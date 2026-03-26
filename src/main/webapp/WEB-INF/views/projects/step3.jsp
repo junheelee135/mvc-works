@@ -25,6 +25,18 @@ document.addEventListener('click', function (e) {
         const displayArea = dropdown.querySelector('.selected-value');
         const hiddenInput = dropdown.querySelector('.role-input');
 
+        if (hiddenInput && item.getAttribute('data-code') === 'M') {
+            const empId     = hiddenInput.dataset.empId;
+            const dataMap   = window.__memberDataMap || {};
+            const gradeCode = (dataMap[empId] || {}).gradeCode || '';
+            const gradeName = (dataMap[empId] || {}).grade || '';
+            if (window.getRankNum && window.getRankNum(gradeCode) < 5) {
+                const name = (dataMap[empId] || {}).name || empId;
+                window.toast(name + '님은 ' + gradeName + ' 직급으로 매니저를 맡을 수 없습니다.(매니저 차장 이상부터 가능)');
+                return;
+            }
+        }
+        
         displayArea.innerHTML = '<span class="status-dot"></span>' + item.getAttribute('data-label');
         displayArea.className = 'selected-value ' + item.getAttribute('data-class');
 

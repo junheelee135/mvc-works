@@ -152,21 +152,23 @@ function toast (msg, icon = 'warning'){
 	    container.innerHTML = '';
 
 	    list.forEach(emp => {
-	        const empId = String(emp.EMPID || emp.empId || '');
-	        const name = emp.NAME || emp.name || '';
-	        const dept = emp.DEPT || emp.dept || '';
-	        const grade = emp.GRADE || emp.grade || '';
-	        const isAdded = !!document.getElementById('badge_' + empId);
+	        const empId     = String(emp.EMPID     || emp.empId     || '');
+	        const name      = emp.NAME      || emp.name      || '';
+	        const dept      = emp.DEPT      || emp.dept      || '';
+	        const grade     = emp.GRADE     || emp.grade     || '';
+	        const gradeCode = emp.GRADECODE || emp.gradeCode || '';  // 직급 코드 (예: RANK06)
+	        const isAdded   = !!document.getElementById('badge_' + empId);
 
 	        const col  = document.createElement('div');
 	        col.className = 'col';
 
 	        const card = document.createElement('div');
 	        card.className = 'member-card' + (isAdded ? ' added' : '');
-	        card.dataset.empId = empId;
-	        card.dataset.name  = name;
-	        card.dataset.dept  = dept;
-	        card.dataset.grade = grade;
+	        card.dataset.empId     = empId;
+	        card.dataset.name      = name;
+	        card.dataset.dept      = dept;
+	        card.dataset.grade     = grade;
+	        card.dataset.gradeCode = gradeCode;
 
 	        card.innerHTML =
 	            '<div class="emp-name">' + name + '</div>' +
@@ -178,15 +180,16 @@ function toast (msg, icon = 'warning'){
 
 	        card.addEventListener('click', function() {
 	            const clickedEmpId = this.dataset.empId;
-				
+
 	            if (this.classList.contains('added')) {
 	                removeBadge(clickedEmpId);
 	            } else {
 	                addMemberBadge({
-	                    empId: clickedEmpId,
-	                    name:  this.dataset.name,
-	                    dept:  this.dataset.dept,
-	                    grade: this.dataset.grade
+	                    empId:     clickedEmpId,
+	                    name:      this.dataset.name,
+	                    dept:      this.dataset.dept,
+	                    grade:     this.dataset.grade,
+	                    gradeCode: this.dataset.gradeCode
 	                });
 	            }
 	        });
@@ -200,15 +203,16 @@ function toast (msg, icon = 'warning'){
 	}
 
 	function addMemberBadge(emp) {
-	    const empId = emp.empId || emp.EMPID || '';
-	    const name = emp.name || emp.NAME  || '';
-	    const dept = emp.dept || emp.DEPT  || '';
-	    const grade = emp.grade || emp.GRADE || '';
+	    const empId     = emp.empId     || emp.EMPID     || '';
+	    const name      = emp.name      || emp.NAME      || '';
+	    const dept      = emp.dept      || emp.DEPT      || '';
+	    const grade     = emp.grade     || emp.GRADE     || '';
+	    const gradeCode = emp.gradeCode || emp.GRADECODE || '';  // 직급 코드 (예: RANK06)
 
 	    if (!empId) return;
-		
-		if (!window.__memberDataMap) window.__memberDataMap = {};
-		window.__memberDataMap[empId] = { name, dept, grade };
+
+	    if (!window.__memberDataMap) window.__memberDataMap = {};
+	    window.__memberDataMap[empId] = { name, dept, grade, gradeCode };
 
 	    if (document.getElementById('badge_' + empId)) {
 	        removeBadge(empId);
@@ -290,11 +294,12 @@ function toast (msg, icon = 'warning'){
 	
 
 	document.addEventListener('DOMContentLoaded', function() {
-	    const myEmpId = document.getElementById('myEmpId').value;
-	    const myName  = document.getElementById('myName').value;
-	    const myDept  = document.getElementById('myDept').value;
-	    const myGrade = document.getElementById('myGrade').value;
+	    const myEmpId     = document.getElementById('myEmpId').value;
+	    const myName      = document.getElementById('myName').value;
+	    const myDept      = document.getElementById('myDept').value;
+	    const myGrade     = document.getElementById('myGrade').value;
+	    const myGradeCode = document.getElementById('myGradeCode') ? document.getElementById('myGradeCode').value : '';
 	    if (myEmpId) {
-	        addMemberBadge({ empId: myEmpId, name: myName, dept: myDept, grade: myGrade });
+	        addMemberBadge({ empId: myEmpId, name: myName, dept: myDept, grade: myGrade, gradeCode: myGradeCode });
 	    }
 	});

@@ -315,7 +315,7 @@ const toast = (msg) => {
     Swal.fire({
         html: `<div style="font-size:0.95rem; font-weight:500; text-align:center; display:flex; align-items:center; justify-content:center; min-height:40px;">${msg}</div>`,
         showConfirmButton: false,
-        timer: 5000,
+        timer: 3000,
         timerProgressBar: false,
         iconColor: '#4e73df',
         width: '320px',
@@ -799,7 +799,7 @@ function openDailyCheckModal(dateStr) {
 	                icon: 'question',
 	                showCancelButton: true,
 					confirmButtonColor: '#4e73df',
-					cancelButtonColor: '#6c757d',
+					cancelButtonColor: '#888888',
 	                confirmButtonText: '수정',
 	                cancelButtonText: '취소',
 	                width: '320px',
@@ -871,7 +871,7 @@ function submitDailyCheck() {
 	            icon: 'warning',
 	            showCancelButton: true,
 	            confirmButtonColor: '#4e73df',
-	            cancelButtonColor: '#6c757d',
+	            cancelButtonColor: '#888888',
 	            confirmButtonText: '저장',
 	            cancelButtonText: '취소',
 	            width: '320px',
@@ -908,7 +908,7 @@ function submitDailyCheck() {
 	                closeDailyCheckModal();
 	                closeTaskDailyModal();
 	                location.reload();
-	            }, 5000);
+	            }, 3000);
 	        } else {
 	            toast('저장 실패. 다시 시도해주세요.');
 	        }
