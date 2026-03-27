@@ -11,11 +11,10 @@
 				timer: 5000,
 				timerProgressBar: false,
 				text: msg,
-				icon: icon,
 				iconColor: '#4e73df',
-				width: '320px', // 전체 너비 조절 (기본보다 작게)
-				padding: '1rem', // 내부 여백 조절
-				confirmButtonColor: '#4f86c6', // 프로젝트 메인 컬러에 맞춤
+				width: '320px',
+				padding: '1rem',
+				confirmButtonColor: '#4f86c6',
 				confirmButtonText: '확인'
 	        });
 	    };
@@ -249,26 +248,19 @@
     });
 
     /* 초기화 버튼 */
-    document.getElementById('btnResetPhase').addEventListener('click', function () {
-		// 1. ask 함수를 호출하면서, 확인을 눌렀을 때 실행될 코드를 '두 번째 인자'로 전달합니다.
-		    ask('단계를 기본값으로 초기화하시겠습니까?\n입력한 내용이 모두 삭제됩니다.', function() {
-		        
-		        // 2. 이 안쪽이 실제 초기화 로직입니다. (확인 버튼 클릭 시에만 실행됨)
-		        container.innerHTML = '';
-		        
-		        DEFAULT_PHASES.forEach(function(title, i) {
-		            const card = createPhaseCard(i + 1, title);
-		            const titleWrap = card.querySelector('.phase-title');
-		            
-		            if (titleWrap) {
-		                titleWrap.style.cssText = '';
-		                titleWrap.innerHTML = '<span class="phase-number">' + (i + 1) + '</span> ' + title;
-		            }
-		            
-		            container.appendChild(card);
-		        });
-		
-    });
+	document.getElementById('btnResetPhase').addEventListener('click', function () {
+	        ask('단계를 기본값으로 초기화하시겠습니까?\n입력한 내용이 모두 삭제됩니다.', function() {
+	            container.innerHTML = '';
+	            DEFAULT_PHASES.forEach(function(title, i) {
+	                const card = createPhaseCard(i + 1, title);
+	                const titleWrap = card.querySelector('.phase-title');
+	                if (titleWrap) {
+	                    titleWrap.style.cssText = '';
+	                    titleWrap.innerHTML = '<span class="phase-number">' + (i + 1) + '</span> ' + title;
+	                }
+	                container.appendChild(card);
+	            });
+	        });
+	    }); 
 
-})
-})();
+	})();

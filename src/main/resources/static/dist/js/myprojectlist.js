@@ -184,6 +184,21 @@ let replaceTargetEmpId = null;
 let replaceTargetRole  = null;
 
 function selectReplaceTarget(empId, name, role) {
+    // 이미 선택된 구성원을 다시 누르면 선택 취소
+    if (replaceTargetEmpId === empId) {
+        replaceTargetEmpId = null;
+        replaceTargetRole  = null;
+        document.getElementById('newMemberArea').style.display = 'none';
+        document.getElementById('selectedMemberList').innerHTML =
+            '<p class="text-muted mb-0" id="noMemberText">선택된 멤버가 없습니다.</p>';
+        document.getElementById('hiddenInputContainer').innerHTML = '';
+        document.querySelectorAll('#currentMemberBadges .badge').forEach(b => {
+            b.classList.remove('bg-danger');
+            b.classList.add('bg-secondary');
+        });
+        return;
+    }
+
     replaceTargetEmpId = empId;
     replaceTargetRole  = role;
 
@@ -216,13 +231,13 @@ function forceStopProject() {
                 .then(res => {
                     if (res.ok) {
                         toast('프로젝트가 중단되었습니다.', 'success');
-                        setTimeout(() => location.reload(), 5000);
+                        setTimeout(() => location.reload(), 1500);
                     } else {
                         toast('중단 처리 중 오류가 발생했습니다.');
                     }
                 });
         });
-    }, 5000);
+    }, 300);
 }
 
 function saveMemberChange() {
@@ -232,13 +247,6 @@ function saveMemberChange() {
 	const startDate = document.getElementById('editStartDate').value;
 	const endDate   = document.getElementById('editEndDate').value;
 
-	const today = new Date().toISOString().split('T')[0];
-	
-	if (startDate && startDate < today) {
-	    toast('시작일은 오늘 날짜보다 이전일 수 없습니다.');
-	    return;
-	}
-	
 	if (startDate && endDate && startDate > endDate) {
 	    toast('시작일이 종료일보다 늦을 수 없습니다.');
 	    return;
@@ -451,11 +459,21 @@ function editRenderMemberList(list) {
             '<div class="emp-meta"><span>' + dept + '</span><span class="sep">|</span><span>' + grade + '</span></div>';
 
         card.addEventListener('click', function() {
-			
-			if (window.__currentMemberIds && window.__currentMemberIds.includes(empId)) {
-			    toast('이미 프로젝트 구성원입니다.');
-			    return;
-			}
+
+            if (window.__currentMemberIds && window.__currentMemberIds.includes(empId)) {
+                toast('이미 프로젝트 구성원입니다.');
+                return;
+            }
+
+            // 매니저 교체 시 차장(RANK05) 이상만 선택 가능
+            if (replaceTargetRole === 'M') {
+                const gradeCode = emp.GRADECODE || emp.gradeCode || '';
+                const rankNum = parseInt((gradeCode.match(/\d+/) || ['0'])[0]);
+                if (rankNum < 5) {
+                    toast(`${name}님은 ${grade} 직급으로 매니저를 맡을 수 없습니다. (차장 이상만 가능)`);
+                    return;
+                }
+            }
 			
             document.querySelectorAll('#editModalMemberList .member-card').forEach(c => c.classList.remove('added'));
             this.classList.add('added');
