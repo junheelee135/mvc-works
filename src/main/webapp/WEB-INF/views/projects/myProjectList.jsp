@@ -144,10 +144,19 @@
 						</ul>
 					</div>
 
-					<button type="button" class="btn-icon btn-edit" id="editModeBtn"
-						onclick="toggleEditMode()">
-						<i class="fas fa-pen"></i>
-					</button>
+				<c:set var="hasManagerProject" value="false"/>
+					<c:forEach var="p" items="${list}">
+					    <c:if test="${p.role == 'M'}">
+					        <c:set var="hasManagerProject" value="true"/>
+					    </c:if>
+					</c:forEach>
+				
+				<c:if test="${hasManagerProject}">
+				    <button type="button" class="btn-icon btn-edit" id="editModeBtn"
+				        onclick="toggleEditMode()">
+				        <i class="fas fa-pen"></i>
+				    </button>
+				</c:if>
 
 					<button type="button" class="btn btn-create"
 						onclick="location.href='${pageContext.request.contextPath}/projects/create';">+</button>

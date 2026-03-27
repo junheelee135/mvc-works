@@ -567,6 +567,11 @@ function updateTask(taskId, type) {
         if (!res.ok) {
             toast('저장 실패.');
         } else {
+			res.json().then(data => {
+			    if (data && data.empTaskId) {
+			        row.dataset.empTaskId = data.empTaskId;
+			    }
+			});
 			
 			if (startDate) row.dataset.start = startDate;
 			if (endDate) row.dataset.end = endDate;
@@ -579,7 +584,7 @@ function updateTask(taskId, type) {
 			const taskNameTd = row.querySelector('.task-name');
 			if (taskNameTd) {
 			    const onclick = taskNameTd.getAttribute('onclick');
-			    if (onclick) {  // ← null 체크 추가
+			    if (onclick) { 
 			        let updated = onclick.replace(
 			            /openTaskDailyModal\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'/,
 			            `openTaskDailyModal('$1', '$2', '${startDate}', '${endDate}'`
