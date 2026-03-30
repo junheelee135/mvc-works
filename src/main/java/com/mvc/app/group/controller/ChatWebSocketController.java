@@ -15,15 +15,6 @@ import java.util.Map;
 
 /**
  * STOMP 메시지 처리 컨트롤러
- *
- * 클라이언트 → 서버 전송 경로 (/app prefix 포함)
- *   /app/chat/message   : 텍스트 메시지 전송
- *   /app/chat/read      : 읽음 처리 요청
- *   /app/chat/enter     : 채팅방 입장 알림
- *   /app/chat/leave     : 채팅방 퇴장 알림
- *
- * 서버 → 클라이언트 브로드캐스트
- *   /topic/chat/{roomId} : 채팅방 구독
  */
 @Slf4j
 @Controller
@@ -35,7 +26,6 @@ public class ChatWebSocketController {
 
     /**
      * 텍스트 메시지 전송
-     * 클라이언트: stompClient.publish({ destination: '/app/chat/message', body: JSON.stringify(dto) })
      */
     @MessageMapping("/chat/message")
     public void sendMessage(@Payload ChatMessageDto dto,
@@ -80,7 +70,6 @@ public class ChatWebSocketController {
 
     /**
      * 읽음 처리 요청
-     * 클라이언트: stompClient.publish({ destination: '/app/chat/read', body: JSON.stringify({ roomId }) })
      */
     @MessageMapping("/chat/read")
     public void markRead(@Payload Map<String, Object> payload,
@@ -160,7 +149,6 @@ public class ChatWebSocketController {
         }
     }
 
-    /* ── 헬퍼 ── */
     private SessionInfo getSession(SimpMessageHeaderAccessor headerAccessor) {
         Map<String, Object> attrs = headerAccessor.getSessionAttributes();
         if (attrs == null) return null;

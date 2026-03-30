@@ -25,7 +25,6 @@ public class ChatController {
 
     /**
      * 내가 참여 중인 프로젝트 목록
-     * GET /api/chat/projects
      */
     @GetMapping("/projects")
     public ResponseEntity<?> getMyProjects(
@@ -40,8 +39,7 @@ public class ChatController {
     }
 
     /**
-     * 직원 목록 (무한스크롤)
-     * GET /api/chat/users
+     * 직원 목록
      */
     @GetMapping("/users")
     public ResponseEntity<?> getChatUsers(
@@ -71,7 +69,6 @@ public class ChatController {
 
     /**
      * 채팅방 조회 또는 생성
-     * POST /api/chat/rooms
      */
     @PostMapping("/rooms")
     public ResponseEntity<?> getOrCreateRoom(
@@ -95,8 +92,7 @@ public class ChatController {
     }
 
     /**
-     * 채팅 메시지 목록 조회 (무한스크롤)
-     * GET /api/chat/rooms/{roomId}/messages
+     * 채팅 메시지 목록 조회
      */
     @GetMapping("/rooms/{roomId}/messages")
     public ResponseEntity<?> getMessages(
@@ -123,8 +119,7 @@ public class ChatController {
     }
 
     /**
-     * 파일 업로드 (채팅)
-     * POST /api/chat/rooms/{roomId}/files
+     * 파일 업로드
      */
     @PostMapping("/rooms/{roomId}/files")
     public ResponseEntity<?> uploadFile(
@@ -152,7 +147,6 @@ public class ChatController {
 
     /**
      * 파일 다운로드
-     * GET /api/chat/files/{fileId}/download
      */
     @GetMapping("/files/{fileId}/download")
     public ResponseEntity<?> downloadFile(
