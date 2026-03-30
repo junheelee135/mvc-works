@@ -83,6 +83,8 @@
 .notice-footer {
 	padding: 20px 25px;
 	border-top: 1px solid #eee;
+	display: flex;
+	align-items: center;
 }
 
 .btn-list {
@@ -91,32 +93,20 @@
 	border: 1px solid #ccc;
 	background: #fff;
 	cursor: pointer;
-}
-
-/* 하단 버튼 정렬 */
-.notice-footer {
-	display: flex;
-	align-items: center;
-	margin-top: 10px;
-}
-
-/* 왼쪽: 목록 */
-.btn-list:first-child {
-	margin-right: auto;
-}
-
-/* 오른쪽 버튼 간격 */
-.notice-footer .btn-list {
 	margin-left: 6px;
 }
 
-/* 삭제 버튼만 강조 */
-.notice-footer .btn-list:last-child {
+.btn-list:first-child {
+	margin-right: auto;
+	margin-left: 0;
+}
+
+.btn-delete {
 	border-color: #ef4444;
 	color: #ef4444;
 }
 
-.notice-footer .btn-list:last-child:hover {
+.btn-delete:hover {
 	background: #fee2e2;
 }
 </style>
@@ -130,7 +120,6 @@
 		<div class="main-content">
 			<div class="notice-card">
 
-				<!-- 제목 -->
 				<div class="notice-header">
 					<div class="notice-title">{{ detail.subject }}</div>
 					<div class="notice-meta">
@@ -139,26 +128,21 @@
 					</div>
 				</div>
 
-				<!-- 내용 -->
 				<div class="notice-content" v-html="detail.content"></div>
 
-				<!-- 첨부파일 -->
 				<div class="notice-files"
 					v-if="detail.files && detail.files.length > 0">
 					<div style="font-weight: 500; margin-bottom: 10px;">첨부파일</div>
-
 					<div v-for="f in detail.files" :key="f.filenum" class="file-item"
 						@click="downloadFile(f.filenum)">📎 {{ f.originalfilename }}
 					</div>
 				</div>
 
-				<!-- 하단 -->
 				<div class="notice-footer">
 					<button class="btn-list" @click="goList">목록</button>
-
-					<!-- ⭐ 매니저만 -->
 					<button v-if="isManager" class="btn-list" @click="goEdit">수정</button>
-					<button v-if="isManager" class="btn-list" @click="deleteNotice">삭제</button>
+					<button v-if="isManager" class="btn-list btn-delete"
+						@click="deleteNotice">삭제</button>
 				</div>
 
 			</div>
@@ -166,77 +150,87 @@
 	</div>
 
 	<script>
-	document.addEventListener('DOMContentLoaded', function() {
-	const ctx = document.querySelector('meta[name="ctx"]').content
-	const { createApp } = Vue
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.querySelector('meta[name="ctx"]').content
+    const { createApp } = Vue
 
-	createApp({
-		data() {
-			return {
-				detail: {},
-				isManager: false // ⭐ 추가
-			}
-		},
-		mounted() {
-			this.loadDetail()
-		},
-		methods: {
-			async loadDetail() {
-				const params = new URLSearchParams(location.search)
-				const noticenum = params.get("noticenum")
+    createApp({
+        data() {
+            return {
+                detail: {},
+                isManager: false
+            }
+        },
+        mounted() {
+            this.loadDetail()
+        },
+        methods: {
+            async loadDetail() {
+                const params = new URLSearchParams(location.search)
+                const projectNoticeNum = params.get('projectNoticeNum')
+                console.log('[detail] projectNoticeNum:', projectNoticeNum)
 
-				try {
-					const res = await fetch(ctx + '/api/projectnotice/detail?noticenum=' + noticenum, {
-						credentials: "include"
-					})
+                if (!projectNoticeNum) {
+                    console.error('[detail] projectNoticeNum 없음, 목록으로 이동')
+                    this.goList()
+                    return
+                }
 
-					const data = await res.json()
+                try {
+                    const res = await fetch(ctx + '/api/projectnotice/detail?projectNoticeNum=' + projectNoticeNum, {
+                        credentials: 'include',
+                        headers: { 'AJAX': 'true' }
+                    })
+                    console.log('[detail] API 응답 status:', res.status)
 
-					// ⭐ 구조 변경 반영
-					this.detail = data.detail
-					this.isManager = data.isManager
+                    if (!res.ok) {
+                        console.error('[detail] API 응답 실패')
+                        return
+                    }
 
-				} catch (e) {
-					alert("공지사항을 불러오지 못했습니다.")
-					console.error(e)
-				}
-			},
+                    const data = await res.json()
+                    console.log('[detail] data:', data)
+                    this.detail = data.detail
+                    this.isManager = data.isManager
 
-			downloadFile(filenum) {
-				window.open(ctx + '/api/projectnotice/file/' + filenum)
-			},
+                } catch (e) {
+                    console.error('[detail] 오류:', e)
+                }
+            },
 
-			goList() {
-				location.href = ctx + '/projects/projectNotice'
-			},
+            downloadFile(filenum) {
+                window.open(ctx + '/api/projectnotice/file/' + filenum)
+            },
 
-			// ⭐ 수정
-			goEdit() {
-				location.href = ctx + '/projects/projectNotice/projectNoticeForm?noticenum=' + this.detail.noticenum
-			},
+            goList() {
+                location.href = ctx + '/projects/projectNotice'
+            },
 
-			// ⭐ 삭제
-			async deleteNotice() {
-				if (!confirm("삭제하시겠습니까?")) return
+            goEdit() {
+                location.href = ctx + '/projects/projectNotice/projectNoticeForm?projectNoticeNum=' + this.detail.projectNoticeNum
+            },
 
-				try {
-					const res = await fetch(ctx + '/api/projectnotice/delete?noticenum=' + this.detail.noticenum, {
-						method: "POST",
-						credentials: "include"
-					})
+            async deleteNotice() {
+                if (!confirm('삭제하시겠습니까?')) return
 
-					if (res.ok) {
-						alert("삭제 완료")
-						this.goList()
-					} else {
-						alert("삭제 실패")
-					}
-				} catch (e) {
-					console.error(e)
-				}
-			}
-		}
-	}).mount('#app')
+                try {
+                    const res = await fetch(ctx + '/api/projectnotice/delete?projectNoticeNum=' + this.detail.projectNoticeNum, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'AJAX': 'true' }
+                    })
+
+                    if (res.ok) {
+                        this.goList()
+                    } else {
+                        console.error('[detail] 삭제 실패')
+                    }
+                } catch (e) {
+                    console.error('[detail] 삭제 오류:', e)
+                }
+            }
+        }
+    }).mount('#app')
 })
 </script>
 </body>

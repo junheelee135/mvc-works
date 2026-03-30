@@ -56,7 +56,7 @@
 			<div class="table-header">
 				<h5 class="mb-0 fw-bold">
 					<c:choose>
-						<c:when test="${projectId == 0 || empty projectId}">전체 내 태스크</c:when>
+						<c:when test="${projectId == 0 || empty projectId}">내 태스크</c:when>
 						<c:otherwise>${projectTitle}</c:otherwise>
 					</c:choose>
 				</h5>

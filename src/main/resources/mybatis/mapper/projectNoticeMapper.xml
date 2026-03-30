@@ -4,314 +4,213 @@
 
 <mapper namespace="com.mvc.app.mapper.ProjectNoticeMapper">
 
-
-	<select id="isManager" resultType="int">
-		SELECT COUNT(*)
-		FROM empproject
-		WHERE empid = #{empId}
-		<if test="projectid != null">
-			AND projectid = #{projectid, jdbcType=NUMERIC}
-		</if>
-		AND UPPER(role) = 'M'
-	</select>
-
-
-
-	<insert id="insertNotice"
-		parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
-
-		<selectKey keyProperty="noticenum" resultType="long"
-			order="BEFORE">
-			SELECT PROJECTNOTICE_SEQ.NEXTVAL FROM dual
-		</selectKey>
-
-		INSERT INTO projectnotice(
-		noticenum,
-		projectid,
-		subject,
-		content,
-		hitcount,
-		regdate,
-		isnotice,
-		state,
-		authorempid
-		)
-		VALUES(
-		#{noticenum},
-		#{projectid, jdbcType=NUMERIC},
-		#{subject},
-		#{content},
-		0,
-		SYSDATE,
-		#{isnotice},
-		1,
-		#{authorempid}
-		)
-
-	</insert>
-
-
-
-	<update id="updateNotice"
-		parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
-
-		UPDATE projectnotice
-		SET
-		subject = #{subject},
-		content =
-		#{content},
-		isnotice = #{isnotice},
-		updatedate = SYSDATE
-		WHERE noticenum
-		= #{noticenum}
-
-	</update>
-
-
-
-	<update id="deleteNotice" parameterType="long">
-		UPDATE projectnotice
-		SET
-		state = 0
-		WHERE noticenum = #{noticenum}
-	</update>
-
-
-
-	<update id="increaseHit" parameterType="long">
-		UPDATE projectnotice
-		SET
-		hitcount = hitcount + 1
-		WHERE noticenum = #{noticenum}
-	</update>
-
-
-
-	<select id="listNotice" parameterType="map"
-		resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
-
-		SELECT
-		n.noticenum,
-		n.projectid,
-		p.title AS projectName,
-		n.subject,
-		n.hitcount,
-		n.isnotice,
-		n.state,
-		TO_CHAR(n.regdate,'YYYY-MM-DD') regdate,
-		TO_CHAR(n.updatedate,'YYYY-MM-DD') updatedate,
-		n.authorempid,
-		e.name
-		authorName
-
-		FROM projectnotice n
-		LEFT JOIN employee2 e ON n.authorempid =
-		e.empid
-		LEFT JOIN project p ON n.projectid = p.projectid
-
-		WHERE n.state =
-		1
-
-
-		AND EXISTS (
-		SELECT 1
-		FROM empproject ep
-		WHERE ep.projectid =
-		n.projectid
-		AND ep.empid = #{empId}
-		)
-
-
-		<if test="projectid != null and projectid != ''">
-			AND n.projectid = #{projectid}
-		</if>
-
-
-		<if test="keyword != null and keyword != ''">
-			AND (
-			n.subject LIKE '%' || #{keyword} || '%'
-			OR n.content
-			LIKE '%' || #{keyword} || '%'
-			)
-		</if>
-
-		ORDER BY
-		n.isnotice DESC,
-		n.noticenum DESC
-
-		<if test="offset != null and pageSize != null">
-			OFFSET #{offset, jdbcType=NUMERIC} ROWS
-			FETCH NEXT
-			#{pageSize, jdbcType=NUMERIC} ROWS ONLY
-		</if>
-
-	</select>
-
-
-
-	<select id="countNotice" parameterType="map" resultType="int">
-
-		SELECT COUNT(*)
-		FROM projectnotice n
-		WHERE n.state = 1
-
-
-		AND EXISTS (
-		SELECT 1
-		FROM empproject ep
-		WHERE ep.projectid = n.projectid
-		AND ep.empid
-		= #{empId}
-		)
-
-		<if test="projectid != null and projectid != ''">
-			AND n.projectid = #{projectid, jdbcType=NUMERIC}
-		</if>
-
-		<if test="keyword != null and keyword != ''">
-			AND (
-			n.subject LIKE '%' || #{keyword} || '%'
-			OR n.content
-			LIKE '%' || #{keyword} || '%'
-			)
-		</if>
-
-	</select>
-
-
-
-	<select id="getNotice" parameterType="long"
-		resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
-
-		SELECT
-		n.noticenum,
-		n.projectid,
-		n.subject,
-		n.content,
-		n.hitcount,
-		n.isnotice,
-		n.state,
-		TO_CHAR(n.regdate,'YYYY-MM-DD') regdate,
-		TO_CHAR(n.updatedate,'YYYY-MM-DD') updatedate,
-		n.authorempid,
-		e.name
-		authorName,
-		p.title projectName
-
-		FROM projectnotice n
-		LEFT JOIN employee2
-		e
-		ON n.authorempid = e.empid
-		LEFT JOIN project p
-		ON n.projectid =
-		p.projectid
-
-		WHERE n.noticenum = #{noticenum}
-
-	</select>
-
-
-
-	<select id="getMyProjects" parameterType="string"
-		resultType="map">
-
-		SELECT
-		ep.projectid,
-		p.title projectname,
-		ep.role
-
-		FROM
-		empproject ep
-		JOIN project p
-		ON ep.projectid = p.projectid
-
-		WHERE ep.empid
-		= #{empId}
-		ORDER BY p.title
-
-	</select>
-
-	<select id="getMyPmProjects" parameterType="string"
-		resultType="map">
-		SELECT
-		ep.projectid,
-		p.title projectname,
-		ep.role
-		FROM
-		empproject ep
-		JOIN project p ON ep.projectid = p.projectid
-		WHERE
-		ep.empid = #{empId}
-		AND UPPER(ep.role) = 'M'
-		ORDER BY p.title
-	</select>
-
-
-	<insert id="insertFile"
-		parameterType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
-
-		<selectKey keyProperty="filenum" resultType="long"
-			order="BEFORE">
-			SELECT PROJECTNOTICEFILE_SEQ.NEXTVAL FROM dual
-		</selectKey>
-
-		INSERT INTO projectnoticefile(
-		filenum,
-		savefilename,
-		originalfilename,
-		filesize,
-		noticenum
-		)
-		VALUES(
-		#{filenum},
-		#{savefilename},
-		#{originalfilename},
-		#{filesize},
-		#{noticenum}
-		)
-
-	</insert>
-
-
-
-	<delete id="deleteFile" parameterType="long">
-		DELETE FROM
-		projectnoticefile
-		WHERE filenum = #{filenum}
-	</delete>
-
-
-
-	<select id="getFiles" parameterType="long"
-		resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
-
-		SELECT
-		filenum,
-		savefilename,
-		originalfilename,
-		filesize,
-		noticenum
-		FROM projectnoticefile
-		WHERE noticenum = #{noticenum}
-		ORDER BY
-		filenum
-
-	</select>
-
-
-
-	<select id="getFile" parameterType="long"
-		resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
-
-		SELECT
-		filenum,
-		savefilename,
-		originalfilename,
-		filesize,
-		noticenum
-		FROM projectnoticefile
-		WHERE filenum = #{filenum}
-
-	</select>
+    <select id="isManager" resultType="int">
+        SELECT COUNT(*)
+        FROM empproject
+        WHERE empid = #{empId}
+        <if test="projectid != 0">
+            AND projectid = #{projectid}
+        </if>
+        AND UPPER(role) = 'M'
+    </select>
+
+    <insert id="insertNotice" parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        <selectKey keyProperty="projectNoticeNum" resultType="long" order="BEFORE">
+            SELECT PROJECTNOTICE_SEQ.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO projectnotice(
+            projectNoticeNum,
+            projectid,
+            subject,
+            content,
+            hitcount,
+            regdate,
+            isnotice,
+            state,
+            authorempid
+        )
+        VALUES(
+            #{projectNoticeNum},
+            #{projectid},
+            #{subject},
+            #{content},
+            0,
+            SYSDATE,
+            #{isnotice},
+            1,
+            #{authorempid}
+        )
+    </insert>
+
+    <update id="updateNotice" parameterType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        UPDATE projectnotice
+        SET subject = #{subject},
+            content = #{content},
+            isnotice = #{isnotice},
+            updatedate = SYSDATE
+        WHERE projectNoticeNum = #{projectNoticeNum}
+    </update>
+
+    <update id="deleteNotice" parameterType="long">
+        UPDATE projectnotice
+        SET state = 0
+        WHERE projectNoticeNum = #{projectNoticeNum}
+    </update>
+
+    <update id="increaseHit" parameterType="long">
+        UPDATE projectnotice
+        SET hitcount = hitcount + 1
+        WHERE projectNoticeNum = #{projectNoticeNum}
+    </update>
+
+    <select id="listNotice" parameterType="map" resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        SELECT
+            n.projectNoticeNum,
+            n.projectid,
+            p.title AS projectName,
+            n.subject,
+            n.hitcount,
+            n.isnotice,
+            n.state,
+            TO_CHAR(n.regdate,'YYYY-MM-DD') regdate,
+            TO_CHAR(n.updatedate,'YYYY-MM-DD') updatedate,
+            n.authorempid,
+            e.name AS authorName
+        FROM projectnotice n
+        LEFT JOIN employee2 e ON n.authorempid = e.empid
+        LEFT JOIN project p ON n.projectid = p.projectid
+        WHERE n.state = 1
+        AND EXISTS (
+            SELECT 1
+            FROM empproject ep
+            WHERE ep.projectid = n.projectid
+            AND ep.empid = #{empId}
+        )
+        <if test="projectid != null">
+            AND n.projectid = #{projectid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                n.subject LIKE '%' || #{keyword} || '%'
+                OR n.content LIKE '%' || #{keyword} || '%'
+            )
+        </if>
+        ORDER BY n.isnotice DESC, n.projectNoticeNum DESC
+        <if test="offset != null and pageSize != null">
+            OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+        </if>
+    </select>
+
+    <select id="countNotice" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM projectnotice n
+        WHERE n.state = 1
+        AND EXISTS (
+            SELECT 1
+            FROM empproject ep
+            WHERE ep.projectid = n.projectid
+            AND ep.empid = #{empId}
+        )
+        <if test="projectid != null">
+            AND n.projectid = #{projectid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                n.subject LIKE '%' || #{keyword} || '%'
+                OR n.content LIKE '%' || #{keyword} || '%'
+            )
+        </if>
+    </select>
+
+    <select id="getNotice" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectNoticeDto">
+        SELECT
+            n.projectNoticeNum,
+            n.projectid,
+            n.subject,
+            n.content,
+            n.hitcount,
+            n.isnotice,
+            n.state,
+            TO_CHAR(n.regdate,'YYYY-MM-DD') regdate,
+            TO_CHAR(n.updatedate,'YYYY-MM-DD') updatedate,
+            n.authorempid,
+            e.name AS authorName,
+            p.title AS projectName
+        FROM projectnotice n
+        LEFT JOIN employee2 e ON n.authorempid = e.empid
+        LEFT JOIN project p ON n.projectid = p.projectid
+        WHERE n.projectNoticeNum = #{projectNoticeNum}
+    </select>
+
+    <select id="getMyProjects" parameterType="string" resultType="map">
+        SELECT
+            ep.projectid,
+            p.title AS projectname,
+            ep.role
+        FROM empproject ep
+        JOIN project p ON ep.projectid = p.projectid
+        WHERE ep.empid = #{empId}
+        ORDER BY p.title
+    </select>
+
+    <select id="getMyPmProjects" parameterType="string" resultType="map">
+        SELECT
+            ep.projectid,
+            p.title AS projectname,
+            ep.role
+        FROM empproject ep
+        JOIN project p ON ep.projectid = p.projectid
+        WHERE ep.empid = #{empId}
+        AND UPPER(ep.role) = 'M'
+        ORDER BY p.title
+    </select>
+
+    <insert id="insertFile" parameterType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
+        <selectKey keyProperty="filenum" resultType="long" order="BEFORE">
+            SELECT PROJECTNOTICEFILE_SEQ.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO projectnoticefile(
+            filenum,
+            savefilename,
+            originalfilename,
+            filesize,
+            projectNoticeNum
+        )
+        VALUES(
+            #{filenum},
+            #{savefilename},
+            #{originalfilename},
+            #{filesize},
+            #{projectNoticeNum}
+        )
+    </insert>
+
+    <delete id="deleteFile" parameterType="long">
+        DELETE FROM projectnoticefile
+        WHERE filenum = #{filenum}
+    </delete>
+
+    <select id="getFiles" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
+        SELECT
+            filenum,
+            savefilename,
+            originalfilename,
+            filesize,
+            projectNoticeNum
+        FROM projectnoticefile
+        WHERE projectNoticeNum = #{projectNoticeNum}
+        ORDER BY filenum
+    </select>
+
+    <select id="getFile" parameterType="long" resultType="com.mvc.app.domain.dto.ProjectNoticeFileDto">
+        SELECT
+            filenum,
+            savefilename,
+            originalfilename,
+            filesize,
+            projectNoticeNum
+        FROM projectnoticefile
+        WHERE filenum = #{filenum}
+    </select>
 
 </mapper>

@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <!DOCTYPE html>
 <html lang="ko">
@@ -10,19 +9,14 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <jsp:include page="/WEB-INF/views/layout/sidebarResources.jsp" />
 
-<link
-	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-	rel="stylesheet">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/projectnoticelist.css">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/projectnoticelist.css">
 <meta name="ctx" content="${pageContext.request.contextPath}">
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
 <style>
-[v-cloak] {
-	display: none !important;
-}
+[v-cloak] { display: none !important; }
 </style>
 </head>
 
@@ -37,22 +31,20 @@
 			</div>
 
 			<div class="project-select-wrap">
-				<select v-model="selectedProjectId" @change="onProjectChange"
-					class="project-select">
+				<select v-model="selectedProjectId" @change="onProjectChange" class="project-select">
 					<option value="all">-- 전체 프로젝트 --</option>
-					<option v-for="p in myProjects" :key="p.PROJECTID"
-						:value="p.PROJECTID">{{ p.PROJECTNAME }}</option>
+					<option v-for="p in myProjects" :key="p.PROJECTID || p.projectid" :value="p.PROJECTID || p.projectid">
+                        {{ p.PROJECTNAME || p.projectName }}
+                    </option>
 				</select>
 			</div>
 
 			<div class="notice-topbar">
 				<div class="notice-search-bar">
-					<input v-model="keyword" @keyup.enter="fetchList(1)" type="text"
-						placeholder="제목 또는 내용 검색">
+					<input v-model="keyword" @keyup.enter="fetchList(1)" type="text" placeholder="제목 또는 내용 검색">
 					<button @click="fetchList(1)" class="btn-search">검색</button>
 				</div>
-				<button v-if="isManager && selectedProjectId !== 'all'"
-					@click="goToForm" class="btn-new-notice">+ 공지 등록</button>
+				<button v-if="isManager && selectedProjectId !== 'all'" @click="goToForm" class="btn-new-notice">+ 공지 등록</button>
 			</div>
 
 			<div class="notice-panel">
@@ -69,30 +61,31 @@
 
 					<tbody>
 						<tr v-if="list.length === 0">
-							<td :colspan="5"
-								style="text-align: center; padding: 30px; color: #999;">
-								등록된 공지사항이 없습니다.</td>
+							<td :colspan="5" style="text-align: center; padding: 30px; color: #999;">등록된 공지사항이 없습니다.</td>
 						</tr>
 
-						<tr v-for="item in list" :key="item.noticenum"
-							@click="openDetail(item.noticenum)">
+						<tr v-for="item in list" :key="item.projectNoticeNum || item.PROJECTNOTICENUM || item.noticenum"
+							@click="openDetail(item.projectNoticeNum || item.PROJECTNOTICENUM || item.noticenum)">
 
-							<td style="text-align: center"><span
-								v-if="item.isnotice === 1" class="badge-notice">공지</span> <span
-								v-else>{{ item.noticenum }}</span></td>
+							<td style="text-align: center">
+                                <span v-if="(item.isnotice || item.ISNOTICE) === 1" class="badge-notice">공지</span> 
+                                <span v-else>{{ item.projectNoticeNum || item.PROJECTNOTICENUM || item.noticenum }}</span>
+                            </td>
 
-							<td><span v-if="selectedProjectId === 'all'"
-								style="color: #888; margin-right: 8px;"> [{{
-									item.projectName }}] </span> {{ item.subject }}</td>
+							<td>
+                                <span v-if="selectedProjectId === 'all'" style="color: #888; margin-right: 8px;"> 
+                                    [{{ item.projectName || item.PROJECTNAME }}] 
+                                </span> 
+                                {{ item.subject || item.SUBJECT }}
+                            </td>
 
-							<td style="text-align: center">{{ item.authorName }} 매니저</td>
-							<td style="text-align: center">{{ item.regdate }}</td>
-							<td style="text-align: center">{{ item.hitcount }}</td>
+							<td style="text-align: center">{{ item.authorName || item.AUTHORNAME }} 매니저</td>
+							<td style="text-align: center">{{ item.regdate || item.REGDATE }}</td>
+							<td style="text-align: center">{{ item.hitcount || item.HITCOUNT }}</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-
 		</div>
 	</div>
 
@@ -131,10 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
             async fetchMyProjects() {
                 const res = await this.safeApi('/api/projectnotice/myprojects');
                 if(!res) return;
-
                 const data = await res.json();
                 this.myProjects = data;
-
                 this.fetchList(1);
             },
             onProjectChange() {
@@ -144,9 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             async fetchList(p) {
                 this.page = p;
-
                 const projectid = this.selectedProjectId === 'all' ? '' : this.selectedProjectId;
-
                 const params = new URLSearchParams({
                     projectid: projectid,
                     page: this.page,
@@ -157,17 +146,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     credentials: "include",
                     headers: { "AJAX": "true", "Content-Type": "application/json" }
                 });
-
                 const data = await res.json();
 
-                this.list = data.list;
+                this.list = data.list || [];
                 this.total = data.total;
                 this.isManager = data.isManager;
             },
-            openDetail(noticenum) {
+            openDetail(num) {
+                // 핵심 수정: 파라미터 이름을 projectNoticeNum으로 변경
                 window.location.href =
-                    ctx + '/projects/projectNotice/projectNoticeDetail?noticenum='
-                    + noticenum
+                    ctx + '/projects/projectNotice/projectNoticeDetail?projectNoticeNum='
+                    + num
                     + '&projectid='
                     + (this.selectedProjectId === 'all' ? '' : this.selectedProjectId)
             },
@@ -176,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert("공지 등록은 프로젝트 선택 후 가능합니다.");
                     return;
                 }
-
                 window.location.href =
                     ctx + '/projects/projectNotice/projectNoticeForm?projectid='
                     + this.selectedProjectId;
@@ -185,6 +173,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }).mount('#app')
 })
 </script>
-
 </body>
 </html>

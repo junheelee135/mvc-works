@@ -32,7 +32,8 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 		mapper.insertNotice(dto);
 
 		if (files != null && !files.isEmpty()) {
-			saveFiles(files, dto.getNoticenum());
+			// ✅ DTO 필드명 변경 반영: getProjectNoticeNum()
+			saveFiles(files, dto.getProjectNoticeNum());
 		}
 	}
 
@@ -42,7 +43,8 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 
 		mapper.updateNotice(dto);
 
-		List<ProjectNoticeFileDto> oldFiles = mapper.getFiles(dto.getNoticenum());
+		// ✅ DTO 필드명 변경 반영: getProjectNoticeNum()
+		List<ProjectNoticeFileDto> oldFiles = mapper.getFiles(dto.getProjectNoticeNum());
 
 		if (oldFiles != null && !oldFiles.isEmpty()) {
 			for (ProjectNoticeFileDto file : oldFiles) {
@@ -58,15 +60,16 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 		}
 
 		if (files != null && !files.isEmpty()) {
-			saveFiles(files, dto.getNoticenum());
+			// ✅ DTO 필드명 변경 반영: getProjectNoticeNum()
+			saveFiles(files, dto.getProjectNoticeNum());
 		}
 	}
 
 	@Override
 	@Transactional
-	public void deleteNotice(long noticenum) throws Exception {
+	public void deleteNotice(long projectNoticeNum) throws Exception {
 
-		List<ProjectNoticeFileDto> files = mapper.getFiles(noticenum);
+		List<ProjectNoticeFileDto> files = mapper.getFiles(projectNoticeNum);
 
 		if (files != null && !files.isEmpty()) {
 			for (ProjectNoticeFileDto file : files) {
@@ -81,7 +84,7 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 			}
 		}
 
-		mapper.deleteNotice(noticenum);
+		mapper.deleteNotice(projectNoticeNum);
 	}
 
 	@Override
@@ -96,14 +99,14 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 
 	@Override
 	@Transactional
-	public ProjectNoticeDto getNotice(long noticenum) {
+	public ProjectNoticeDto getNotice(long projectNoticeNum) {
 
-		mapper.increaseHit(noticenum); // ⭐ 조회수 증가
+		mapper.increaseHit(projectNoticeNum);
 
-		ProjectNoticeDto dto = mapper.getNotice(noticenum);
+		ProjectNoticeDto dto = mapper.getNotice(projectNoticeNum);
 
 		if (dto != null) {
-			dto.setFiles(mapper.getFiles(noticenum));
+			dto.setFiles(mapper.getFiles(projectNoticeNum));
 		}
 
 		return dto;
@@ -143,11 +146,11 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 	}
 
 	@Override
-	public List<ProjectNoticeFileDto> getFiles(long noticenum) {
-		return mapper.getFiles(noticenum);
+	public List<ProjectNoticeFileDto> getFiles(long projectNoticeNum) {
+		return mapper.getFiles(projectNoticeNum);
 	}
 
-	private void saveFiles(List<MultipartFile> files, long noticenum) throws Exception {
+	private void saveFiles(List<MultipartFile> files, long projectNoticeNum) throws Exception {
 
 		File dir = new File(uploadRoot);
 
@@ -183,7 +186,7 @@ public class ProjectNoticeServiceImpl implements ProjectNoticeService {
 			fileDto.setSavefilename(saveName);
 			fileDto.setOriginalfilename(origin);
 			fileDto.setFilesize(mf.getSize());
-			fileDto.setNoticenum(noticenum);
+			fileDto.setProjectNoticeNum(projectNoticeNum); 
 
 			mapper.insertFile(fileDto);
 		}

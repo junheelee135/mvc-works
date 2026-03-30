@@ -42,23 +42,17 @@ public class ProjectNoticeRestController {
 
 	@GetMapping("/myprojects")
 	public ResponseEntity<?> myProjects(@AuthenticationPrincipal UserDetails user) {
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
-
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 		String empId = user.getUsername();
 		List<Map<String, Object>> list = service.getMyProjects(empId);
-
 		return ResponseEntity.ok(list);
 	}
 
 	@GetMapping("/myprojects/pm")
 	public ResponseEntity<?> myPmProjects(@AuthenticationPrincipal UserDetails user) {
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
-
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 		String empId = user.getUsername();
 		List<Map<String, Object>> list = service.getMyPmProjects(empId);
-
 		return ResponseEntity.ok(list);
 	}
 
@@ -68,8 +62,7 @@ public class ProjectNoticeRestController {
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@AuthenticationPrincipal UserDetails user) {
 
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 
 		String empId = user.getUsername();
 		int pageSize = 10;
@@ -81,7 +74,6 @@ public class ProjectNoticeRestController {
 		param.put("keyword", keyword);
 		param.put("offset", offset);
 		param.put("pageSize", pageSize);
-		param.put("limit", pageSize);
 
 		List<ProjectNoticeDto> list = service.listNotice(param);
 		int total = service.countNotice(param);
@@ -99,18 +91,17 @@ public class ProjectNoticeRestController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> insert(@RequestParam("projectid") long projectid, @RequestParam("subject") String subject,
-			@RequestParam("content") String content, @RequestParam(value = "isnotice", defaultValue = "0") int isnotice,
+	public ResponseEntity<?> insert(@RequestParam("projectid") long projectid, 
+			@RequestParam("subject") String subject,
+			@RequestParam("content") String content, 
+			@RequestParam(value = "isnotice", defaultValue = "0") int isnotice,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@AuthenticationPrincipal UserDetails user) {
 
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 
 		String empId = user.getUsername();
-
-		if (!service.isManager(empId, projectid))
-			return ResponseEntity.status(403).body("권한 없음");
+		if (!service.isManager(empId, projectid)) return ResponseEntity.status(403).body("권한 없음");
 
 		try {
 			ProjectNoticeDto dto = new ProjectNoticeDto();
@@ -121,27 +112,23 @@ public class ProjectNoticeRestController {
 			dto.setAuthorempid(empId);
 
 			service.insertNotice(dto, files);
-
 			return ResponseEntity.ok("등록 완료");
-
 		} catch (Exception e) {
-			log.error("insertNotice", e);
+			log.error("insertNotice error", e);
 			return ResponseEntity.status(500).body("등록 실패");
 		}
 	}
 
 	@GetMapping("/detail")
-	public ResponseEntity<?> detail(@RequestParam("noticenum") long noticenum,
+	public ResponseEntity<?> detail(@RequestParam("projectNoticeNum") long projectNoticeNum,
 			@AuthenticationPrincipal UserDetails user) {
 
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 
 		String empId = user.getUsername();
-
-		ProjectNoticeDto dto = service.getNotice(noticenum);
-		if (dto == null)
-			return ResponseEntity.status(404).body("공지 없음");
+		ProjectNoticeDto dto = service.getNotice(projectNoticeNum);
+		
+		if (dto == null) return ResponseEntity.status(404).body("공지 없음");
 
 		boolean isManager = service.isManager(empId, dto.getProjectid());
 
@@ -153,62 +140,52 @@ public class ProjectNoticeRestController {
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<?> update(@RequestParam("noticenum") long noticenum, @RequestParam("subject") String subject,
-			@RequestParam("content") String content, @RequestParam(value = "isnotice", defaultValue = "0") int isnotice,
+	public ResponseEntity<?> update(@RequestParam("projectNoticeNum") long projectNoticeNum, 
+			@RequestParam("subject") String subject,
+			@RequestParam("content") String content, 
+			@RequestParam(value = "isnotice", defaultValue = "0") int isnotice,
 			@AuthenticationPrincipal UserDetails user) {
 
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 
 		try {
 			String empId = user.getUsername();
-
-			ProjectNoticeDto origin = service.getNotice(noticenum);
-			if (origin == null)
-				return ResponseEntity.status(404).body("공지 없음");
-
-			if (!service.isManager(empId, origin.getProjectid()))
-				return ResponseEntity.status(403).body("권한 없음");
+			ProjectNoticeDto origin = service.getNotice(projectNoticeNum);
+			
+			if (origin == null) return ResponseEntity.status(404).body("공지 없음");
+			if (!service.isManager(empId, origin.getProjectid())) return ResponseEntity.status(403).body("권한 없음");
 
 			ProjectNoticeDto dto = new ProjectNoticeDto();
-			dto.setNoticenum(noticenum);
+			dto.setProjectNoticeNum(projectNoticeNum);
 			dto.setSubject(subject);
 			dto.setContent(content);
 			dto.setIsnotice(isnotice);
 
 			service.updateNotice(dto, null);
-
 			return ResponseEntity.ok("수정 완료");
-
 		} catch (Exception e) {
-			log.error("updateNotice", e);
+			log.error("updateNotice error", e);
 			return ResponseEntity.status(500).body("수정 실패");
 		}
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<?> delete(@RequestParam("noticenum") long noticenum,
+	public ResponseEntity<?> delete(@RequestParam("projectNoticeNum") long projectNoticeNum,
 			@AuthenticationPrincipal UserDetails user) {
 
-		if (user == null)
-			return ResponseEntity.status(401).body("로그인 필요");
+		if (user == null) return ResponseEntity.status(401).body("로그인 필요");
 
 		try {
 			String empId = user.getUsername();
+			ProjectNoticeDto dto = service.getNotice(projectNoticeNum);
+			
+			if (dto == null) return ResponseEntity.status(404).body("공지 없음");
+			if (!service.isManager(empId, dto.getProjectid())) return ResponseEntity.status(403).body("권한 없음");
 
-			ProjectNoticeDto dto = service.getNotice(noticenum);
-			if (dto == null)
-				return ResponseEntity.status(404).body("공지 없음");
-
-			if (!service.isManager(empId, dto.getProjectid()))
-				return ResponseEntity.status(403).body("권한 없음");
-
-			service.deleteNotice(noticenum);
-
+			service.deleteNotice(projectNoticeNum);
 			return ResponseEntity.ok().build();
-
 		} catch (Exception e) {
-			log.error("deleteNotice", e);
+			log.error("deleteNotice error", e);
 			return ResponseEntity.status(500).body("삭제 실패");
 		}
 	}
@@ -217,20 +194,19 @@ public class ProjectNoticeRestController {
 	public ResponseEntity<?> downloadFile(@PathVariable("filenum") long filenum) {
 		try {
 			ProjectNoticeFileDto file = service.getFile(filenum);
-			if (file == null)
-				return ResponseEntity.notFound().build();
+			if (file == null) return ResponseEntity.notFound().build();
 
 			File f = new File(uploadRoot, file.getSavefilename());
-			if (!f.exists())
-				return ResponseEntity.notFound().build();
+			if (!f.exists()) return ResponseEntity.notFound().build();
 
 			Resource resource = new FileSystemResource(f);
 			String encodedName = URLEncoder.encode(file.getOriginalfilename(), "UTF-8").replaceAll("\\+", "%20");
 
 			return ResponseEntity.ok()
 					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedName + "\"")
-					.contentLength(f.length()).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
-
+					.contentLength(f.length())
+					.contentType(MediaType.APPLICATION_OCTET_STREAM)
+					.body(resource);
 		} catch (Exception e) {
 			log.error("file download error", e);
 			return ResponseEntity.status(500).body("파일 다운로드 실패");

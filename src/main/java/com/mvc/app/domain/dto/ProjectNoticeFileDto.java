@@ -12,5 +12,5 @@ public class ProjectNoticeFileDto {
     private String savefilename;
     private String originalfilename;
     private long   filesize;
-    private long   noticenum;
+    private long   projectNoticeNum; 
 }

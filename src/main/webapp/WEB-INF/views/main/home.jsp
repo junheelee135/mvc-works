@@ -63,7 +63,8 @@
 			<div class="card todo-card">
 				<div class="project-header">
 					<div class="card-title"
-						onclick="location.href='<c:url value="projects/myTask"/>'">나의 태스크</div>
+						onclick="location.href='<c:url value="projects/myTask"/>'">나의
+						태스크</div>
 					<div class="project-nav-wrap">
 						<button class="project-nav" onclick="todoPrev()">‹</button>
 						<button class="project-nav" onclick="todoNext()">›</button>
@@ -197,12 +198,11 @@
 							</c:if>
 
 							<div class="notice-item"
-								onclick="location.href='<c:url value='/projects/projectNotice/projectNoticeDetail?noticenum=${n.noticenum}' />'">
+								onclick="location.href='<c:url value='/projects/projectNotice/projectNoticeDetail?projectNoticeNum=${n.projectNoticeNum}' />'">
 								<div class="notice-subject">[${n.projectName}]
 									${n.subject}</div>
 								<div class="notice-date">${n.regdate}</div>
 							</div>
-
 							<c:if test="${s.index % 2 == 1 || s.last}">
 			</div>
 			</c:if>

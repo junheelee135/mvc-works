@@ -12,31 +12,31 @@ import com.mvc.app.domain.dto.ProjectNoticeFileDto;
 @Mapper
 public interface ProjectNoticeMapper {
 
-	public void insertNotice(ProjectNoticeDto dto);
+    void insertNotice(ProjectNoticeDto dto);
 
-	public void updateNotice(ProjectNoticeDto dto);
+    void updateNotice(ProjectNoticeDto dto);
 
-	public void deleteNotice(@Param("noticenum") long noticenum);
+    void deleteNotice(@Param("projectNoticeNum") long projectNoticeNum);
 
-	public void increaseHit(@Param("noticenum") long noticenum);
+    void increaseHit(@Param("projectNoticeNum") long projectNoticeNum);
 
-	public List<ProjectNoticeDto> listNotice(Map<String, Object> param);
+    List<ProjectNoticeDto> listNotice(Map<String, Object> param);
 
-	public int countNotice(Map<String, Object> param);
+    int countNotice(Map<String, Object> param);
 
-	public ProjectNoticeDto getNotice(@Param("noticenum") long noticenum);
+    ProjectNoticeDto getNotice(@Param("projectNoticeNum") long projectNoticeNum);
 
-	int isManager(@Param("empId") String empId, @Param("projectid") long projectid);
+    int isManager(@Param("empId") String empId, @Param("projectid") long projectid);
 
-	public List<Map<String, Object>> getMyProjects(@Param("empId") String empId);
+    List<Map<String, Object>> getMyProjects(@Param("empId") String empId);
 
-	public void insertFile(ProjectNoticeFileDto dto);
+    List<Map<String, Object>> getMyPmProjects(@Param("empId") String empId);
 
-	public void deleteFile(@Param("filenum") long filenum);
+    void insertFile(ProjectNoticeFileDto dto);
 
-	public List<ProjectNoticeFileDto> getFiles(@Param("noticenum") long noticenum);
+    void deleteFile(@Param("filenum") long filenum);
 
-	public ProjectNoticeFileDto getFile(@Param("filenum") long filenum);
+    List<ProjectNoticeFileDto> getFiles(@Param("projectNoticeNum") long projectNoticeNum);
 
-	List<Map<String, Object>> getMyPmProjects(@Param("empId") String empId);
+    ProjectNoticeFileDto getFile(@Param("filenum") long filenum);
 }

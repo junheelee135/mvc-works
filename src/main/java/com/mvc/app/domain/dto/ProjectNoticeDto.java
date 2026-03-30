@@ -1,7 +1,6 @@
 package com.mvc.app.domain.dto;
 
 import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ProjectNoticeDto {
-    private long   noticenum;
+	
+    private long   projectNoticeNum; 
+    
     private long   projectid;
     private String subject;
     private String content;
@@ -21,10 +22,10 @@ public class ProjectNoticeDto {
     private int    state;
     private String authorempid;
 
-    // JOIN
+    // JOIN 결과 담는 필드
     private String authorName;
     private String projectName;   // project 테이블 JOIN
 
-    // 첨부파일
+    // 첨부파일 리스트
     private List<ProjectNoticeFileDto> files;
 }
