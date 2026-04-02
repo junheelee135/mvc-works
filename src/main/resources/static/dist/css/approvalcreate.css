@@ -629,6 +629,21 @@
     gap: 8px;
     padding: 12px 0 4px;
 }
+.btn-delete-draft {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+}
+.btn-delete-draft:hover { background: #b02a37; }
 .btn-save-temp {
     background: #4e73df;
     color: #fff;

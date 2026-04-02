@@ -34,6 +34,7 @@ public interface ApprovalDocMapper {
     public ApprovalFileDto getFileById(long fileId) throws SQLException;
     public List<ApprovalRefDto> getRefs(long docId) throws SQLException;
     public void deleteFiles(long docId) throws SQLException;
+    public void deleteFile(long fileId) throws SQLException;
     public void deleteRefs(long docId) throws SQLException;
     public void deleteLines(long docId) throws SQLException;
     public void deleteDoc(long docId) throws SQLException;

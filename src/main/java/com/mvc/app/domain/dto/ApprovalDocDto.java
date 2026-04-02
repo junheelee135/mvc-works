@@ -36,4 +36,5 @@ public class ApprovalDocDto {
     private String formCode;
     private long oldDocId;
     private int versionIncrement;
+    private List<Long> keepFileIds;
 }

@@ -44,10 +44,14 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
 
             if (dto.getOldDocId() > 0) {
                 List<ApprovalFileDto> oldFiles = mapper.getFiles(dto.getOldDocId());
+                List<Long> keepIds = dto.getKeepFileIds();
                 for (ApprovalFileDto f : oldFiles) {
+                    if (keepIds != null && keepIds.contains(f.getFileId())) {
+                        continue;
+                    }
                     storageService.deleteFile(uploadPath, f.getSaveFilename());
+                    mapper.deleteFile(f.getFileId());
                 }
-                mapper.deleteFiles(dto.getOldDocId());
                 mapper.deleteRefs(dto.getOldDocId());
                 mapper.deleteLines(dto.getOldDocId());
                 dto.setDocId(dto.getOldDocId());
@@ -158,6 +162,25 @@ public class ApprovalDocServiceImpl implements ApprovalDocService {
             mapper.cancelLines(docId);
         }
         return cnt > 0;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteDraft(long docId, String empId) throws Exception {
+        ApprovalDocDto doc = mapper.getDoc(docId);
+        if (doc == null) return false;
+        if (!empId.equals(doc.getWriterEmpId())) return false;
+        if (!"DRAFT".equals(doc.getDocStatus())) return false;
+
+        List<ApprovalFileDto> oldFiles = mapper.getFiles(docId);
+        for (ApprovalFileDto f : oldFiles) {
+            storageService.deleteFile(uploadPath, f.getSaveFilename());
+        }
+        mapper.deleteFiles(docId);
+        mapper.deleteRefs(docId);
+        mapper.deleteLines(docId);
+        mapper.deleteDoc(docId);
+        return true;
     }
 
     @Override

@@ -168,6 +168,18 @@ export const useApprovalViewStore = defineStore('approvalView', {
 		    }
 		},
 
+		// 임시저장 삭제
+		async deleteDraft(docId) {
+		    try {
+		        await http.post('/approval/doc/' + docId + '/delete');
+		        alert('문서가 삭제되었습니다.');
+		        return true;
+		    } catch (e) {
+		        alert(e.response?.data?.msg || '삭제 처리 중 오류가 발생했습니다.');
+		        return false;
+		    }
+		},
+
 		// 참조자 코멘트
 		async saveRefComment(docId, comment) {
 		    try {

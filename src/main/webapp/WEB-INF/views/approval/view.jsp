@@ -11,7 +11,7 @@
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/projectlist.css" type="text/css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/approvalview.css?v=4" type="text/css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/approvalview.css?v=5" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/approvalcreate.css" type="text/css">
 <meta name="ctx"   content="${pageContext.request.contextPath}">
 <meta name="docId" content="${param.docId}">
@@ -225,6 +225,12 @@
                 </button>
             </template>
 
+            <button class="btn-delete-draft"
+                    v-if="store.doc.writerEmpId === currentEmpId && store.doc.docStatus === 'DRAFT'"
+                    @click="deleteDraft">
+                <span class="material-symbols-outlined" style="font-size:15px">delete</span>
+                삭제
+            </button>
             <button class="btn-cancel"
                     v-if="store.doc.writerEmpId === currentEmpId && store.canCancel"
                     @click="cancelDoc">
@@ -274,7 +280,7 @@
 {
     "imports": {
         "http":              "/dist/util/http.js",
-        "approvalViewStore": "/dist/util/store/approvalViewStore.js?v=8",
+        "approvalViewStore": "/dist/util/store/approvalViewStore.js?v=9",
         "commonCodeStore":   "/dist/util/store/commonCodeStore.js"
     }
 }
@@ -350,6 +356,12 @@
 
             const resubmit = () => {
                 location.href = ctx + '/approval/create?docId=' + docId;
+            };
+
+            const deleteDraft = async () => {
+                if (!confirm('임시저장 문서를 삭제하시겠습니까?')) return;
+                const ok = await store.deleteDraft(docId);
+                if (ok) location.href = ctx + '/approval/list';
             };
 
             const cancelDoc = async () => {
@@ -428,7 +440,7 @@
                 }
             });
 
-            return { store, codeStore, goList, download, cancelDoc, resubmit, openPdf, currentEmpId,
+            return { store, codeStore, goList, download, deleteDraft, cancelDoc, resubmit, openPdf, currentEmpId,
                      apprComment, modalType, modalTitle, modalBtnClass, refCommentText,
                      openApproveModal, processApproval, submitRefComment };
 

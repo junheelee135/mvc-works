@@ -516,6 +516,9 @@
     <delete id="deleteFiles" parameterType="long">
         DELETE FROM approvalFile WHERE docId = #{docId}
     </delete>
+    <delete id="deleteFile" parameterType="long">
+        DELETE FROM approvalFile WHERE fileId = #{fileId}
+    </delete>
     <delete id="deleteRefs" parameterType="long">
         DELETE FROM approvalReference WHERE docId = #{docId}
     </delete>

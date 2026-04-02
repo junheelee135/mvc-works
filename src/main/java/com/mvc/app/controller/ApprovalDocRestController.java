@@ -244,6 +244,22 @@ public class ApprovalDocRestController {
         }
     }
 
+    @PostMapping("/{docId}/delete")
+    public ResponseEntity<?> deleteDraft(@PathVariable("docId") long docId) {
+        try {
+            SessionInfo info = LoginMemberUtil.getSessionInfo();
+            boolean ok = service.deleteDraft(docId, info.getEmpId());
+            if (ok) {
+                return ResponseEntity.ok(Map.of("msg", "문서가 삭제되었습니다."));
+            } else {
+                return ResponseEntity.status(403).body(Map.of("msg", "삭제할 수 없는 문서입니다."));
+            }
+        } catch (Exception e) {
+            log.error("deleteDraft : ", e);
+            return ResponseEntity.badRequest().body(Map.of("msg", "삭제 처리에 실패했습니다."));
+        }
+    }
+
     @PostMapping("/{docId}/cancel")
     public ResponseEntity<?> cancelDoc(@PathVariable("docId") long docId) {
         try {

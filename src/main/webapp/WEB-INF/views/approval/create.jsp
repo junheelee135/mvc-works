@@ -131,6 +131,12 @@
             </div>
 
             <div class="form-footer">
+                <button class="btn-delete-draft"
+                        v-if="store.editMode && store.editDocStatus === 'DRAFT'"
+                        @click="deleteDraft">
+                    <span class="material-symbols-outlined" style="font-size:16px">delete</span>
+                    삭제
+                </button>
                 <button class="btn-save-temp" @click="store.saveDraft()">
                     <span class="material-symbols-outlined" style="font-size:16px">save</span>
                     임시저장
@@ -157,7 +163,7 @@
 {
 	"imports": {
 		"http": "/dist/util/http.js",
-		"approvalCreateStore": "/dist/util/store/approvalCreateStore.js?v=5",
+		"approvalCreateStore": "/dist/util/store/approvalCreateStore.js?v=9",
 		"OrgSearchModal": "/dist/util/component/OrgSearchModal.js?v=2",
         "commonCodeStore": "/dist/util/store/commonCodeStore.js"
 	}
@@ -197,6 +203,12 @@
             // 템플릿 불러오기 모달
             const templateLoadModalVisible = ref(false);
             const templateList = ref([])
+
+            // 임시저장 삭제
+            const deleteDraft = async () => {
+                if (!confirm('임시저장 문서를 삭제하시겠습니까?')) return;
+                await store.deleteDraft();
+            };
 
             // 네비게이션
             const goList = () => { location.href = ctx + '/approval/list'; };
@@ -260,7 +272,7 @@
     				approverModalVisible, referenceModalVisible,
       				approverEmpIds, referenceEmpIds,
                     companionModalVisible, companionEmpIds,
-                    goList, saveTemplate,
+                    deleteDraft, goList, saveTemplate,
                     templateLoadModalVisible, templateList,
                     openTemplateLoad, onLoadTemplate, onDeleteTemplate,
       				drag, onDragStart, onDragOver, onDrop, onDragEnd

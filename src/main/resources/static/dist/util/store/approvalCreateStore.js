@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { toRaw, markRaw } from 'vue';
 import http from 'http';
 
 export const useApprovalCreateStore = defineStore('approvalCreate', {
@@ -19,6 +20,7 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
         approvers: [],
         references: [],
 		attachedFiles: [],
+		existingFiles: [],
 
 		title: '',
 		detailData: {
@@ -118,6 +120,13 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
 		                gradeCode: r.refGradeCode, grade: r.refGradeName
 		            }));
 		        }
+
+		        // 기존 첨부파일 복원
+		        this.existingFiles = (doc.files || []).map(f => ({
+		            fileId: f.fileId,
+		            oriFilename: f.oriFilename,
+		            fileSize: f.fileSize
+		        }));
 		    } catch (e) {
 		        console.error('임시저장 문서 로딩 실패:', e);
 		        alert('문서를 불러오지 못했습니다.');
@@ -196,12 +205,15 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
 		        if (this.attachedFiles.some(f => f.name === file.name && f.size === file.size)) {
 		            return;
 		        }
-		        this.attachedFiles.push(file);
+		        this.attachedFiles.push(markRaw(file));
 		    });
 		},
 				
 		removeFile(idx) {
 		    this.attachedFiles.splice(idx, 1);
+		},
+		removeExistingFile(idx) {
+		    this.existingFiles.splice(idx, 1);
 		},
 
 		formatFileSize(bytes) {
@@ -361,13 +373,16 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
 					
 		        };
 
-				if (this.editMode) data.oldDocId = this.editDocId;
+				if (this.editMode) {
+				    data.oldDocId = this.editDocId;
+				    data.keepFileIds = this.existingFiles.map(f => f.fileId);
+				}
 
 				const formData = new FormData();
 				formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
 
 				this.attachedFiles.forEach(file => {
-				    formData.append('files', file);
+				    formData.append('files', toRaw(file));
 				});
 
 				await http.post('/approval/doc', formData, {
@@ -472,6 +487,7 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
 
 		        if (this.editMode) {
 		            data.oldDocId = this.editDocId;
+		            data.keepFileIds = this.existingFiles.map(f => f.fileId);
 		            if (this.editDocStatus === 'REJECTED') {
 		                data.versionIncrement = 1;
 		            }
@@ -480,7 +496,7 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
 		        const formData = new FormData();
 		        formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
 		        this.attachedFiles.forEach(file => {
-		            formData.append('files', file);
+		            formData.append('files', toRaw(file));
 		        });
 
 		        await http.post('/approval/doc', formData, {
@@ -496,6 +512,20 @@ export const useApprovalCreateStore = defineStore('approvalCreate', {
 		        alert('상신 중 오류가 발생했습니다.');
 		        return false;
 		    }
-		}		
+		},
+
+		async deleteDraft() {
+		    if (!this.editMode || !this.editDocId) return false;
+		    try {
+		        await http.post('/approval/doc/' + this.editDocId + '/delete');
+		        alert('문서가 삭제되었습니다.');
+		        const ctx = document.querySelector('meta[name="ctx"]').content;
+		        location.href = ctx + '/approval/list';
+		        return true;
+		    } catch (e) {
+		        alert(e.response?.data?.msg || '삭제 처리 중 오류가 발생했습니다.');
+		        return false;
+		    }
+		}
     }
 });
