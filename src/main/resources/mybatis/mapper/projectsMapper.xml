@@ -311,11 +311,16 @@
 		TO_CHAR(p.startDate, 'YYYY-MM-DD') AS startDate,
 		TO_CHAR(p.endDate, 'YYYY-MM-DD') AS endDate,
 		p.status,
-		(SELECT MIN(e.NAME)
+		p.progress, (SELECT MIN(e.NAME)
 		FROM EMPPROJECT ep2
 		JOIN EMPLOYEE2 e ON ep2.EMPID = e.EMPID
 		WHERE ep2.PROJECTID = p.PROJECTID AND ep2.ROLE = 'M') AS managerName,
-		TRUNC(p.endDate) - TRUNC(SYSDATE) AS remainDays
+		CASE
+		WHEN p.STARTDATE &gt; TRUNC(SYSDATE) THEN '시작 전'
+		WHEN p.ENDDATE &lt;= TRUNC(SYSDATE) THEN '종료'
+		ELSE TO_CHAR(GREATEST(p.ENDDATE - TRUNC(SYSDATE) + 1, 0)) || ' / ' ||
+		TO_CHAR(TRUNC(p.ENDDATE - p.STARTDATE + 1))
+		END AS remainDays
 		FROM PROJECT p
 		WHERE EXISTS (
 		SELECT 1 FROM EMPPROJECT ep
