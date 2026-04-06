@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				projects: [],
 				selectedProjectId: '',
 				formData: {
-					noticenum: null, // ⭐ 추가
+					projectNoticeNum: null, // ⭐ 추가
 					subject: '',
 					content: '',
 					files: []
@@ -103,12 +103,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			const params = new URLSearchParams(window.location.search);
 
 			const pid = params.get("projectid");
-			const noticenum = params.get("noticenum");
-
+			const projectNoticeNum = params.get("projectNoticeNum");
+			
 			// ⭐ 수정모드 체크
-			if (noticenum) {
+			if (projectNoticeNum) {
 				this.isEdit = true;
-				this.formData.noticenum = noticenum;
+				this.formData.projectNoticeNum = projectNoticeNum;
 			}
 
 			if (pid) this.selectedProjectId = pid;
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			// ⭐ 기존 데이터 로드
 			async loadDetail() {
 				try {
-					const res = await fetch(ctx + '/api/projectnotice/detail?noticenum=' + this.formData.noticenum, {
+					const res = await fetch(ctx + '/api/projectnotice/detail?projectNoticeNum=' + this.formData.projectNoticeNum, {
 						credentials: "include"
 					});
 
@@ -192,9 +192,9 @@ document.addEventListener('DOMContentLoaded', function() {
 				form.append("subject", this.formData.subject);
 				form.append("content", this.formData.content);
 
-				// ⭐ 수정이면 noticenum 추가
+				// ⭐ 수정이면 projectNoticeNum 추가
 				if (this.isEdit) {
-					form.append("noticenum", this.formData.noticenum);
+					form.append("projectNoticeNum", this.formData.projectNoticeNum);
 				}
 
 				this.formData.files.forEach(f => form.append("files", f));

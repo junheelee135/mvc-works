@@ -134,7 +134,7 @@ public class NoticeRestController {
 			if (file == null)
 				return ResponseEntity.notFound().build();
 
-			File savedFile = new File(uploadPath + file.getSavefilename());
+			File savedFile = new File(uploadPath + File.separator + file.getSavefilename());
 			if (!savedFile.exists())
 				return ResponseEntity.notFound().build();
 

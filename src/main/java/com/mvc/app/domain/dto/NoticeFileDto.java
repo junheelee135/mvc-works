@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class NoticeFileDto {
     private long   filenum;
-    private long   savefilename;
+    private String   savefilename;
     private String originalfilename;
     private long    filesize;
     private long   noticenum;

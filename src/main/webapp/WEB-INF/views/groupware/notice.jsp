@@ -304,7 +304,7 @@ const app = createApp({
 
         const downloadFile = async (filenum) => {
             try {
-                const res = await fetch(`${ctx}/api/notice/file/${filenum}`);
+                const res = await fetch(`\${ctx}/api/notice/file/\${filenum}`);
                 if (!res.ok) {
                     alert('파일을 찾을 수 없습니다.');
                     return;

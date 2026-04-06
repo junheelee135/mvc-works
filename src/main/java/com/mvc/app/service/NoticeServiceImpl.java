@@ -45,7 +45,7 @@ public class NoticeServiceImpl implements NoticeService {
             for (long filenum : deleteFileNums) {
                 NoticeFileDto file = mapper.getFile(filenum);
                 if (file != null) {
-                    new File(uploadPath + file.getSavefilename()).delete();
+                    new File(uploadPath + File.separator + file.getSavefilename()).delete();
                     mapper.deleteFile(filenum);
                 }
             }
@@ -100,7 +100,7 @@ public class NoticeServiceImpl implements NoticeService {
     public void deleteFile(long filenum) throws Exception {
         NoticeFileDto file = mapper.getFile(filenum);
         if (file != null) {
-            new File(uploadPath + file.getSavefilename()).delete();
+            new File(uploadPath + File.separator + file.getSavefilename()).delete();
             mapper.deleteFile(filenum);
         }
     }
@@ -113,14 +113,17 @@ public class NoticeServiceImpl implements NoticeService {
 
         for (MultipartFile f : files) {
             if (f.isEmpty()) continue;
-
+            
+            String originalFilename = f.getOriginalFilename();
+            
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             // 저장 파일명: UUID 기반 숫자 (savefilename이 NUMBER 타입이므로)
             long savedName = Math.abs(UUID.randomUUID().getMostSignificantBits());
-            f.transferTo(new File(uploadPath + savedName));
+            f.transferTo(new File(uploadPath + File.separator + savedName + extension));
 
             NoticeFileDto fileDto = new NoticeFileDto();
             fileDto.setNoticenum(noticenum);
-            fileDto.setSavefilename(savedName);
+            fileDto.setSavefilename(savedName + extension);
             fileDto.setOriginalfilename(f.getOriginalFilename());
             fileDto.setFilesize((int) f.getSize());
             mapper.insertFile(fileDto);
